@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "django-mtl"
+version = "0.1.0"
+description = ""
+authors = ["Cristian Moraes <cristian.hennequin1@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "3.12.*"
+django = "^5.1"
+django-types = "^0.19.1"
+django-stubs-ext = "^5.0.4"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.6.3"
+taskipy = "^1.13.0"
+
+[tool.ruff]
+line-lenght = 79
+extend-exclude =['Django_agenda']
+
+[tool.ruff.lint]
+preview = true
+select = ['I','F','E','W','PL', 'PT']
+
+[tool.ruff.format]
+preview = true
+quote-style = 'single'
+
+[tool.taskipy.tasks]
+run = 'poetry run python manage.py runserver'
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
