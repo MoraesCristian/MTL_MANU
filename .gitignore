@@ -143,5 +143,5 @@ GitHub.sublime-settings
 .history
 
 #ARQUIVOS NAO USADOS 
-COMAND_USADOS.txt
+Comandos.txt
 local_settings.py
