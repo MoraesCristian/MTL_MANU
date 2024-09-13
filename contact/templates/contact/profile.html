@@ -1,0 +1,10 @@
+{% extends 'global/base.html' %}
+
+{% block content %}
+  <h1>Perfil do Usuário</h1>
+  <p><strong>Nome:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</p>
+  <p><strong>Email:</strong> {{ usuario.email }}</p>
+  <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
+  <p><strong>Empresa:</strong> {{ usuario.empresa.razao_social }}</p>
+  <p><strong>Tipo de Usuário:</strong> {{ usuario.get_tipo_usuario_display }}</p>
+{% endblock %}

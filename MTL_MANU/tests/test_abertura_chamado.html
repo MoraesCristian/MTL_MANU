@@ -1,39 +1,53 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abertura de Chamado</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h2>Abertura de Chamado</h2>
-        <form action="/submit_chamado" method="POST">
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" required>
-
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-
-            <label for="tipo_manutencao">Tipo de Manutenção:</label>
-            <select id="tipo_manutencao" name="tipo_manutencao" required>
-                <option value="preventiva">Preventiva</option>
-                <option value="corretiva">Corretiva</option>
-                <option value="emergencial">Emergencial</option>
-            </select>
-
-            <label for="localizacao">Localização:</label>
-            <input type="text" id="localizacao" name="localizacao" required>
-
-            <label for="descricao">Descrição do Chamado:</label>
-            <textarea id="descricao" name="descricao" required></textarea>
-
-            <button type="submit">Enviar Chamado</button>
-        </form>
-    </div>
-</body>
-</html>
+body {
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+.sidebar {
+    width: 20%;
+    background-color: #f4f4f4;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+.main-content {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+}
+.client-info {
+    background-color: #007bff;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+.chat-window {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #e9ecef;
+}
+.chat-input {
+    display: flex;
+    padding: 10px;
+    background-color: #f4f4f4;
+    border-top: 1px solid #ccc;
+}
+.chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.chat-input button {
+    padding: 10px 20px;
+    margin-left: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
 
 

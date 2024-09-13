@@ -16,6 +16,7 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('tipo_usuario', 'admin')
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
@@ -25,16 +26,21 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
+    USER_TYPE_CHOICES = [
+        ('admin', 'Administrador'),
+        ('manager', 'Gerente'),
+        ('user', 'Técnico'),
+    ]
     id = models.AutoField(primary_key=True) 
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
-    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True, blank=True)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=30)
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
     telefone = models.CharField(max_length=50, blank=True)
     email = models.EmailField(max_length=255, unique=True)
-
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
+    tipo_usuario = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='user')
+    
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
@@ -42,6 +48,15 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+    
+    def can_create_user(self):
+        return self.tipo_usuario in ['admin', 'manager']
+
+    def can_create_admin(self):
+        return self.tipo_usuario == 'admin'
+
+    def can_create_manager(self):
+        return self.tipo_usuario in ['admin', 'manager']
 
 class Empresa(models.Model):
     id = models.AutoField(primary_key=True)

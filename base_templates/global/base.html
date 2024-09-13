@@ -2,24 +2,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="{% static 'global/css/style.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'global/css/home.css' %}">
+    <!-- Boxicons CDN Link -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-  <header>
-    {% if user.is_authenticated %}
-      <form method="post" action="{% url 'logout' %}" style="display: inline;">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-      </form>
-    {% endif %}
-  </header>
-  <main>
-    {% block content %}
-    {% endblock %}
-  </main>
+  <div class="sidebar">
+    <div class="logo_content">
+      <div class="logo">
+        <i class='bx bxl-typescript'></i>
+        <div class="logo_name">MTL MANU</div>
+      </div>
+      <i class='bx bx-menu' id="btn" ></i>
+    </div>
+    <ul class="nav_list">
+      <li class="search-container">
+        <i class='bx bx-search search-icon'></i>
+        <input type="text" placeholder="Procurar">
+      </li>
+      <li>
+        <a href="{% url 'home' %}" class="nav-link">
+          <i class='bx bx-home-alt-2'></i>
+          <span class="links_name">Inicio</span>
+        </a>
+        <span class="tooltip">Inicio</span>
+      </li>
+      <li>
+        <a href="{% url 'contact:empresas' %}">
+          <i class='bx bx-building'></i>
+          <span class="links_name">Empresas</span>
+        </a>
+        <span class="tooltip">Empresas</span>
+      </li>
+      <li>
+        <a href="{% url 'contact:chamados' %}" class="nav-link">
+          <i class='bx bx-phone'></i>
+          <span class="links_name">Chamados</span>
+        </a>
+        <span class="tooltip">Chamados</span>
+      </li>
+      <li>
+        <a href="#">
+          <i class='bx bx-user-circle' ></i>
+          <span class="links_name">Perfil</span>
+        </a>
+        <span class="tooltip">Perfil</span>
+      </li>
+    </ul>
+    <div class="profile_content">
+      <div class="profile">
+        <div class="profile_details">
+          {% comment %} <img src="{% static 'global/images/img.jpg' %}" alt=""> {% endcomment %}
+          <div class="name_job">
+            <div class="name">Cristian Moraes</div>
+            <div class="job">Desnvolvimento</div>
+          </div>
+        </div>
+        <a href="{% url 'logout' %}" id="log_out"><i class='bx bx-log-out' ></i></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="home_content">
+    <div class="text">
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+
+  <script>
+    let btn = document.querySelector("#btn");
+    let sidebar = document.querySelector(".sidebar");
+    let searchBtn = document.querySelector(".bx-search");
+    let searchInput = document.querySelector(".search-box input");
+
+    btn.onclick = function() {
+      sidebar.classList.toggle("active");
+    }
+    
+    searchBtn.onclick = function() {
+      if(!sidebar.classList.contains("active")) {
+        sidebar.classList.toggle("active");
+      }
+      searchInput.focus();
+    }
+</script>
+  {% block extra_js %}{% endblock %}
 </body>
 </html>
