@@ -23,7 +23,7 @@ h1{
   border: 1px solid rgb(75, 82, 92);
   border-radius: 10px;
   background-color: #737886;
-  text-align: center;
+  text-align: left;
 }
 
 .grid-container{
@@ -33,3 +33,4 @@ h1{
   gap: 15px;
   justify-content: center;
 }
+

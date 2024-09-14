@@ -1,0 +1,16 @@
+{% extends 'global/base.html' %}
+{% block content %}
+  <h1>{{ empresa.razao_social }}</h1>
+  <p><strong>Nome Fantasia:</strong> {{ empresa.nome_fantasia }}</p>
+  <p><strong>CNPJ:</strong> {{ empresa.cnpj }}</p>
+  <p><strong>Inscrição Estadual:</strong> {{ empresa.is_estadual }}</p>
+  <p><strong>Inscrição Municipal:</strong> {{ empresa.is_municipal }}</p>
+  <p><strong>Logradouro:</strong> {{ empresa.logradouro }}</p>
+  <p><strong>Estado:</strong> {{ empresa.get_estado_display }}</p>
+  <p><strong>Telefone:</strong> {{ empresa.telefone }}</p>
+  <p><strong>Email:</strong> {{ empresa.email_empresa }}</p>
+  <p><strong>Observação:</strong> {{ empresa.observacao }}</p>
+  <p><strong>Prefixo:</strong> {{ empresa.prefixo }}</p>
+  <a href="{% url 'contact:edit_empresas' empresa.id %}">Editar</a>
+  <a href="{% url 'contact:empresas_view' %}">Voltar</a>
+{% endblock %}

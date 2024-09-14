@@ -1,0 +1,10 @@
+{% extends 'global/base.html' %}
+{% block content %}
+  <h1>Editar Empresa</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar</button>
+  </form>
+  <a href="{% url 'contact:empresas_details' empresa.id %}">Cancelar</a>
+{% endblock %}

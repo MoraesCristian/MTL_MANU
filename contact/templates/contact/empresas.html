@@ -9,30 +9,19 @@
 
 {% block content %}
   <div class="grid-container">
+    <div class="card">
+      <a href="{% url 'contact:adicionar_empresa' %}">Adicionar Empresa</a>
+      <i class='bx bx-alarm-add' ></i>
+      <li><strong>Adicionar empresa:</strong></li>
+    </div>
     {% for empresa in empresas %}
       <div class="card">
-        <li><strong>Empresa:</strong> {{ empresa.razao_social }} </li>
+        <i class='bx bx-building'></i>
+        <a href="{% url 'contact:empresas_details' empresa.id %}">{{ empresa.razao_social }}</a>
         <li><strong>Nome Fantasia:</strong>{{ empresa.nome_fantasia }}</li>
         <li><strong>CNPJ:</strong> {{ empresa.cnpj }}</li>
       </div>
-      {% endfor %}
+    {% endfor %}
 {% endblock %}
 
 
-  <!-- <h1>Empresas</h1>
-  <ul>
-    {% for empresa in empresas %}
-      <li><strong>Nome Empresa:</strong>{{ empresa.razao_social }}</li>
-      <li><strong>Nome Fantasia:</strong>{{ empresa.nome_fantasia }}</li>
-      <li><strong>CNPJ:</strong>{{ empresa.cnpj }}</li>
-      <li><strong>Inscrição Estadual:</strong>{{ empresa.is_estadual }}</li>
-      <li><strong>Inscrição Municipal:</strong>{{ empresa.is_municipal }}</li>
-      <li><strong>Logradouro:</strong>{{ empresa.logradouro }}</li>
-      <li><strong>Estado:</strong>{{ empresa.estado }}</li>
-      <li><strong>Telefone:</strong>{{ empresa.telefone}}</li>
-      <li><strong>Email empresa:</strong>{{ empresa.email_empresa }}</li>
-      <li><strong>Observação:</strong>{{ empresa.observacao }}</li>
-      <li><strong>Prefixo:</strong>{{ empresa.prefixo }}</li>
-
-    {% endfor %}
-  </ul> --> 
