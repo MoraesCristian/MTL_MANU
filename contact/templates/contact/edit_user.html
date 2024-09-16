@@ -1,0 +1,12 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block content %}
+  <h1>Editar Usuário</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="{% url 'contact:user_detail' usuario.id %}" class="btn btn-secondary">Cancelar</a>
+  </form>
+{% endblock %}

@@ -24,3 +24,15 @@ class AdicionarEmpresaForm(forms.ModelForm):
             'observacao': forms.TextInput(attrs={'class': 'form-control'}),
             'prefixo': forms.TextInput(attrs={'class': 'form-control'}),
         }
+        
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop('request', None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        empresa = super().save(commit=False)
+        
+        if commit:
+            empresa.criado_por = self.request.user
+            empresa.save()
+        return empresa

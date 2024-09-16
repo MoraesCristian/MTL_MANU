@@ -1,0 +1,16 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block content %}
+  <h1>Detalhes do Usuário</h1>
+  <div class="card">
+      <i class='bx bx-user-circle'></i>
+      <li><strong>Nome:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</li>
+      <li><strong>Email:</strong> {{ usuario.email }}</li>
+      <li><strong>Empresa:</strong> {{ usuario.empresa }}</li>
+      <li><strong>Telefone:</strong> {{ usuario.telefone }}</li>
+      <li><strong>Tipo de Usuário:</strong> {{ usuario.get_tipo_usuario_display }}</li>
+      <li><strong>Criado por :</strong> {{ usuario.criado_por }}</li>
+      <a href="{% url 'contact:edit_user' user_id=usuario.id %}" class="btn btn-primary">Editar</a>
+  </div>
+{% endblock %}

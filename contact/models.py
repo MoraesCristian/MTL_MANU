@@ -2,44 +2,40 @@
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.db import models
+from django.conf import settings
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         if not email:
-            raise ValueError('O email deve ser fornecido')
+            raise ValueError('The Email field must be set')
         email = self.normalize_email(email)
-        user = self.model(email=email, **extra_fields)
+        user = self.model(email=email, first_name=first_name, last_name=last_name, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password=None, **extra_fields):
+    def create_superuser(self, email, first_name, last_name, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('tipo_usuario', 'admin')
+        return self.create_user(email, first_name, last_name, password, **extra_fields)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
-
-        return self.create_user(email, password, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_CHOICES = [
         ('admin', 'Administrador'),
         ('manager', 'Gerente'),
-        ('user', 'Técnico'),
-    ]
+        ('user', 'Técnico'),]
     id = models.AutoField(primary_key=True) 
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True)
+    empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True, blank=True)
     telefone = models.CharField(max_length=50, blank=True)
     email = models.EmailField(max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     tipo_usuario = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='user')
+    criado_por = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='usuarios_criados')
     
     objects = CustomUserManager()
 
@@ -57,7 +53,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def can_create_manager(self):
         return self.tipo_usuario in ['admin', 'manager']
-
+    
+    @property
+    def tipo_usuario_display(self):
+        return dict(self.USER_TYPE_CHOICES).get(self.tipo_usuario, 'Desconhecido')
+    
+    
 class Empresa(models.Model):
     id = models.AutoField(primary_key=True)
     razao_social = models.CharField(max_length=255)
@@ -100,13 +101,14 @@ class Empresa(models.Model):
     email_empresa = models.EmailField(max_length=255)
     observacao = models.CharField(max_length=255)
     prefixo = models.CharField(max_length=15, blank=True, default='') 
+    criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas_criadas')
 
     def __str__(self):
         return self.razao_social
 
 class Chamado(models.Model):
     id = models.AutoField(primary_key=True)
-    numero_ordem = models.CharField(max_length=20, unique=True, editable=False)  # Campo para o número de ordem formatado
+    numero_ordem = models.CharField(max_length=20, unique=True, editable=False)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True)
@@ -114,7 +116,7 @@ class Chamado(models.Model):
         ('preventiva', 'preventiva'),
         ('eletrica', 'Manutenção Elétrica'),
         ('hidraulica', 'Manutenção Hidráulica'),
-        # Adicione mais tipos conforme necessário
+
     ])
     localizacao_atv = models.CharField(max_length=255, choices=[
         ('interno', 'Interno'),
@@ -125,7 +127,7 @@ class Chamado(models.Model):
         ('Normal', 'Prioridade Normal'),
         ('Baixa', 'Baixa Prioridade')
     ])
-    local_especifico = models.CharField(max_length=255)  #Local da manuntenção
+    local_especifico = models.CharField(max_length=255)
     data_criacao = models.DateTimeField(auto_now_add=True)
     empresa_nome_fantasia = models.CharField(max_length=255, blank=True)
     empresa_cnpj = models.CharField(max_length=18, blank=True)

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    {% block title %}{% endblock title %}
     <link rel="stylesheet" href="{% static 'global/css/home.css' %}">
     <!-- Boxicons CDN Link -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -32,25 +32,25 @@
         <span class="tooltip">Inicio</span>
       </li>
       <li>
-        <a href="{% url 'contact:empresas_view' %}">
+      <a href="{% url 'contact:empresas_view' %}" class="nav-link">
           <i class='bx bx-building'></i>
           <span class="links_name">Empresas</span>
         </a>
         <span class="tooltip">Empresas</span>
       </li>
       <li>
-        <a href="{% url 'contact:chamados' %}" class="nav-link">
+        <a href="{% url 'contact:listar_chamados' %}" class="nav-link">
           <i class='bx bx-phone'></i>
           <span class="links_name">Chamados</span>
         </a>
         <span class="tooltip">Chamados</span>
       </li>
       <li>
-        <a href="#">
+        <a href="{% url 'contact:list_user' %}" class="nav-link">
           <i class='bx bx-user-circle' ></i>
-          <span class="links_name">Perfil</span>
+          <span class="links_name">Usuarios</span>
         </a>
-        <span class="tooltip">Perfil</span>
+        <span class="tooltip">Usuarios</span>
       </li>
     </ul>
     <div class="profile_content">
@@ -58,8 +58,10 @@
         <div class="profile_details">
           {% comment %} <img src="{% static 'global/images/img.jpg' %}" alt=""> {% endcomment %}
           <div class="name_job">
-            <div class="name">Cristian Moraes</div>
-            <div class="job">Desnvolvimento</div>
+            <a href="{% url 'contact:profile' %}" class="nav-link">
+              <div class="name">{{ user.first_name }} {{ user.last_name }}</div>
+              <div class="job">{{ user.tipo_usuario_display }}</div>
+            </a>
           </div>
         </div>
         <a href="{% url 'logout' %}" id="log_out"><i class='bx bx-log-out' ></i></a>

@@ -1,0 +1,31 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
+{% endblock %}
+
+{% block content %}
+  <h1>Lista de Usuários</h1>
+  <div class="grid-container">
+      <div class="card">
+          <a href="{% url 'contact:create_user' %}" class="href">
+              <i class='bx bx-alarm-add'></i>
+              <strong>Adicionar usuário:</strong>
+          </a>
+      </div>
+  </div>    
+  {% for usuario in usuarios %}
+    <div class="card">
+        <i class='bx bx-user-circle'></i>
+        <a href="{% url 'contact:user_detail' user_id=usuario.id %}">{{ usuario.first_name }} {{ usuario.last_name }}</a>
+        <ul>
+          <li><strong>Nome:</strong> {{ usuario.first_name }}</li>
+          <li><strong>Email:</strong> {{ usuario.email }}</li>
+          <li><strong>Cargo:</strong> {{ user.tipo_usuario_display }}</li>
+        </ul>
+    </div>
+  {% empty %}
+    <p>Nenhum usuário encontrado.</p>
+  {% endfor %}
+{% endblock %}
