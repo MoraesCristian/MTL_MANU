@@ -2,7 +2,7 @@
 {% block content %}
 <h2>Lista de Chamados</h2>
 
-{% if user_tipo == 'admin' or user_tipo == 'manager' %}
+{% if user_tipo == 'admin' or user_tipo == 'cliente' %}
 <form method="get">
     <select name="empresa">
         <option value="">Selecione uma empresa</option>
@@ -13,6 +13,7 @@
     <button type="submit">Filtrar</button>
 </form>
 {% endif %}
+
 
 <table>
     <thead>

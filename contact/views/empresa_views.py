@@ -3,8 +3,12 @@ from contact.models import Empresa
 from django.contrib.auth.decorators import login_required, user_passes_test
 from contact.forms.empresa_forms import AdicionarEmpresaForm, EmpresaForm
 
+def is_admin(user):
+    return user.is_authenticated and user.tipo_usuario == 'admin'
+
 def is_admin_or_manager(user):
     return user.is_authenticated and (user.is_superuser or user.tipo_usuario == 'manager')
+
 
 @user_passes_test(is_admin_or_manager)
 @login_required
@@ -41,11 +45,16 @@ def empresa_detalhes_view(request, empresa_id):
 
     return render(request, 'contact/empresas_details.html', {'empresa': empresa})
 
+
 @user_passes_test(is_admin_or_manager)
 @login_required
 def adicionar_empresa_view(request):
+    user = request.user
+    if user.tipo_usuario != 'admin':
+        return redirect('contact:empresas_view')
+    
     if request.method == 'POST':
-        form = AdicionarEmpresaForm(request.POST, request= request)
+        form = AdicionarEmpresaForm(request.POST, request=request)
         form.request = request 
         if form.is_valid():
             form.save()
@@ -54,9 +63,14 @@ def adicionar_empresa_view(request):
         form = AdicionarEmpresaForm()
     return render(request, 'contact/adicionar_empresa.html', {'form': form})
 
+
 @user_passes_test(is_admin_or_manager)
 @login_required
 def editar_empresa_view(request, empresa_id):
+    user = request.user
+    if user.tipo_usuario != 'admin':
+        return redirect('contact:empresas_view')
+    
     empresa = get_object_or_404(Empresa, id=empresa_id)
     if request.method == 'POST':
         form = EmpresaForm(request.POST, instance=empresa)

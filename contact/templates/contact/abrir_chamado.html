@@ -1,0 +1,39 @@
+{% extends 'global/base.html' %}
+{% block content %}
+<h2>Abrir Chamado</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="empresa">Empresa:</label>
+    <select id="empresa" name="empresa" required>
+        {% for empresa in empresas %}
+            <option value="{{ empresa.id }}">{{ empresa.nome_fantasia }}</option>
+        {% endfor %}
+    </select><br>
+
+    <label for="localizacaoAtv">Localização da Atividade:</label>
+    <select id="localizacaoAtv" name="localizacaoAtv" required>
+        <option value="interno">Interno</option>
+        <option value="externo">Externo</option>
+    </select><br>
+
+    <label for="tipoManutencao">Tipo de Manutenção:</label>
+    <select id="tipoManutencao" name="tipoManutencao" required>
+        <option value="preventiva">Preventiva</option>
+        <option value="emergencial">Emergencial</option>
+        <option value="corretiva">Corretiva</option>
+    </select><br>
+
+    <label for="area">Área:</label>
+    <select id="area" name="area" required>
+        <option value="eletrica">Elétrica</option>
+        <option value="hidraulica">Hidráulica</option>
+        <option value="civil">Civil</option>
+    </select><br>
+
+    <label for="descricao">Descrição:</label>
+    <textarea id="descricao" name="descricao" required></textarea><br>
+
+    <button type="submit">Criar Chamado</button>
+</form>
+{% endblock %}

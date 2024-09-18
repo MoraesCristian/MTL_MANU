@@ -114,9 +114,8 @@ class Chamado(models.Model):
     descricao = models.TextField(blank=True)
     tipo_manutencao = models.CharField(max_length=255, choices=[
         ('preventiva', 'preventiva'),
-        ('eletrica', 'Manutenção Elétrica'),
-        ('hidraulica', 'Manutenção Hidráulica'),
-
+        ('emergial', 'emergial'),
+        ('corretiva', 'corretiva'),
     ])
     localizacao_atv = models.CharField(max_length=255, choices=[
         ('interno', 'Interno'),
@@ -137,7 +136,7 @@ class Chamado(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk: 
-            prefixo = self.usuario.empresa.prefixo  # Obtém o prefixo da empresa
+            prefixo = self.usuario.empresa.prefixo
             max_numero = Chamado.objects.filter(
                 numero_ordem__startswith=prefixo
             ).aggregate(models.Max('numero_ordem'))['numero_ordem__max']
@@ -148,7 +147,7 @@ class Chamado(models.Model):
             else:
                 novo_numero = 1
 
-            self.numero_ordem = f'{prefixo}{str(novo_numero).zfill(6)}'  # Formata o número com 6 dígitos
+            self.numero_ordem = f'{prefixo}{str(novo_numero).zfill(6)}'
         if self.usuario:
             self.empresa_nome_fantasia = self.usuario.empresa.nome_fantasia
             self.empresa_cnpj = self.usuario.empresa.cnpj

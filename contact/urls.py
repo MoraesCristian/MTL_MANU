@@ -14,5 +14,6 @@ urlpatterns = [
     path('list-users/<int:user_id>/', views.user_detail_view, name='user_detail'),
     path('list-users/', views.list_users_view, name='list_user'),
     path('chamados/', views.listar_chamados, name='listar_chamados'),
+    path('abrir_chamado/', views.abrir_chamado, name='abrir_chamado'),
     path('profile/', views.profile_view, name='profile'),
 ]
