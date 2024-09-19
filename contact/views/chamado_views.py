@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from contact.models import Chamado, Empresa
+from contact.models import Chamado, Empresa, Tarefa
 from django.http import HttpResponseForbidden
+from django.http import JsonResponse
+from contact.forms.chamado_forms import ChamadoForm
 
 
 @login_required
@@ -39,47 +41,40 @@ def listar_chamados(request):
 def abrir_chamado(request):
     user = request.user
 
-    # Verifica se o usuário tem permissão para abrir chamados
-    if user.tipo_usuario not in ['admin', 'cliente']:
-        return HttpResponseForbidden("Você não tem permissão para acessar esta página.")
-
-    if request.method == 'POST':
-        empresa_id = request.POST.get('empresa')
-        localizacao_atv = request.POST.get('localizacaoAtv')
-        tipo_manutencao = request.POST.get('tipoManutencao')
-        area = request.POST.get('area')
-        descricao = request.POST.get('descricao')
-
-        # Verifica se a empresa existe
-        try:
-            empresa = Empresa.objects.get(id=empresa_id)
-        except Empresa.DoesNotExist:
-            return HttpResponseForbidden("Empresa selecionada não existe.")
-
-        # Verifica se a empresa está vinculada ao cliente
-        if user.tipo_usuario == 'cliente':
-            if empresa.id != user.empresa.id:
-                return HttpResponseForbidden("Você não pode abrir um chamado para esta empresa.")
-
-        chamado = Chamado(
-            empresa_id=empresa_id,
-            localizacao_atv=localizacao_atv,
-            tipo_manutencao=tipo_manutencao,
-            area=area,
-            descricao=descricao,
-            usuario=user
-        )
-        chamado.save()
-
-        return redirect('listar_chamados')
-
-    # Filtra empresas para exibir apenas as permitidas para o cliente
+    # Verifique se o usuário tem a empresa vinculada
     if user.tipo_usuario == 'cliente':
-        empresas = Empresa.objects.filter(id=user.empresa.id)
+        if user.empresa is None:
+            return HttpResponseForbidden("Usuário não está vinculado a nenhuma empresa.")
+        
+        # Obtenha a empresa associada ao usuário
+        empresa_id = user.empresa.id
+        empresas = Empresa.objects.filter(id=empresa_id)
     else:
         empresas = Empresa.objects.all()
+    
+    # Debug: Verifique se as empresas estão sendo carregadas corretamente
+    print(f'Empresas carregadas: {empresas}')
+
+    if request.method == 'POST':
+        form = ChamadoForm(request.POST, empresas=empresas)
+        if form.is_valid():
+            chamado = form.save(commit=False)
+            chamado.usuario = user
+            chamado.save()
+            return redirect('contact:listar_chamados')
+    else:
+        form = ChamadoForm(empresas=empresas)
 
     return render(request, 'contact/abrir_chamado.html', {
+        'form': form,
         'empresas': empresas,
     })
+
+def get_tarefas(request):
+    area = request.GET.get('area')
+    if area:
+        tarefas = Tarefa.objects.filter(area=area).values('id', 'descricao')
+        tarefas_list = list(tarefas)
+        return JsonResponse(tarefas_list, safe=False)
+    return JsonResponse({'error': 'Área não especificada'}, status=400)
 

@@ -15,5 +15,7 @@ urlpatterns = [
     path('list-users/', views.list_users_view, name='list_user'),
     path('chamados/', views.listar_chamados, name='listar_chamados'),
     path('abrir_chamado/', views.abrir_chamado, name='abrir_chamado'),
+    path('tarefas/', views.get_tarefas, name='get_tarefas'),
+    path('listar-chamados/', views.listar_chamados, name='listar_chamados'),
     path('profile/', views.profile_view, name='profile'),
 ]

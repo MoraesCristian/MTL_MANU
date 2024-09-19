@@ -4,37 +4,43 @@
 
 {% if user_tipo == 'admin' or user_tipo == 'cliente' %}
 <form method="get">
-    <select name="empresa">
-        <option value="">Selecione uma empresa</option>
-        {% for empresa in empresas %}
-        <option value="{{ empresa.nome_fantasia }}">{{ empresa.nome_fantasia }}</option>
-        {% endfor %}
-    </select>
-    <button type="submit">Filtrar</button>
+  <select name="empresa">
+    <option value="">Selecione uma empresa</option>
+    {% for empresa in empresas %}
+    <option value="{{ empresa.nome_fantasia }}">{{ empresa.nome_fantasia }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
 </form>
 {% endif %}
 
-
+<div class="grid-container">
+  <div class="card">
+    <a href="{% url 'contact:abrir_chamado' %}" class='bx bx-alarm-add'>Abrir Chamado</a>
+    <i class='bx bx-alarm-add' ></i>
+    <li><strong>Abrir Chamado</strong></li>
+  </div>
+</div>
 <table>
-    <thead>
-        <tr>
-            <th>Número da Ordem</th>
-            <th>Empresa</th>
-            <th>Usuário</th>
-            <th>Título</th>
-            <th>Data de Criação</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for chamado in chamados %}
-        <tr>
-            <td>{{ chamado.numero_ordem }}</td>
-            <td>{{ chamado.empresa_nome_fantasia }}</td>
-            <td>{{ chamado.get_usuario_nome }}</td>
-            <td>{{ chamado.titulo }}</td>
-            <td>{{ chamado.data_criacao }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+  <thead>
+    <tr>
+      <th>Número da Ordem</th>
+      <th>Empresa</th>
+      <th>Usuário</th>
+      <th>Título</th>
+      <th>Data de Criação</th>
+    </tr>
+</thead>
+  <tbody>
+    {% for chamado in chamados %}
+    <tr>
+      <td>{{ chamado.numero_ordem }}</td>
+      <td>{{ chamado.empresa_nome_fantasia }}</td>
+      <td>{{ chamado.get_usuario_nome }}</td>
+      <td>{{ chamado.titulo }}</td>
+      <td>{{ chamado.data_criacao }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
 </table>
 {% endblock %}

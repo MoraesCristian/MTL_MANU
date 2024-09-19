@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 from django.db import models
 from django.conf import settings
 
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         if not email:
@@ -105,6 +106,18 @@ class Empresa(models.Model):
 
     def __str__(self):
         return self.razao_social
+    
+class Tarefa(models.Model):
+    area = models.CharField(max_length=255, choices=[
+        ('Eletrica', 'Elétrica'),
+        ('Hidraulica', 'Hidraulica'),
+        ('Civil', 'Civil'),
+    ])
+    descricao = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f'{self.area} - {self.descricao}'
+
 
 class Chamado(models.Model):
     id = models.AutoField(primary_key=True)
@@ -126,6 +139,13 @@ class Chamado(models.Model):
         ('Normal', 'Prioridade Normal'),
         ('Baixa', 'Baixa Prioridade')
     ])
+    area_chamado = models.CharField(max_length=255, choices=[
+        ('Eletrica', 'Elétrica'),
+        ('Hidraulica', 'Hidraulica'),
+        ('Civil', 'Civil'),
+    ],default='Não especificado')
+    
+    tarefa = models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True)
     local_especifico = models.CharField(max_length=255)
     data_criacao = models.DateTimeField(auto_now_add=True)
     empresa_nome_fantasia = models.CharField(max_length=255, blank=True)
@@ -168,6 +188,7 @@ class Chamado(models.Model):
 
     def get_usuario_nome(self):
         return f'{self.usuario.first_name} {self.usuario.last_name}'
+        
 
 class ImagemChamado(models.Model):
     chamado = models.ForeignKey('Chamado', on_delete=models.CASCADE, related_name='imagens')
@@ -182,3 +203,4 @@ class ImagemChamado(models.Model):
 
     def __str__(self):
         return f'{self.numero_ordem} - {self.tipo_imagem}'
+

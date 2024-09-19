@@ -3,7 +3,7 @@ from contact import models
 
 @admin.register(models.Empresa)
 class EmpresaAdmin(admin.ModelAdmin):
-    list_display = ('id','razao_social','cnpj','email_empresa','telefone')
+    list_display = ('id','razao_social','cnpj','email_empresa','telefone','nome_fantasia')
     #list_filter = ('razao_social',)
     search_fields = ('razao_social','cnpj','razao_social','nome_fantasia',)
     list_per_page = 20
