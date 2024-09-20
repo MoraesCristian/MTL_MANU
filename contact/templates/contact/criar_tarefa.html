@@ -1,0 +1,12 @@
+{% extends 'global/base.html' %}
+{% block content %}
+<h2>Criar Tarefa</h2>
+
+<form method="post" action="{% url 'contact:criar_tarefa' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Criar Tarefa</button>
+</form>
+
+<a href="{% url 'contact:listar_tarefas' %}">Voltar para a lista de tarefas</a>
+{% endblock %}

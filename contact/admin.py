@@ -25,3 +25,11 @@ class ChamadoAdmin(admin.ModelAdmin):
 @admin.register(models.ImagemChamado)
 class ImagemChamadoAdmin(admin.ModelAdmin):
     ...
+    
+@admin.register(models.Area)
+class AreaAdmin(admin.ModelAdmin):
+    list_display = ('nome',)
+    search_fields = ('nome',)
+    list_per_page = 50
+    list_max_show_all = 100
+    list_display_links = ('nome',)

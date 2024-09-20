@@ -1,0 +1,25 @@
+{% extends 'global/base.html' %}
+{% block content %}
+<h2>Lista de Áreas</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nome da Área</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for area in areas %}
+        <tr>
+            <td><a href="{% url 'contact:detalhes_area' area.id %}">{{ area.nome }}</a></td>  <!-- Link para detalhes -->
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="1">Nenhuma área encontrada.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'contact:criar_area' %}">Adicionar Nova Área</a>
+{% endblock %}

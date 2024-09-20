@@ -1,0 +1,13 @@
+
+{% extends 'global/base.html' %}
+{% block content %}
+<h2>Criar Área</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Criar Área</button>
+</form>
+
+<a href="{% url 'contact:listar_areas' %}">Voltar para a lista de áreas</a>
+{% endblock %}

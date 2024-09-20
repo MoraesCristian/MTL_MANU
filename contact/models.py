@@ -1,9 +1,11 @@
-
+import re
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.conf import settings
+
 
 
 class CustomUserManager(BaseUserManager):
@@ -103,32 +105,43 @@ class Empresa(models.Model):
     observacao = models.CharField(max_length=255)
     prefixo = models.CharField(max_length=15, blank=True, default='') 
     criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas_criadas')
+    
+    def clean(self):
+        self.razao_social = self.remove_special_characters(self.razao_social)
+        self.nome_fantasia = self.remove_special_characters(self.nome_fantasia)
+        if not self.razao_social or not self.nome_fantasia:
+            raise ValidationError('Razão social e nome fantasia não podem estar vazios ou conter caracteres especiais.')
+        
+    @staticmethod
+    def remove_special_characters(value):
+        return re.sub(r'[^A-Za-z0-9 ]+', '', value)
 
     def __str__(self):
         return self.razao_social
+
+class Area(models.Model):
+    nome = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.nome
     
 class Tarefa(models.Model):
-    area = models.CharField(max_length=255, choices=[
-        ('Eletrica', 'Elétrica'),
-        ('Hidraulica', 'Hidraulica'),
-        ('Civil', 'Civil'),
-    ])
+    area = models.ForeignKey(Area, on_delete=models.CASCADE)
     descricao = models.CharField(max_length=255)
 
     def __str__(self):
-        return f'{self.area} - {self.descricao}'
+        return f'{self.area.nome} - {self.descricao}'
 
 
 class Chamado(models.Model):
     id = models.AutoField(primary_key=True)
     numero_ordem = models.CharField(max_length=20, unique=True, editable=False)
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     titulo = models.CharField(max_length=255)
     descricao = models.TextField(blank=True)
     tipo_manutencao = models.CharField(max_length=255, choices=[
-        ('preventiva', 'preventiva'),
-        ('emergial', 'emergial'),
-        ('corretiva', 'corretiva'),
+        ('preventiva', 'Preventiva'),
+        ('emergial', 'Emergial'),
+        ('corretiva', 'Corretiva'),
     ])
     localizacao_atv = models.CharField(max_length=255, choices=[
         ('interno', 'Interno'),
@@ -139,41 +152,41 @@ class Chamado(models.Model):
         ('Normal', 'Prioridade Normal'),
         ('Baixa', 'Baixa Prioridade')
     ])
-    area_chamado = models.CharField(max_length=255, choices=[
-        ('Eletrica', 'Elétrica'),
-        ('Hidraulica', 'Hidraulica'),
-        ('Civil', 'Civil'),
-    ],default='Não especificado')
     
+    area_chamado = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True)
     tarefa = models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True)
     local_especifico = models.CharField(max_length=255)
+    
     data_criacao = models.DateTimeField(auto_now_add=True)
+    
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='chamados',null=True)
     empresa_nome_fantasia = models.CharField(max_length=255, blank=True)
     empresa_cnpj = models.CharField(max_length=18, blank=True)
-    usuario_telefone = models.CharField(max_length=50, blank=True)
+    
+    prestadora_servico = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='empresa', null=True, blank=True)
+    tecnico_responsavel = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='tecnicos')
+    
     data_inicio_atv = models.DateTimeField(blank=True, null=True)
     data_fim_atv = models.DateTimeField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.pk: 
-            prefixo = self.usuario.empresa.prefixo
+            prefixo = self.empresa.prefixo
             max_numero = Chamado.objects.filter(
                 numero_ordem__startswith=prefixo
             ).aggregate(models.Max('numero_ordem'))['numero_ordem__max']
 
             if max_numero:
-                numero_atual = int(max_numero[len(prefixo):]) 
+                numero_atual = int(max_numero[len(prefixo):])
                 novo_numero = numero_atual + 1
             else:
                 novo_numero = 1
 
             self.numero_ordem = f'{prefixo}{str(novo_numero).zfill(6)}'
-        if self.usuario:
-            self.empresa_nome_fantasia = self.usuario.empresa.nome_fantasia
-            self.empresa_cnpj = self.usuario.empresa.cnpj
-            self.usuario_telefone = self.usuario.telefone
-            self.usuario_first_name = self.usuario.first_name
-            self.usuario_last_name = self.usuario.last_name
+
+        if self.empresa:
+            self.empresa_nome_fantasia = self.empresa.nome_fantasia
+            self.empresa_cnpj = self.empresa.cnpj
         
         if 'iniciar_atividade' in kwargs:
             self.data_inicio_atv = timezone.now()
@@ -186,9 +199,6 @@ class Chamado(models.Model):
     def __str__(self):
         return f'Chamado {self.numero_ordem} - {self.titulo}'
 
-    def get_usuario_nome(self):
-        return f'{self.usuario.first_name} {self.usuario.last_name}'
-        
 
 class ImagemChamado(models.Model):
     chamado = models.ForeignKey('Chamado', on_delete=models.CASCADE, related_name='imagens')

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visualizar Chamado</title>
+    <style>
+        /* Adicione aqui os estilos CSS conforme necessário */
+        .container {
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 20%;
+            float: left;
+        }
+        .main-content {
+            width: 80%;
+            float: right;
+        }
+        .dynamic-content {
+            width: 100%;
+            height: 500px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div>
+                <h3>Data abertura CHAMADO</h3>
+                <p id="data_abertura"></p>
+            </div>
+            <div>
+                <h3>Data fechamento CHAMADO</h3>
+                <p id="data_fechamento"></p>
+            </div>
+            <div>
+                <button id="chat">CHAT</button>
+            </div>
+            <div>
+                <button id="informacao_chamado">INFORMAÇÃO DO CHAMADO</button>
+            </div>
+            <div>
+                <button id="tarefas_a_realizar">Tarefas a realizar</button>
+            </div>
+            <div>
+                <h3>Status CHAMADO</h3>
+                <p id="status_chamado"></p>
+            </div>
+            <div>
+                <button id="concluir">Concluir</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div>
+                <h3>Informações do Cliente</h3>
+                <p id="informacoes_cliente"></p>
+            </div>
+            <div>
+                <h3>Número da Ordem</h3>
+                <p id="numero_ordem"></p>
+            </div>
+            <div class="dynamic-content" id="dynamic-content">
+                <!-- Conteúdo dinâmico será carregado aqui -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Adicione aqui os scripts JavaScript conforme necessário
+        document.getElementById('chat').addEventListener('click', function() {
+            loadContent('/path/to/chat/');
+        });
+
+        document.getElementById('informacao_chamado').addEventListener('click', function() {
+            loadContent('/path/to/informacao_chamado/');
+        });
+
+        document.getElementById('tarefas_a_realizar').addEventListener('click', function() {
+            loadContent('/path/to/tarefas_a_realizar/');
+        });
+
+        function loadContent(url) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('dynamic-content').innerHTML = data;
+                });
+        }
+    </script>
+</body>
+</html>

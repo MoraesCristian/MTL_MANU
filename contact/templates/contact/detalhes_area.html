@@ -1,0 +1,26 @@
+{% extends 'global/base.html' %}
+{% block content %}
+<h2>Detalhes da Área: {{ area.nome }}</h2>
+
+<h3>Descrições</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Descrição</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for descricao in descricoes %}
+        <tr>
+            <td>{{ descricao.descricao }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td>Nenhuma descrição encontrada para esta área.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'contact:listar_areas' %}">Voltar para a lista de áreas</a>
+{% endblock %}

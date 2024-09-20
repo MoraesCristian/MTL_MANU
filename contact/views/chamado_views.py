@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from contact.models import Chamado, Empresa, Tarefa
+from contact.models import Chamado, Empresa, Tarefa, Area
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
 from contact.forms.chamado_forms import ChamadoForm
+from contact.forms.area_forms import AreaForm
+from contact.forms.tarefa_forms import TarefaForm
 
 
 @login_required
@@ -41,40 +43,74 @@ def listar_chamados(request):
 def abrir_chamado(request):
     user = request.user
 
-    # Verifique se o usuário tem a empresa vinculada
     if user.tipo_usuario == 'cliente':
         if user.empresa is None:
             return HttpResponseForbidden("Usuário não está vinculado a nenhuma empresa.")
-        
-        # Obtenha a empresa associada ao usuário
+
         empresa_id = user.empresa.id
         empresas = Empresa.objects.filter(id=empresa_id)
     else:
         empresas = Empresa.objects.all()
-    
-    # Debug: Verifique se as empresas estão sendo carregadas corretamente
-    print(f'Empresas carregadas: {empresas}')
-
+        
     if request.method == 'POST':
         form = ChamadoForm(request.POST, empresas=empresas)
         if form.is_valid():
-            chamado = form.save(commit=False)
-            chamado.usuario = user
+            chamado = form.save(commit=False) 
+            chamado.criado_por = request.user
+            chamado.empresa = form.cleaned_data['empresa_nome_fantasia']
             chamado.save()
             return redirect('contact:listar_chamados')
+
     else:
-        form = ChamadoForm(empresas=empresas)
+        if request.user.is_superuser:
+            form = ChamadoForm(empresas=empresas)
+        else:
+            form = ChamadoForm(user=request.user, empresas=empresas)
+    
+    return render(request, 'contact/abrir_chamado.html', {'form': form, 'empresas': empresas})
 
-    return render(request, 'contact/abrir_chamado.html', {
-        'form': form,
-        'empresas': empresas,
-    })
+def buscar_tarefas(request):
+    area_id = request.GET.get('area')
+    tarefas = Tarefa.objects.filter(area_id=area_id).values('id', 'descricao')
+    return JsonResponse(list(tarefas), safe=False)
 
-def get_tarefas(request):
-    area = request.GET.get('area')
-    if area:
-        tarefas = Tarefa.objects.filter(area=area).values('id', 'descricao')
-        tarefas_list = list(tarefas)
-        return JsonResponse(tarefas_list, safe=False)
-    return JsonResponse({'error': 'Área não especificada'}, status=400)
+@login_required
+def criar_area(request):
+    if request.method == 'POST':
+        form = AreaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('contact:listar_areas') 
+    else:
+        form = AreaForm()
+    
+    return render(request, 'contact/criar_area.html', {'form': form})
+
+@login_required
+def listar_areas(request):
+    areas = Area.objects.all()
+    return render(request, 'contact/listar_areas.html', {'areas': areas})
+
+@login_required
+def detalhes_area(request, area_id):
+    area = Area.objects.get(id=area_id)
+    descricoes = Tarefa.objects.filter(area=area)
+    return render(request, 'contact/detalhes_area.html', {'area': area, 'descricoes': descricoes})
+
+@login_required
+def listar_tarefas(request):
+    tarefas = Tarefa.objects.all()
+    return render(request, 'contact/listar_tarefas.html', {'tarefas': tarefas})
+
+@login_required
+def criar_tarefa(request):
+    if request.method == 'POST':
+        form = TarefaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('contact:listar_tarefas')
+    else:
+        form = TarefaForm()
+    
+    return render(request, 'contact/criar_tarefa.html', {'form': form})
 
