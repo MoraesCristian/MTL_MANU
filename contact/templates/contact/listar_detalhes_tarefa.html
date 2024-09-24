@@ -1,0 +1,11 @@
+{% extends "global/base.html" %}
+
+{% block content %}
+  <h1>Detalhes da Tarefa: {{ tarefa.descricao }}</h1>
+  <ul>
+    {% for detalhe in detalhes %}
+      <li>{{ detalhe.descricao }}</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'contact:criar_detalhe_tarefa' tarefa.id %}">Adicionar Detalhe</a>
+{% endblock %}

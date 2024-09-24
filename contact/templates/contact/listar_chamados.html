@@ -22,26 +22,17 @@
     </div>
   </div>
 {% endif %}
-<table>
-  <thead>
-    <tr>
-      <th>Número da Ordem</th>
-      <th>Empresa</th>
-      <th>Usuário</th>
-      <th>Título</th>
-      <th>Data de Criação</th>
-    </tr>
-</thead>
-  <tbody>
-    {% for chamado in chamados %}
-    <tr>
-      <td>{{ chamado.numero_ordem }}</td>
-      <td>{{ chamado.empresa_nome_fantasia }}</td>
-      <td>{{ chamado.get_usuario_nome }}</td>
-      <td>{{ chamado.titulo }}</td>
-      <td>{{ chamado.data_criacao }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+
+{% for chamado in chamados %}
+  <div class="card">
+    <a href="{% url 'contact:visualizar_chamado' chamado.id %}" class="full-card-link">
+      <i class='bx bx-building'></i>
+      <li><strong>Nº Ordem:</strong>{{ chamado.numero_ordem }}</li>
+      <li><strong>Nome Fantasia:</strong>{{ chamado.empresa_nome_fantasia }}</li>
+      <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
+      <li><strong>Status:</strong> {{ chamado.prioridade_chamado }}</li>
+    </a>
+  </div>
+{% endfor %}
+
 {% endblock %}

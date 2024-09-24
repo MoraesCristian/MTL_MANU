@@ -1,5 +1,5 @@
 from django import forms
-from contact.models import Chamado, Tarefa, Empresa, Usuario
+from contact.models import Chamado, Tarefa, Empresa, Usuario,  MensagemChat, DetalheTarefa
 
 class ChamadoForm(forms.ModelForm):
     empresa_nome_fantasia = forms.ModelChoiceField(
@@ -67,3 +67,28 @@ class ChamadoForm(forms.ModelForm):
                     pass
         elif self.instance.pk:
             self.fields['tarefa'].queryset = self.instance.area_chamado.tarefas.all()
+
+
+class MensagemChatForm(forms.ModelForm):
+    class Meta:
+        model = MensagemChat
+        fields = ['conteudo']
+        widgets = {
+            'conteudo': forms.Textarea(attrs={'rows': 2, 'cols': 40})
+        }
+        
+
+
+class DetalheTarefaForm(forms.ModelForm):
+    tarefa = forms.ModelChoiceField(queryset=Tarefa.objects.none(), widget=forms.HiddenInput())
+
+    class Meta:
+        model = DetalheTarefa
+        fields = ['tarefa', 'descricao']
+
+    def __init__(self, *args, **kwargs):
+        tarefa = kwargs.pop('tarefa', None)
+        super().__init__(*args, **kwargs)
+        if tarefa:
+            self.fields['tarefa'].queryset = Tarefa.objects.filter(id=tarefa.id)
+            self.fields['tarefa'].initial = tarefa

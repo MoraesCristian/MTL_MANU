@@ -1,27 +1,14 @@
 {% extends 'global/base.html' %}
+
 {% block content %}
-<h2>Lista de Tarefas</h2>
-
-<table>
-    <thead>
-        <tr>
-            <th>Área</th>
-            <th>Descrição</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for tarefa in tarefas %}
-        <tr>
-            <td>{{ tarefa.area.nome }}</td>
-            <td>{{ tarefa.descricao }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="2">Nenhuma tarefa encontrada.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<a href="{% url 'contact:criar_tarefa' %}">Adicionar Nova Tarefa</a>
+  <h1>Lista de Tarefas</h1>
+  <ul>
+    {% for tarefa in tarefas %}
+      <li>
+        {{ tarefa.descricao }} - 
+        <a href="{% url 'contact:listar_detalhes_tarefa' tarefa.id %}">Ver Detalhes</a>
+      </li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'contact:criar_tarefa' %}">Adicionar Tarefa</a>
 {% endblock %}

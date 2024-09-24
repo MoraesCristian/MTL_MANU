@@ -3,8 +3,8 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 
@@ -119,11 +119,13 @@ class Empresa(models.Model):
     def __str__(self):
         return self.razao_social
 
+
 class Area(models.Model):
     nome = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return self.nome
+   
     
 class Tarefa(models.Model):
     area = models.ForeignKey(Area, on_delete=models.CASCADE)
@@ -131,6 +133,14 @@ class Tarefa(models.Model):
 
     def __str__(self):
         return f'{self.area.nome} - {self.descricao}'
+    
+    
+class DetalheTarefa(models.Model):
+    tarefa = models.ForeignKey(Tarefa, on_delete=models.CASCADE, related_name='detalhes')
+    descricao = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return f'{self.tarefa.descricao} - {self.descricao}'
 
 
 class Chamado(models.Model):
@@ -213,4 +223,15 @@ class ImagemChamado(models.Model):
 
     def __str__(self):
         return f'{self.numero_ordem} - {self.tipo_imagem}'
+
+
+class Chat(models.Model):
+    chamado = models.OneToOneField(Chamado, on_delete=models.CASCADE, related_name='chat')
+
+
+class MensagemChat(models.Model):
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='mensagens')
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    conteudo = models.TextField()
+    data_envio = models.DateTimeField(auto_now_add=True)
 

@@ -1,0 +1,11 @@
+{% extends "global/base.html" %}
+
+{% block content %}
+  <h1>Criar Detalhe para {{ tarefa.descricao }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Adicionar Detalhe</button>
+  </form>
+  <a href="{% url 'contact:listar_detalhes_tarefa' tarefa.id %}">Voltar para Detalhes</a>
+{% endblock %}

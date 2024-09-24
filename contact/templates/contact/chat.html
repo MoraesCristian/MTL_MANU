@@ -1,4 +1,17 @@
-<div>
+<div class="chat-container">
     <h3>Chat</h3>
-    <p>{{ chat }}</p>
+    <div id="messages">
+        {% for mensagem in mensagens %}
+            <div class="message">
+                <strong>{{ mensagem.usuario.first_name }} {{ mensagem.usuario.last_name }}:</strong>
+                <p>{{ mensagem.conteudo }}</p>
+                <small>{{ mensagem.data_envio }}</small>
+            </div>
+        {% endfor %}
+    </div>
+    <form id="chat-form" method="post">
+        {% csrf_token %}
+        <textarea id="mensagem" name="mensagem" rows="4" placeholder="Digite sua mensagem..."></textarea>
+        <button type="submit">Enviar</button>
+    </form>
 </div>

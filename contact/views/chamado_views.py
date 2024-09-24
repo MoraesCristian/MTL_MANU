@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django import forms
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from contact.models import Chamado, Empresa, Tarefa, Area
+from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
-from contact.forms.chamado_forms import ChamadoForm
+from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm
 from contact.forms.area_forms import AreaForm
 from contact.forms.tarefa_forms import TarefaForm
+
 
 
 @login_required
@@ -114,3 +116,25 @@ def criar_tarefa(request):
     
     return render(request, 'contact/criar_tarefa.html', {'form': form})
 
+
+@login_required
+def listar_detalhes_tarefa(request, tarefa_id):
+    tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    detalhes = DetalheTarefa.objects.filter(tarefa=tarefa)
+    return render(request, 'contact/listar_detalhes_tarefa.html', {'tarefa': tarefa, 'detalhes': detalhes})
+
+@login_required
+def criar_detalhe_tarefa(request, tarefa_id):
+    tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    
+    if request.method == 'POST':
+        form = DetalheTarefaForm(request.POST, tarefa=tarefa)
+        if form.is_valid():
+            detalhe_tarefa = form.save(commit=False)
+            detalhe_tarefa.tarefa = tarefa
+            detalhe_tarefa.save()
+            return redirect('contact:listar_detalhes_tarefa', tarefa_id=tarefa_id)
+    else:
+        form = DetalheTarefaForm(tarefa=tarefa)
+    
+    return render(request, 'contact/criar_detalhe_tarefa.html', {'form': form, 'tarefa': tarefa})
