@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from contact.models import Chamado, Chat, MensagemChat
+from contact.models import Chamado, Chat, MensagemChat, Tarefa
 from contact.forms.chamado_forms import MensagemChatForm
 from django.http import JsonResponse
 
@@ -67,11 +67,18 @@ def load_informacao_chamado(request, chamado_id):
     }
     return render(request, 'contact/informacao_chamado.html', context)
 
+
 @login_required
 def load_tarefas_a_realizar(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
-    # Lógica para carregar as tarefas
+    
+
+    tarefas = Tarefa.objects.filter(area__id=chamado.area_chamado.id)
+    detalhes_tarefas = {tarefa.id: tarefa.descricao.all() for tarefa in tarefas} 
+
     context = {
-        'tarefas': 'Tarefas a realizar'  # Substitua pelo conteúdo real
+        'tarefas': tarefas,
+        'detalhes_tarefas': detalhes_tarefas,
+        'chamado': chamado,
     }
     return render(request, 'contact/tarefas_a_realizar.html', context)

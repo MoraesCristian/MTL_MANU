@@ -1,4 +1,23 @@
-<div>
-    <h3>Tarefas a Realizar</h3>
-    <p>{{ tarefas }}</p>
-</div>
+
+
+
+  <h1>Tarefas a Realizar para o Chamado #{{ chamado.numero_ordem }}</h1>
+  
+  <ul>
+    {% for tarefa in tarefas %}
+      <li>
+        <strong>{{ tarefa.descricao }}</strong>
+        <ul>
+          {% for detalhe in detalhes_tarefas.tarefa.id %}
+            <li>{{ detalhe.descricao }}</li>
+          {% empty %}
+            <li>Sem detalhes disponíveis.</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% empty %}
+      <li>Sem tarefas disponíveis.</li>
+    {% endfor %}
+  </ul>
+  
+  <a href="{% url 'contact:visualizar_chamado' chamado.id %}">Voltar para o Chamado</a>
