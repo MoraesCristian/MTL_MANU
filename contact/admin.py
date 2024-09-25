@@ -21,10 +21,6 @@ class UsuarioAdmin(admin.ModelAdmin):
 @admin.register(models.Chamado)
 class ChamadoAdmin(admin.ModelAdmin):
     ...
-
-@admin.register(models.ImagemChamado)
-class ImagemChamadoAdmin(admin.ModelAdmin):
-    ...
     
 @admin.register(models.Area)
 class AreaAdmin(admin.ModelAdmin):

@@ -25,6 +25,7 @@ urlpatterns = [
     path('listar_tarefas/', views.listar_tarefas, name='listar_tarefas'),
     path('tarefas/<int:tarefa_id>/detalhes/', views.listar_detalhes_tarefa, name='listar_detalhes_tarefa'),
     path('tarefas/<int:tarefa_id>/detalhes/criar/', views.criar_detalhe_tarefa, name='criar_detalhe_tarefa'),
+    path('detalhe_tarefa/<int:detalhe_tarefa_id>/', views.detalhe_tarefa_view, name='detalhe_tarefa_view'),
     path('areas/', views.listar_areas, name='listar_areas'),
     path('areas/criar/', views.criar_area, name='criar_area'),
     path('areas/<int:area_id>/', views.detalhes_area, name='detalhes_area'),

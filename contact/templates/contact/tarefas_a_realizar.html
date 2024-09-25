@@ -1,23 +1,23 @@
 
-
-
-  <h1>Tarefas a Realizar para o Chamado #{{ chamado.numero_ordem }}</h1>
-  
-  <ul>
+<h3>Tarefas a Realizar para o Chamado #{{ chamado.numero_ordem }}</h3>
+<ul>
     {% for tarefa in tarefas %}
-      <li>
-        <strong>{{ tarefa.descricao }}</strong>
-        <ul>
-          {% for detalhe in detalhes_tarefas.tarefa.id %}
-            <li>{{ detalhe.descricao }}</li>
-          {% empty %}
-            <li>Sem detalhes disponíveis.</li>
-          {% endfor %}
-        </ul>
-      </li>
+        <li>
+            <strong>{{ tarefa.descricao }}</strong>
+            <ul>
+                {% for detalhe in detalhes_tarefas %}
+                    {% if detalhe.tarefa.id == tarefa.id %}
+                        <li>
+                            <a href="{% url 'contact:detalhe_tarefa_view' detalhe.id %}">{{ detalhe.descricao }}</a>
+                        </li>
+                    {% endif %}
+                {% empty %}
+                    <li>Sem detalhes disponíveis.</li>
+                {% endfor %}
+            </ul>
+        </li>
     {% empty %}
-      <li>Sem tarefas disponíveis.</li>
+        <li>Sem tarefas disponíveis.</li>
     {% endfor %}
-  </ul>
-  
-  <a href="{% url 'contact:visualizar_chamado' chamado.id %}">Voltar para o Chamado</a>
+</ul>
+<a href="{% url 'contact:visualizar_chamado' chamado.id %}">Voltar para o Chamado</a>

@@ -210,19 +210,18 @@ class Chamado(models.Model):
         return f'Chamado {self.numero_ordem} - {self.titulo}'
 
 
-class ImagemChamado(models.Model):
-    chamado = models.ForeignKey('Chamado', on_delete=models.CASCADE, related_name='imagens')
-    numero_ordem = models.CharField(max_length=20)
-    tipo_imagem = models.CharField(max_length=50, choices=[
-        ('antes', 'Antes'),
-        ('depois', 'Depois'),
-    ])
-    imagem_cliente_operador = models.ImageField(upload_to='fotos_Abertura/%Y/%m/%d')
-    imagem_prestador = models.ImageField(upload_to='fotos_fechamento/%Y/%m/%d/', blank=True, null=True)
-    data_upload = models.DateTimeField(auto_now_add=True)
+class DetalheTarefaPreenchido(models.Model):
+    detalhe_tarefa = models.ForeignKey(DetalheTarefa, on_delete=models.CASCADE)
+    chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Use settings.AUTH_USER_MODEL
+    fotos_clientes = models.ImageField(upload_to='fotos_clientes/', blank=True, null=True)
+    fotos_ajustes = models.ImageField(upload_to='fotos_ajustes/', blank=True, null=True)
+    observacao = models.TextField(blank=True, null=True)
+    concluido = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.numero_ordem} - {self.tipo_imagem}'
+        return f'Detalhe preenchido por {self.usuario} para {self.detalhe_tarefa}'
+
 
 
 class Chat(models.Model):

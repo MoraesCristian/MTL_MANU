@@ -157,23 +157,23 @@
             $('#chat').on('click', function() {
                 loadContent("{% url 'contact:load_chat' chamado.id %}");
             });
-
+    
             $('#informacao_chamado').on('click', function() {
                 loadContent("{% url 'contact:load_informacao_chamado' chamado.id %}");
             });
-
+    
             $('#tarefas_a_realizar').on('click', function() {
                 loadContent("{% url 'contact:load_tarefas_a_realizar' chamado.id %}");
             });
-
+    
             function loadContent(url) {
                 $.get(url, function(data) {
                     $('#dynamic-content').html(data);
-                    // Inicializar o formulário de chat após o carregamento
+                    // Inicializar o formulário de chat após o carregamento, se necessário
                     initializeChatForm();
                 });
             }
-
+    
             function initializeChatForm() {
                 $('#chat-form').on('submit', function(event) {
                     event.preventDefault();
@@ -202,5 +202,9 @@
             }
         });
     </script>
+    
+    
 </body>
 </html>
+
+
