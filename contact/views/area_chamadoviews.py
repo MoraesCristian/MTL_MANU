@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, get_object_or_404, redirect
-from contact.models import Chamado, Chat, MensagemChat, Tarefa,DetalheTarefa
+from contact.models import Chamado, Chat, MensagemChat, Tarefa,DetalheTarefa, DetalheTarefaPreenchido
 from contact.forms.chamado_forms import MensagemChatForm
 from contact.forms.tarefa_forms import DetalheTarefaPreenchidoForm
 from django.http import JsonResponse
@@ -82,26 +82,63 @@ def load_tarefas_a_realizar(request, chamado_id):
     }
     return render(request, 'contact/tarefas_a_realizar.html', context)
 
+@login_required
+def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
+    tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
+    detalhe_preenchido = get_object_or_404(DetalheTarefaPreenchido, detalhe_tarefa=detalhe_tarefa, chamado=chamado)
+
+    context = {
+        'chamado': chamado,
+        'tarefa': tarefa,
+        'detalhe_tarefa': detalhe_tarefa,
+        'detalhe_preenchido': detalhe_preenchido,
+        'edit_mode': False,
+    }
+    return render(request, 'contact/detalhe_tarefa.html', context)
 
 @login_required
-def detalhe_tarefa_view(request, detalhe_tarefa_id):
-    detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id)
-    chamado = detalhe_tarefa.tarefa.chamado  # Verifique se esta linha corresponde ao seu modelo
+def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
+    tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
+    detalhe_preenchido = get_object_or_404(DetalheTarefaPreenchido, detalhe_tarefa=detalhe_tarefa, chamado=chamado)
+
+    print(request.method)
     if request.method == 'POST':
-        form = DetalheTarefaPreenchidoForm(request.POST, request.FILES)
+        print(f'{request.method} DENTRO DO POST' )
+        form = DetalheTarefaPreenchidoForm(request.POST, request.FILES, instance=detalhe_preenchido)
         if form.is_valid():
             detalhe_preenchido = form.save(commit=False)
             detalhe_preenchido.detalhe_tarefa = detalhe_tarefa
             detalhe_preenchido.chamado = chamado
             detalhe_preenchido.usuario = request.user
             detalhe_preenchido.save()
-            return redirect('contact:load_tarefas_a_realizar', chamado_id=chamado.id)
+            if request.is_ajax():
+                response_data = {
+                    'success': True,
+                    'message': 'Detalhe da tarefa atualizado com sucesso.'
+                }
+                return JsonResponse(response_data)
+            return redirect('contact:detalhe_tarefa', chamado_id=chamado.id, tarefa_id=tarefa.id, detalhe_tarefa_id=detalhe_tarefa.id)
+        else:
+            if request.is_ajax():
+                response_data = {
+                    'success': False,
+                    'errors': form.errors
+                }
+                return JsonResponse(response_data)
     else:
-        form = DetalheTarefaPreenchidoForm()
+        form = DetalheTarefaPreenchidoForm(instance=detalhe_preenchido)
 
     context = {
-        'detalhe_tarefa': detalhe_tarefa,
         'chamado': chamado,
-        'form': form
+        'tarefa': tarefa,
+        'detalhe_tarefa': detalhe_tarefa,
+        'detalhe_preenchido': detalhe_preenchido,
+        'form': form,
+        'edit_mode': True,
+        'is_new': False
     }
     return render(request, 'contact/detalhe_tarefa_form.html', context)

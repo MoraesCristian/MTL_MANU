@@ -1,4 +1,3 @@
-
 <h3>Tarefas a Realizar para o Chamado #{{ chamado.numero_ordem }}</h3>
 <ul>
     {% for tarefa in tarefas %}
@@ -8,7 +7,14 @@
                 {% for detalhe in detalhes_tarefas %}
                     {% if detalhe.tarefa.id == tarefa.id %}
                         <li>
-                            <a href="{% url 'contact:detalhe_tarefa_view' detalhe.id %}">{{ detalhe.descricao }}</a>
+                            <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe.id %}">{{ detalhe.descricao }}</a>
+                            {% for detalhe_preenchido in detalhe.detalhes_preenchidos %}
+                                {% if detalhe_preenchido.concluido %}
+                                    <input type="checkbox" checked disabled>
+                                {% else %}
+                                    <input type="checkbox" disabled>
+                                {% endif %}
+                            {% endfor %}
                         </li>
                     {% endif %}
                 {% empty %}
@@ -20,4 +26,3 @@
         <li>Sem tarefas disponíveis.</li>
     {% endfor %}
 </ul>
-<a href="{% url 'contact:visualizar_chamado' chamado.id %}">Voltar para o Chamado</a>

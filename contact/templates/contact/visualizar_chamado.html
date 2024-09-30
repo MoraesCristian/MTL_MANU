@@ -111,7 +111,6 @@
                 <button id="tarefas_a_realizar">Tarefas a realizar</button>
             </div>
             <div>
-
                 <p id="status_chamado"><strong>Status:</strong> {{ chamado.prioridade_chamado }}</p>
             </div>
             <div>
@@ -154,45 +153,33 @@
 
     <script>
         $(document).ready(function() {
-            $('#chat').on('click', function() {
-                loadContent("{% url 'contact:load_chat' chamado.id %}");
-            });
-    
-            $('#informacao_chamado').on('click', function() {
-                loadContent("{% url 'contact:load_informacao_chamado' chamado.id %}");
-            });
-    
-            $('#tarefas_a_realizar').on('click', function() {
-                loadContent("{% url 'contact:load_tarefas_a_realizar' chamado.id %}");
-            });
-    
+            // Função genérica para carregar conteúdo dinâmico
             function loadContent(url) {
                 $.get(url, function(data) {
                     $('#dynamic-content').html(data);
-                    // Inicializar o formulário de chat após o carregamento, se necessário
-                    initializeChatForm();
+                    initializeFormsAndLinks(); // Inicializa o formulário de detalhe e links dinâmicos
                 });
             }
-    
-            function initializeChatForm() {
-                $('#chat-form').on('submit', function(event) {
-                    event.preventDefault();
+        
+            // Inicializa links e formulários dinâmicos
+            function initializeFormsAndLinks() {
+                $('#dynamic-content a').on('click', function(e) {
+                    e.preventDefault(); // Impede o comportamento padrão do link
+                    var url = $(this).attr('href'); // Obtém a URL do link
+                    loadContent(url); // Carrega o conteúdo na parte dinâmica
+                });
+        
+                $('form').on('submit', function(event) {
+                    event.preventDefault(); // Impede o comportamento padrão do formulário
                     $.ajax({
-                        url: "{% url 'contact:load_chat' chamado.id %}",
+                        url: $(this).attr('action'), // URL do formulário
                         type: 'POST',
-                        data: {
-                            'mensagem': $('#mensagem').val(),
-                            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
-                        },
+                        data: new FormData(this), // Serializa todos os dados do formulário
+                        contentType: false,
+                        processData: false,
                         success: function(response) {
-                            $('#mensagem').val('');
-                            $('#messages').append(
-                                '<div class="message">' +
-                                '<strong>' + response.usuario.first_name + ' ' + response.usuario.last_name + ':</strong>' +
-                                '<p>' + response.conteudo + '</p>' +
-                                '<small>' + response.data_envio + '</small>' +
-                                '</div>'
-                            );
+                            $('#dynamic-content').html(response); // Atualiza o conteúdo com a resposta
+                            initializeFormsAndLinks(); // Re-inicializa os links dinâmicos e formulários
                         },
                         error: function(xhr, errmsg, err) {
                             console.log(xhr.status + ": " + xhr.responseText);
@@ -200,10 +187,25 @@
                     });
                 });
             }
+        
+            // Inicializa conteúdo dinâmico na primeira carga
+            $('#chat').on('click', function() {
+                loadContent("{% url 'contact:load_chat' chamado.id %}");
+            });
+        
+            $('#informacao_chamado').on('click', function() {
+                loadContent("{% url 'contact:load_informacao_chamado' chamado.id %}");
+            });
+        
+            $('#tarefas_a_realizar').on('click', function() {
+                loadContent("{% url 'contact:load_tarefas_a_realizar' chamado.id %}");
+            });
+        
+            // Inicializa links dinâmicos na primeira carga
+            initializeFormsAndLinks();
         });
     </script>
-    
-    
+        
 </body>
 </html>
 

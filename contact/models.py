@@ -7,7 +7,6 @@ from django.conf import settings
 from django.contrib.auth.models import User
 
 
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         if not email:
@@ -164,7 +163,7 @@ class Chamado(models.Model):
     ])
     
     area_chamado = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True)
-    tarefa = models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True)
+    tarefa =  models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True, related_name='chamados')
     local_especifico = models.CharField(max_length=255)
     
     data_criacao = models.DateTimeField(auto_now_add=True)
@@ -213,7 +212,7 @@ class Chamado(models.Model):
 class DetalheTarefaPreenchido(models.Model):
     detalhe_tarefa = models.ForeignKey(DetalheTarefa, on_delete=models.CASCADE)
     chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE)
-    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Use settings.AUTH_USER_MODEL
+    usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     fotos_clientes = models.ImageField(upload_to='fotos_clientes/', blank=True, null=True)
     fotos_ajustes = models.ImageField(upload_to='fotos_ajustes/', blank=True, null=True)
     observacao = models.TextField(blank=True, null=True)
@@ -221,7 +220,6 @@ class DetalheTarefaPreenchido(models.Model):
 
     def __str__(self):
         return f'Detalhe preenchido por {self.usuario} para {self.detalhe_tarefa}'
-
 
 
 class Chat(models.Model):

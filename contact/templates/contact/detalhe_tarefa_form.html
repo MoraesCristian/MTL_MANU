@@ -1,21 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Detalhes da Tarefa</title>
-    <style>
-        
-    </style>
-</head>
-<body>
-    <h1>Detalhes da Tarefa - {{ detalhe_tarefa.descricao }}</h1>
+<div>
+    <h1>Editar Detalhes da Tarefa - {{ detalhe_tarefa.descricao }}</h1>
     <h2>Chamado #{{ chamado.numero_ordem }}</h2>
+
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Salvar</button>
+        <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe_tarefa.id %}" class="btn">Cancelar</a>
     </form>
-    <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">Voltar para Tarefas a Realizar</a>
-</body>
-</html>
 
+    {% if detalhe_preenchido %}
+        <h3>Informações Preenchidas</h3>
+        <p><strong>Detalhe Tarefa:</strong> {{ detalhe_preenchido.detalhe_tarefa }}</p>
+        <p><strong>Usuário:</strong> {{ detalhe_preenchido.usuario }}</p>
+        <p><strong>Observação:</strong> {{ detalhe_preenchido.observacao }}</p>
+        <p><strong>Concluído:</strong> {{ detalhe_preenchido.concluido|yesno:"Sim, Não" }}</p>
+        <p><strong>Fotos Clientes:</strong> 
+            {% if detalhe_preenchido.fotos_clientes %}
+                <img src="{{ detalhe_preenchido.fotos_clientes.url }}" alt="Foto Clientes" style="max-width: 200px; max-height: 200px;">
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+        <p><strong>Fotos Ajustes:</strong> 
+            {% if detalhe_preenchido.fotos_ajustes %}
+                <img src="{{ detalhe_preenchido.fotos_ajustes.url }}" alt="Foto Ajustes" style="max-width: 200px; max-height: 200px;">
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+    {% else %}
+        <p>Não há detalhes preenchidos para esta tarefa. Preencha os campos acima.</p>
+    {% endif %}
+
+    <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">Voltar para Tarefas a Realizar</a>
+</div>
