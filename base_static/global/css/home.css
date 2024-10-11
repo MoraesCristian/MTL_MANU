@@ -11,6 +11,9 @@ body{
     width: 100%;
     overflow: hidden;
 }
+.form-adicionar-empresa body {
+    overflow: auto; /* Para permitir rolagem nos formulários, se necessário */
+}
 
 .sidebar{
     position: fixed;
@@ -176,14 +179,13 @@ body{
     white-space: nowrap;
 }
 
-
 .sidebar ul li a:hover{
     color: #11101d;
     background: #fff;
     
 }
 
-.sidebarul li a i{
+.sidebar ul li a i{
     height: 50px;
     min-width: 50px;
     border-radius: 12px;
@@ -302,14 +304,23 @@ body{
     left: 78px;
     transition: all 0.5s ease;
     z-index: 1;
+    align-items: center;
+    overflow-y: scroll;
 }
 
 .home_content .text{
     font-size: 25px;
     font-weight: 500;
     color: #1d1b31;
-    margin: 12px;
+    margin: 10px;
 }
+
+.home_content .text h1{
+    color: #ffffff;
+    margin: 10px;
+}
+
+
 
 .sidebar.active ~ .home_content{
     width: calc(100% - 240px);
@@ -321,5 +332,28 @@ body{
     padding: 20px;
     overflow: auto; 
     background-color: rgb(13, 13, 20);
-    box-sizing: border-box; 
+    box-sizing: border-box;
+    display: flex;             /* Adiciona flexbox */
+    flex-direction: column;    /* Alinha os itens em coluna */
+    align-items: center;      /* Centraliza horizontalmente */
+    justify-content: center;   /* Centraliza verticalmente */
+    height: 100%;             /* Certifique-se de que ocupa toda a altura */
+    
 }
+
+/* Estilo para esconder a barra de rolagem */
+.home_content::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* Opcional: deixa o fundo transparente */
+}
+
+/* Firefox */
+.home_content {
+    scrollbar-width: none; /* Oculta a barra de rolagem no Firefox */
+}
+
+/* Outros navegadores */
+.home_content {
+    -ms-overflow-style: none;  /* Oculta a barra de rolagem no IE e Edge */
+}
+

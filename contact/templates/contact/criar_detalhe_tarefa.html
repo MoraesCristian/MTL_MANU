@@ -1,11 +1,26 @@
 {% extends "global/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
+{% endblock %}
 
 {% block content %}
-  <h1>Criar Detalhe para {{ tarefa.descricao }}</h1>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Adicionar Detalhe</button>
-  </form>
-  <a href="{% url 'contact:listar_detalhes_tarefa' tarefa.id %}">Voltar para Detalhes</a>
+  <div class="grid-container">
+    <div class="card">
+      <h1>Criar Detalhe para {{ tarefa.descricao }}</h1>
+      <form method="post" class="form-create-tarefas">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="{{ form.descricao.id_for_label }}">Descrição:</label>
+          {{ form.descricao }}
+        </div>
+        {{ form.tarefa }}  <!-- Certifique-se de que o campo oculto está incluído -->
+        <div class="form-group button-group">
+          <button type="submit" class="btn btn-primary">Adicionar Detalhe</button>
+          <a href="{% url 'contact:listar_detalhes_tarefa' tarefa.id %}" class="btn btn-secondary">Voltar</a>
+        </div>
+      </form>
+    </div>
+  </div>
 {% endblock %}

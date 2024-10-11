@@ -45,7 +45,7 @@ def edit_user_view(request, user_id):
         form = UsuarioCreationForm(request.POST, instance=usuario, request=request)
         if form.is_valid():
             form.save()
-            return redirect('contact:user_detail', user_id=user_id)
+            return render(request, 'contact/user_detail.html', {'usuario': usuario})
     else:
         form = UsuarioCreationForm(instance=usuario, request=request)
     return render(request, 'contact/edit_user.html', {'form': form, 'usuario': usuario})

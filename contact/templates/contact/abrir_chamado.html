@@ -1,43 +1,83 @@
 {% extends 'global/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Abrir Chamado</h2>
+    <div class="grid-container">
+        <div class="card">
+            <h1>Abrir Chamado</h1>
+            <form method="post" action="{% url 'contact:abrir_chamado' %}" class="form-chamado" >
+                {% csrf_token %}
+                <label for="id_empresa_nome_fantasia">Empresa:</label>
+                {{ form.empresa_nome_fantasia }}
+                <label for="id_localizacao_atv">Localização:</label>
+                {{ form.localizacao_atv }}
+                <label for="id_tipo_manutencao">Tipo de Manutenção:</label>
+                {{ form.tipo_manutencao }}
+                <label for="id_area_chamado">Área:</label>
+                {{ form.area_chamado }}
+                <label for="id_tarefa">Tarefa:</label>
+                {{ form.tarefa }}
+                <label for="id_descricao">Descrição:</label>
+                {{ form.descricao }}
+                <label for="id_local_especifico">Local Específico:</label>
+                {{ form.local_especifico }}
+                <label for="id_prioridade_chamado">Prioridade:</label>
+                {{ form.prioridade_chamado }}            
+                <div class="form-group button-group">
+                    <button type="submit" class="btn btn-primary">Criar Chamado</button>
+                    <a href="{% url 'contact:listar_chamados' %}" class="btn btn-secondary">Voltar</a>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<form method="post" action="{% url 'contact:abrir_chamado' %}">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const empresaField = document.getElementById('id_empresa_nome_fantasia');
+            const areaField = document.getElementById('id_area_chamado');
+            const tarefaField = document.getElementById('id_tarefa');
 
-    <button type="submit">Criar Chamado</button>
-</form>
+            empresaField.addEventListener('change', function () {
+                const empresaId = this.value;
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const areaField = document.getElementById('id_area_chamado');
-        const tarefaField = document.getElementById('id_tarefa');
-    
-        areaField.addEventListener('change', function () {
-            const area = this.value;
-   
-            fetch(`/contact/tarefas/?area=${area}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Erro ao carregar tarefas: ' + response.statusText);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    tarefaField.innerHTML = '<option value="" selected disabled>Selecione a tarefa</option>';
-                    data.forEach(tarefa => {
-                        const option = document.createElement('option');
-                        option.value = tarefa.id;
-                        option.text = tarefa.descricao;
-                        tarefaField.appendChild(option);
+                fetch(`/contact/ajax/load-areas/?empresa_id=${empresaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        areaField.innerHTML = '<option value="" selected disabled>Selecione a área</option>';
+                        data.forEach(area => {
+                            const option = document.createElement('option');
+                            option.value = area.id;
+                            option.text = area.nome;
+                            areaField.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar áreas:', error);
                     });
-                })
-                .catch(error => {
-                    console.error('Erro ao carregar tarefas:', error);
-                });
-        });
-    });
-</script>
+            });
 
+            areaField.addEventListener('change', function () {
+                const areaId = this.value;
+
+                fetch(`/contact/ajax/load-tarefas/?area_id=${areaId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        tarefaField.innerHTML = '<option value="" selected disabled>Selecione a tarefa</option>';
+                        data.forEach(tarefa => {
+                            const option = document.createElement('option');
+                            option.value = tarefa.id;
+                            option.text = tarefa.descricao;
+                            tarefaField.appendChild(option);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Erro ao carregar tarefas:', error);
+                    });
+            });
+        });
+    </script>
 {% endblock %}

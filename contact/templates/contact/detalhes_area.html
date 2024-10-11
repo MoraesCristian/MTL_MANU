@@ -1,26 +1,30 @@
-{% extends 'global/base.html' %}
-{% block content %}
-<h2>Detalhes da Área: {{ area.nome }}</h2>
+{% extends "global/base.html" %}
+{% load static %}
 
-<h3>Descrições</h3>
-<table>
-    <thead>
-        <tr>
-            <th>Descrição</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for descricao in descricoes %}
-        <tr>
-            <td>{{ descricao.descricao }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td>Nenhuma descrição encontrada para esta área.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<a href="{% url 'contact:listar_areas' %}">Voltar para a lista de áreas</a>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
 {% endblock %}
+
+{% block content %}
+    <div class="cards-container">
+        <h1>Detalhes da Área: {{ area.nome }}</h1>
+        {% for descricao in descricoes %}
+        <div class="card">
+            <p>{{ descricao.descricao }}</p>
+        </div>
+        {% empty %}
+        <div class="card">
+            <p>Nenhuma descrição encontrada para esta área.</p>
+        </div>
+        {% endfor %}
+        <div class="card">
+            <div class="form-group button-group">
+                <a href="{%url 'contact:listar_tarefas' %}" class="btn btn-primary"> Criar Tarefa</a>
+                <a href="{% url 'contact:listar_areas' %}" class="btn btn-secondary">Voltar para a lista de áreas</a>
+            </div>
+        </div>
+    </div>
+  
+{% endblock %}
+
+

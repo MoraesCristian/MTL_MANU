@@ -29,3 +29,11 @@ class AreaAdmin(admin.ModelAdmin):
     list_per_page = 50
     list_max_show_all = 100
     list_display_links = ('nome',)
+    
+@admin.register(models.Tarefa)
+class TarefaAdmin(admin.ModelAdmin):
+    list_display = ('descricao',)
+    search_fields = ('descricao',)
+    list_per_page = 50
+    list_max_show_all = 100
+    list_display_links = ('descricao',)

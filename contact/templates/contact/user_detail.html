@@ -1,16 +1,22 @@
 {% extends 'global/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
+{% endblock %}
+
 {% block content %}
-  <h1>Detalhes do Usuário</h1>
-  <div class="card">
-      <i class='bx bx-user-circle'></i>
-      <li><strong>Nome:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</li>
-      <li><strong>Email:</strong> {{ usuario.email }}</li>
-      <li><strong>Empresa:</strong> {{ usuario.empresa }}</li>
-      <li><strong>Telefone:</strong> {{ usuario.telefone }}</li>
-      <li><strong>Tipo de Usuário:</strong> {{ usuario.get_tipo_usuario_display }}</li>
-      <li><strong>Criado por :</strong> {{ usuario.criado_por }}</li>
-      <a href="{% url 'contact:edit_user' user_id=usuario.id %}" class="btn btn-primary">Editar</a>
+  <div class="grid-container">
+    <div class="card">
+      <h1 id="id_usuario">Usuário: {{ usuario.first_name }} {{ usuario.last_name }}</h1>
+      <p id="email_usuario">Email:  {{ usuario.email }} </p>
+      <p id="empresa_usuario">Empresa: {{ usuario.empresa }} </p>
+      <p id="telefone_usuario">Telefone: {{ usuario.telefone }} </p>
+      <p id="tipo_usuairo">Tipo usuário: {{ usuario.get_tipo_usuario_display }} </p>
+      <div class="form-group button-group">
+        <a href="{% url 'contact:edit_user' user_id=usuario.id %}" class="btn btn-primary">Editar</a>
+        <a href="{% url 'contact:list_user' %}" class="btn btn-secondary">Voltar</a>
+      </div>
+    </div>
   </div>
 {% endblock %}

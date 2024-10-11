@@ -1,25 +1,35 @@
-{% extends 'global/base.html' %}
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>Lista de Áreas</h2>
-
-<table>
-    <thead>
-        <tr>
-            <th>Nome da Área</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for area in areas %}
-        <tr>
-            <td><a href="{% url 'contact:detalhes_area' area.id %}">{{ area.nome }}</a></td>  <!-- Link para detalhes -->
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="1">Nenhuma área encontrada.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<a href="{% url 'contact:criar_area' %}">Adicionar Nova Área</a>
+    <div class="grid-container">
+        <div class="card">
+            <h1>Lista de Áreas</h1>
+            {% regroup areas by empresa as grouped_areas %}
+            {% for group in grouped_areas %}
+                <h2>{{ group.grouper.nome_fantasia }}</h2>  {# Nome da empresa #}
+                {% for area in group.list %}
+                    <div class="card">
+                        <a href="{% url 'contact:detalhes_area' area.id %}" id="id_area_{{ area.id }}" class="link-as-text">{{ area.nome }}</a>
+                    </div>
+                {% empty %}
+                    <div class="card">
+                        <p>Nenhuma área encontrada para esta empresa.</p>
+                    </div>
+                {% endfor %}
+            {% empty %}
+                <div class="card">
+                    <p>Nenhuma área encontrada.</p>
+                </div>
+            {% endfor %}
+            <div class="form-group button-group">
+                <a href="{% url 'contact:criar_area' %}" class="btn btn-primary">Adicionar Nova Área</a>
+                <a href="{% url 'contact:configuracao' %}" class="btn btn-secondary">Voltar</a>
+            </div>
+        </div>
+    </div>
 {% endblock %}

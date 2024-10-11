@@ -1,6 +1,7 @@
 from django import forms
 from contact.models import Chamado, Tarefa, Empresa, Usuario,  MensagemChat, DetalheTarefa
 
+
 class ChamadoForm(forms.ModelForm):
     empresa_nome_fantasia = forms.ModelChoiceField(
         queryset=Empresa.objects.none(),  # Inicialmente vazio
@@ -34,8 +35,8 @@ class ChamadoForm(forms.ModelForm):
             'descricao': forms.Textarea(attrs={'required': True}),
             'local_especifico': forms.TextInput(attrs={'required': True}),
             'prioridade_chamado': forms.Select(attrs={'required': True}),
-            'prestadora_servico': forms.Select(attrs={'required': True}),
-            'tecnico_responsavel': forms.Select(attrs={'required': True}),
+            'prestadora_servico': forms.Select(attrs={'required': False}),
+            'tecnico_responsavel': forms.Select(attrs={'required': False}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -43,28 +44,28 @@ class ChamadoForm(forms.ModelForm):
         empresas = kwargs.pop('empresas', None)
         super().__init__(*args, **kwargs)
         
+        # Atualizando o queryset dos campos baseados em empresas e usuários
         if empresas is not None:
             self.fields['empresa_nome_fantasia'].queryset = empresas
             self.fields['empresa_nome_fantasia'].label_from_instance = lambda obj: obj.nome_fantasia
 
         if user and user.is_superuser:
             self.fields['empresa_nome_fantasia'].required = False
-            
         else:
             self.fields['empresa_nome_fantasia'].required = True
 
-        # TAREFA DROP DOWN DINAMICO
         self.fields['tarefa'].queryset = Tarefa.objects.none()
+        
+        # Substituindo a escolha padrão
+        self.fields['area_chamado'].choices = [('', 'Selecione a área')] + list(self.fields['area_chamado'].choices)[1:]
 
-        # Definindo as opções da área do chamado
-        self.fields['area_chamado'].choices = [('', 'Selecione a área')] + list(self.fields['area_chamado'].choices)
-                
+        # Atualizando o queryset de tarefas baseado na área selecionada
         if 'area_chamado' in self.data:
             try:
                 area_id = int(self.data.get('area_chamado'))
                 self.fields['tarefa'].queryset = Tarefa.objects.filter(area_id=area_id)
             except (ValueError, TypeError):
-                    pass
+                pass
         elif self.instance.pk:
             self.fields['tarefa'].queryset = self.instance.area_chamado.tarefas.all()
 
@@ -77,7 +78,6 @@ class MensagemChatForm(forms.ModelForm):
             'conteudo': forms.Textarea(attrs={'rows': 2, 'cols': 40})
         }
         
-
 
 class DetalheTarefaForm(forms.ModelForm):
     tarefa = forms.ModelChoiceField(queryset=Tarefa.objects.none(), widget=forms.HiddenInput())
@@ -92,3 +92,4 @@ class DetalheTarefaForm(forms.ModelForm):
         if tarefa:
             self.fields['tarefa'].queryset = Tarefa.objects.filter(id=tarefa.id)
             self.fields['tarefa'].initial = tarefa
+

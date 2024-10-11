@@ -1,6 +1,13 @@
 {% extends 'global/base.html' %}
+{% load static %}
+
+{% block title %}Lista de Chamados {% endblock %}
+
 {% block content %}
-<h2>Lista de Chamados</h2>
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
+{% endblock %}
 
 {% if user_tipo == 'admin' or user_tipo == 'cliente' %}
   <form method="get">
@@ -30,7 +37,8 @@
       <li><strong>Nº Ordem:</strong>{{ chamado.numero_ordem }}</li>
       <li><strong>Nome Fantasia:</strong>{{ chamado.empresa_nome_fantasia }}</li>
       <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
-      <li><strong>Status:</strong> {{ chamado.prioridade_chamado }}</li>
+      <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
+      <li><strong>Status chamado :</strong> {{ chamado.status_chamado }}</li>
     </a>
   </div>
 {% endfor %}

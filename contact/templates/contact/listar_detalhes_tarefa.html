@@ -1,11 +1,23 @@
 {% extends "global/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
+{% endblock %}
 
 {% block content %}
-  <h1>Detalhes da Tarefa: {{ tarefa.descricao }}</h1>
-  <ul>
-    {% for detalhe in detalhes %}
-      <li>{{ detalhe.descricao }}</li>
-    {% endfor %}
-  </ul>
-  <a href="{% url 'contact:criar_detalhe_tarefa' tarefa.id %}">Adicionar Detalhe</a>
+  <div class="cards-container">
+    <h1>Detalhes da Tarefa: {{ tarefa.descricao }}</h1>
+      {% for detalhe in detalhes %}
+        <div class="card">
+          <p>{{ detalhe.descricao }}</p>
+          </div>
+      {% endfor %}
+    <div class="card">
+      <div class="form-group button-group">
+        <a href="{% url 'contact:criar_detalhe_tarefa' tarefa.id %}">Adicionar Detalhe</a>
+        <a href="{% url 'contact:listar_tarefas' %}" class="btn btn-secondary">Voltar</a>
+      </div>
+    </div>
+  </div>
 {% endblock %}

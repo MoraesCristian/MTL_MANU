@@ -1,14 +1,30 @@
-{% extends 'global/base.html' %}
+{% extends "global/base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
+{% endblock %}
 
 {% block content %}
-  <h1>Lista de Tarefas</h1>
-  <ul>
-    {% for tarefa in tarefas %}
-      <li>
-        {{ tarefa.descricao }} - 
-        <a href="{% url 'contact:listar_detalhes_tarefa' tarefa.id %}">Ver Detalhes</a>
-      </li>
+  <div class="cards-container">
+    <h1>Lista de tarefas</h1>
+    {% for area, tarefas in tarefas_por_area.items %}
+      <div class="area-section">
+        <h2>{{ area.nome }}</h2>
+        <h3>{{ area.empresa.nome_fantasia }}</h3> {# Nome da empresa vinculada à área #}
+        {% for tarefa in tarefas %}
+          <div class="card">
+            <p>{{ tarefa.descricao }}</p>
+            <a href="{% url 'contact:listar_detalhes_tarefa' tarefa.id %}">{{ tarefa.descricao }}</a>
+          </div>
+        {% endfor %}
+      </div>
     {% endfor %}
-  </ul>
-  <a href="{% url 'contact:criar_tarefa' %}">Adicionar Tarefa</a>
+    <div class="card">
+      <div class="form-group button-group">
+        <a href="{% url 'contact:criar_tarefa' %}" class="btn btn-primary">Adicionar Tarefa</a>
+        <a href="{% url 'contact:configuracao' %}" class="btn btn-secondary"> Voltar </a>
+      </div>
+    </div>
+  </div>
 {% endblock %}

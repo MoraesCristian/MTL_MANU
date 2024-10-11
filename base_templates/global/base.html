@@ -52,6 +52,13 @@
         </a>
         <span class="tooltip">Usuarios</span>
       </li>
+      <li>
+        <a href="{% url 'contact:configuracao' %}" class="nav-link">
+          <i class='bx bxs-wrench'></i>
+          <span class="links_name">Configurações</span>
+        </a>
+        <span class="tooltip">Configurações</span>
+      </li>
     </ul>
     <div class="profile_content">
       <div class="profile">
@@ -80,7 +87,7 @@
     let btn = document.querySelector("#btn");
     let sidebar = document.querySelector(".sidebar");
     let searchBtn = document.querySelector(".bx-search");
-    let searchInput = document.querySelector(".search-box input");
+    let searchInput = document.querySelector(".search-container input");
 
     btn.onclick = function() {
       sidebar.classList.toggle("active");

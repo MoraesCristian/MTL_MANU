@@ -4,7 +4,23 @@ from contact.models import Empresa
 class EmpresaForm(forms.ModelForm):
     class Meta:
         model = Empresa
-        fields = ['razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo']
+        fields = [
+            'razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 
+            'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo'
+        ]
+        widgets = {
+            'razao_social': forms.TextInput(attrs={'id': 'razao_social', 'class': 'form-control'}),
+            'nome_fantasia': forms.TextInput(attrs={'id': 'nome_fantasia', 'class': 'form-control'}),
+            'cnpj': forms.TextInput(attrs={'id': 'cnpj', 'class': 'form-control'}),
+            'is_estadual': forms.TextInput(attrs={'id': 'is_estadual', 'class': 'form-control'}),
+            'is_municipal': forms.TextInput(attrs={'id': 'is_municipal', 'class': 'form-control'}),
+            'logradouro': forms.TextInput(attrs={'id': 'logradouro', 'class': 'form-control'}),
+            'estado': forms.Select(attrs={'id': 'estado', 'class': 'form-control'}),
+            'telefone': forms.TextInput(attrs={'id': 'telefone', 'class': 'form-control'}),
+            'email_empresa': forms.EmailInput(attrs={'id': 'email_empresa', 'class': 'form-control'}),
+            'observacao': forms.Textarea(attrs={'id': 'observacao', 'class': 'form-control'}),
+            'prefixo': forms.TextInput(attrs={'id': 'prefixo', 'class': 'form-control'}),
+        }
         
 
 class AdicionarEmpresaForm(forms.ModelForm):

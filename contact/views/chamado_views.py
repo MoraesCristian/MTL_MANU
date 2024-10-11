@@ -1,12 +1,14 @@
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa
+from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa,DetalheTarefaPreenchido
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
 from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm
 from contact.forms.area_forms import AreaForm
 from contact.forms.tarefa_forms import TarefaForm
+from collections import defaultdict
+from django.db import IntegrityError
 
 
 
@@ -20,18 +22,26 @@ def listar_chamados(request):
         empresa_filter = request.GET.get('empresa')
         chamados = Chamado.objects.all()
         if empresa_filter:
-            chamados = chamados.filter(usuario__empresa__nome_fantasia=empresa_filter)
+            chamados = chamados.filter(empresa__nome_fantasia=empresa_filter)
         empresas = Empresa.objects.all()
 
     elif user.tipo_usuario == 'manager':
         empresa_filter = request.GET.get('empresa')
-        chamados = Chamado.objects.filter(usuario__empresa=user.empresa)
+        empresa_usuario = user.empresa
+        chamados = Chamado.objects.filter(empresa=empresa_usuario)
         if empresa_filter:
-            chamados = chamados.filter(usuario__empresa__nome_fantasia=empresa_filter)
-        empresas = Empresa.objects.filter(id=user.empresa.id) | Empresa.objects.filter(criado_por=user)
+            chamados = chamados.filter(empresa__nome_fantasia=empresa_filter)
+        empresas = Empresa.objects.filter(id=empresa_usuario.id)
 
     elif user.tipo_usuario == 'tecnico':
-        chamados = Chamado.objects.filter(usuario=user)
+        chamados = Chamado.objects.filter(tecnico_responsavel=user)
+        empresas = Empresa.objects.filter(tecnico_responsavel=user)  # Adicione esta linha se o técnico pode estar vinculado a várias empresas
+
+    else:
+        # Para outros tipos de usuários, como clientes, mostrando chamados vinculados à empresa deles.
+        empresa_usuario = user.empresa
+        chamados = Chamado.objects.filter(empresa=empresa_usuario)
+        empresas = Empresa.objects.filter(id=empresa_usuario.id)
 
     context = {
         'chamados': chamados,
@@ -40,7 +50,6 @@ def listar_chamados(request):
     }
     return render(request, 'contact/listar_chamados.html', context)
 
-
 @login_required
 def abrir_chamado(request):
     user = request.user
@@ -48,28 +57,35 @@ def abrir_chamado(request):
     if user.tipo_usuario == 'cliente':
         if user.empresa is None:
             return HttpResponseForbidden("Usuário não está vinculado a nenhuma empresa.")
-
-        empresa_id = user.empresa.id
-        empresas = Empresa.objects.filter(id=empresa_id)
+        empresas = Empresa.objects.filter(id=user.empresa.id)
     else:
         empresas = Empresa.objects.all()
         
     if request.method == 'POST':
-        form = ChamadoForm(request.POST, empresas=empresas)
+        form = ChamadoForm(request.POST, user=user, empresas=empresas)
         if form.is_valid():
-            chamado = form.save(commit=False) 
+            chamado = form.save(commit=False)
             chamado.criado_por = request.user
             chamado.empresa = form.cleaned_data['empresa_nome_fantasia']
             chamado.save()
-            return redirect('contact:listar_chamados')
+            if chamado.tarefa:
+                detalhes = DetalheTarefa.objects.filter(tarefa=chamado.tarefa)
+                for detalhe in detalhes:
+                    print(f"- {detalhe.descricao}")
+                
+                for detalhe in detalhes:
+                    DetalheTarefaPreenchido.objects.create(
+                        detalhe_tarefa=detalhe,
+                        chamado=chamado,
+                        usuario=request.user,
+                    )
 
+            return redirect('contact:listar_chamados')
     else:
-        if request.user.is_superuser:
-            form = ChamadoForm(empresas=empresas)
-        else:
-            form = ChamadoForm(user=request.user, empresas=empresas)
+        form = ChamadoForm(user=user, empresas=empresas)
     
-    return render(request, 'contact/abrir_chamado.html', {'form': form, 'empresas': empresas})
+    return render(request, 'contact/abrir_chamado.html', {'form': form})
+
 
 def buscar_tarefas(request):
     area_id = request.GET.get('area')
@@ -82,7 +98,7 @@ def criar_area(request):
         form = AreaForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('contact:listar_areas') 
+            return redirect('contact:listar_areas')
     else:
         form = AreaForm()
     
@@ -90,8 +106,9 @@ def criar_area(request):
 
 @login_required
 def listar_areas(request):
-    areas = Area.objects.all()
+    areas = Area.objects.select_related('empresa').all()
     return render(request, 'contact/listar_areas.html', {'areas': areas})
+
 
 @login_required
 def detalhes_area(request, area_id):
@@ -101,8 +118,14 @@ def detalhes_area(request, area_id):
 
 @login_required
 def listar_tarefas(request):
-    tarefas = Tarefa.objects.all()
-    return render(request, 'contact/listar_tarefas.html', {'tarefas': tarefas})
+    tarefas = Tarefa.objects.select_related('area', 'area__empresa').all()
+    tarefas_por_area = defaultdict(list)
+
+    for tarefa in tarefas:
+        tarefas_por_area[tarefa.area].append(tarefa)
+
+    return render(request, 'contact/listar_tarefas.html', {'tarefas_por_area': dict(tarefas_por_area)})
+
 
 @login_required
 def criar_tarefa(request):
@@ -116,6 +139,17 @@ def criar_tarefa(request):
     
     return render(request, 'contact/criar_tarefa.html', {'form': form})
 
+@login_required
+def ajax_load_areas(request):
+    empresa_id = request.GET.get('empresa_id')
+    areas = Area.objects.filter(empresa_id=empresa_id).order_by('nome')
+    return JsonResponse(list(areas.values('id', 'nome')), safe=False)
+
+@login_required
+def ajax_load_tarefas(request):
+    area_id = request.GET.get('area_id')
+    tarefas = Tarefa.objects.filter(area_id=area_id).order_by('descricao')
+    return JsonResponse(list(tarefas.values('id', 'descricao')), safe=False)
 
 @login_required
 def listar_detalhes_tarefa(request, tarefa_id):
@@ -128,13 +162,17 @@ def criar_detalhe_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     
     if request.method == 'POST':
+        print(request.POST)  # Adicione esta linha para verificar os dados postados
         form = DetalheTarefaForm(request.POST, tarefa=tarefa)
         if form.is_valid():
             detalhe_tarefa = form.save(commit=False)
             detalhe_tarefa.tarefa = tarefa
             detalhe_tarefa.save()
             return redirect('contact:listar_detalhes_tarefa', tarefa_id=tarefa_id)
+        else:
+            print(form.errors)  # Mantenha essa linha para depuração
     else:
         form = DetalheTarefaForm(tarefa=tarefa)
     
     return render(request, 'contact/criar_detalhe_tarefa.html', {'form': form, 'tarefa': tarefa})
+

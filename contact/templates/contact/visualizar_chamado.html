@@ -16,7 +16,7 @@
             width: 80%;
         }
 
-        .dynamic-content {
+        .dynamic-content2 {
             width: 100%;
             height: 500px;
             border: 1px solid #ccc;
@@ -111,11 +111,34 @@
                 <button id="tarefas_a_realizar">Tarefas a realizar</button>
             </div>
             <div>
-                <p id="status_chamado"><strong>Status:</strong> {{ chamado.prioridade_chamado }}</p>
+                <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
             </div>
             <div>
-                <button id="concluir">Concluir</button>
+                <p><strong>Prioridade Chamado:</strong> {{ chamado.prioridade_chamado }}</p>
             </div>
+            {% if user.is_authenticated %}
+                {% if user.is_staff %}
+                    <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                        {% csrf_token %}
+                        <label for="status_chamado_select">Selecione o Status:</label>
+                        <select name="status_chamado" id="status_chamado_select">
+                            <option value="aberto" {% if chamado.status_chamado == 'aberto' %}selected{% endif %}>Aberto</option>
+                            <option value="executando" {% if chamado.status_chamado == 'executando' %}selected{% endif %}>Executando</option>
+                            <option value="concluido" {% if chamado.status_chamado == 'concluido' %}selected{% endif %}>Concluído</option>
+                            <option value="rejeitado" {% if chamado.status_chamado == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
+                        </select>
+                        <button id="atualizar_status" type="submit">Atualizar Status</button>
+                    </form>
+                {% elif user.prestadora_servico == chamado.prestadora_servico %}
+                    <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="status_chamado" value="concluido">
+                        <button id="concluir" type="submit">Concluir</button>
+                    </form>
+                {% elif user.tipo_usuario == 'cliente' %}
+                    <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
+                {% endif %}
+            {% endif %}
         </div>
         <div class="main-content">
             <div>
@@ -124,7 +147,7 @@
                 <p id="cliente_telefone">{{ chamado.cliente_telefone }}</p>
                 <p id="cliente_email">{{ chamado.cliente_email }}</p>
             </div>
-            <div id="dynamic-content" class="dynamic-content">
+            <div id="dynamic-content2" class="dynamic-content2">
                 <div class="info-block">
                     <h3>Informações do Chamado</h3>
                     <p><strong>Número da Ordem:</strong> {{ chamado.numero_ordem }}</p>
@@ -153,60 +176,32 @@
 
     <script>
         $(document).ready(function() {
-            // Função genérica para carregar conteúdo dinâmico
             function loadContent(url) {
                 $.get(url, function(data) {
-                    $('#dynamic-content').html(data);
-                    initializeFormsAndLinks(); // Inicializa o formulário de detalhe e links dinâmicos
+                    $('#dynamic-content2').html(data);
+                    initializeFormsAndLinks();
                 });
             }
-        
-            // Inicializa links e formulários dinâmicos
             function initializeFormsAndLinks() {
-                $('#dynamic-content a').on('click', function(e) {
-                    e.preventDefault(); // Impede o comportamento padrão do link
-                    var url = $(this).attr('href'); // Obtém a URL do link
-                    loadContent(url); // Carrega o conteúdo na parte dinâmica
-                });
-        
-                $('form').on('submit', function(event) {
-                    event.preventDefault(); // Impede o comportamento padrão do formulário
-                    $.ajax({
-                        url: $(this).attr('action'), // URL do formulário
-                        type: 'POST',
-                        data: new FormData(this), // Serializa todos os dados do formulário
-                        contentType: false,
-                        processData: false,
-                        success: function(response) {
-                            $('#dynamic-content').html(response); // Atualiza o conteúdo com a resposta
-                            initializeFormsAndLinks(); // Re-inicializa os links dinâmicos e formulários
-                        },
-                        error: function(xhr, errmsg, err) {
-                            console.log(xhr.status + ": " + xhr.responseText);
-                        }
-                    });
+                $('#dynamic-content2 a').on('click', function(e) {
+                    e.preventDefault();
+                    var url = $(this).attr('href');
+                    loadContent(url);
                 });
             }
-        
-            // Inicializa conteúdo dinâmico na primeira carga
+
             $('#chat').on('click', function() {
                 loadContent("{% url 'contact:load_chat' chamado.id %}");
             });
-        
+
             $('#informacao_chamado').on('click', function() {
                 loadContent("{% url 'contact:load_informacao_chamado' chamado.id %}");
             });
-        
+
             $('#tarefas_a_realizar').on('click', function() {
                 loadContent("{% url 'contact:load_tarefas_a_realizar' chamado.id %}");
             });
-        
-            // Inicializa links dinâmicos na primeira carga
-            initializeFormsAndLinks();
         });
     </script>
-        
 </body>
 </html>
-
-

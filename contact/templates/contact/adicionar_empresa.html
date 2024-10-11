@@ -1,54 +1,65 @@
 {% extends 'global/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/responsive_form.css' %}">
+{% endblock %}
 
 {% block content %}
-  <h1>Adicionar Empresa</h1>
-  <form method="post">
-    {% csrf_token %}
-    <div class="form-group">
-      <label for="id_razao_social">Razão Social</label>
-      {{ form.razao_social }}
+  <div class="grid-container">
+    <div class="card">
+      <h1>Adicionar Empresa</h1>
+      <form method="post" class="form-adicionar-empresa">
+          {% csrf_token %}
+          <div class="form-group">
+              <label for="id_razao_social">Razão Social</label>
+              {{ form.razao_social }}
+          </div>
+          <div class="form-group">
+              <label for="id_nome_fantasia">Nome Fantasia</label>
+              {{ form.nome_fantasia }}
+          </div>
+          <div class="form-group">
+              <label for="id_cnpj">CNPJ</label>
+              {{ form.cnpj }}
+          </div>
+          <div class="form-group">
+              <label for="id_is_estadual">Inscrição Estadual</label>
+              {{ form.is_estadual }}
+          </div>
+          <div class="form-group">
+              <label for="id_is_municipal">Inscrição Municipal</label>
+              {{ form.is_municipal }}
+          </div>
+          <div class="form-group">
+              <label for="id_logradouro">Logradouro</label>
+              {{ form.logradouro }}
+          </div>
+          <div class="form-group">
+              <label for="id_estado">Estado</label>
+              {{ form.estado }}
+          </div>
+          <div class="form-group">
+              <label for="id_telefone">Telefone</label>
+              {{ form.telefone }}
+          </div>
+          <div class="form-group">
+              <label for="id_email_empresa">Email da Empresa</label>
+              {{ form.email_empresa }}
+          </div>
+          <div class="form-group">
+              <label for="id_observacao">Observação</label>
+              {{ form.observacao }}
+          </div>
+          <div class="form-group">
+              <label for="id_prefixo">Prefixo</label>
+              {{ form.prefixo }}
+          </div>
+          <div class="form-group button-group">
+              <button type="submit" class="btn btn-primary">Salvar</button>
+              <a href="{% url 'contact:empresas_view' %}" class="btn btn-secondary">Cancelar</a>
+          </div>
+      </form>
     </div>
-    <div class="form-group">
-      <label for="id_nome_fantasia">Nome Fantasia</label>
-      {{ form.nome_fantasia }}
-    </div>
-    <div class="form-group">
-      <label for="id_cnpj">CNPJ</label>
-      {{ form.cnpj }}
-    </div>
-    <div class="form-group">
-      <label for="id_is_estadual">Inscrição Estadual</label>
-      {{ form.is_estadual }}
-    </div>
-    <div class="form-group">
-      <label for="id_is_municipal">Inscrição Municipal</label>
-      {{ form.is_municipal }}
-    </div>
-    <div class="form-group">
-      <label for="id_logradouro">Logradouro</label>
-      {{ form.logradouro }}
-    </div>
-    <div class="form-group">
-      <label for="id_estado">Estado</label>
-      {{ form.estado }}
-    </div>
-    <div class="form-group">
-      <label for="id_telefone">Telefone</label>
-      {{ form.telefone }}
-    </div>
-    <div class="form-group">
-      <label for="id_email_empresa">Email da Empresa</label>
-      {{ form.email_empresa }}
-    </div>
-    <div class="form-group">
-      <label for="id_observacao">Observação</label>
-      {{ form.observacao }}
-    </div>
-    <div class="form-group">
-      <label for="id_prefixo">Prefixo</label>
-      {{ form.prefixo }}
-    </div>
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a href="{% url 'contact:empresas_view' %}" class="btn btn-secondary">Cancelar</a>
-  </form>
+  </div>
 {% endblock %}

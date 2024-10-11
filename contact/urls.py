@@ -22,8 +22,11 @@ urlpatterns = [
     path('chamado/<int:chamado_id>/tarefas_a_realizar/', views.load_tarefas_a_realizar, name='load_tarefas_a_realizar'),
     path('chamado/<int:chamado_id>/tarefa/<int:tarefa_id>/detalhe/<int:detalhe_tarefa_id>/', views.detalhe_tarefa_view, name='detalhe_tarefa'),
     path('chamado/<int:chamado_id>/tarefa/<int:tarefa_id>/detalhe/<int:detalhe_tarefa_id>/editar/', views.detalhe_tarefa_edit_view, name='detalhe_tarefa_edit'),
+    path('chamado/<int:chamado_id>/atualizar-status/', views.atualizar_status_chamado_view, name='atualizar_status_chamado'),
     path('tarefas/', views.buscar_tarefas, name='buscar_tarefas'),
     path('tarefas/criar/', views.criar_tarefa, name='criar_tarefa'),
+    path('ajax/load-areas/', views.ajax_load_areas, name='ajax_load_areas'),
+    path('ajax/load-tarefas/', views.ajax_load_tarefas, name='ajax_load_tarefas'),
     path('listar_tarefas/', views.listar_tarefas, name='listar_tarefas'),
     path('tarefas/<int:tarefa_id>/detalhes/', views.listar_detalhes_tarefa, name='listar_detalhes_tarefa'),
     path('tarefas/<int:tarefa_id>/detalhes/criar/', views.criar_detalhe_tarefa, name='criar_detalhe_tarefa'),
@@ -31,5 +34,6 @@ urlpatterns = [
     path('areas/criar/', views.criar_area, name='criar_area'),
     path('areas/<int:area_id>/', views.detalhes_area, name='detalhes_area'),
     path('profile/', views.profile_view, name='profile'),
+    path('configuracao/', views.configuracao, name='configuracao'),
 ]
 

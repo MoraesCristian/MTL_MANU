@@ -11,6 +11,8 @@ django = "^5.1"
 django-types = "^0.19.1"
 django-stubs-ext = "^5.0.4"
 pillow = "^10.4.0"
+django-crispy-forms = "^2.3"
+crispy-bootstrap4 = "^2024.1"
 
 
 [tool.poetry.group.dev.dependencies]

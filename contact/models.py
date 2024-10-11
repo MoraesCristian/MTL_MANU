@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db.models import UniqueConstraint
 
 
 class CustomUserManager(BaseUserManager):
@@ -120,7 +121,13 @@ class Empresa(models.Model):
 
 
 class Area(models.Model):
-    nome = models.CharField(max_length=255, unique=True)
+    nome = models.CharField(max_length=255)
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['nome', 'empresa'], name='unique_area_per_empresa')
+        ]
 
     def __str__(self):
         return self.nome
@@ -163,7 +170,7 @@ class Chamado(models.Model):
     ])
     
     area_chamado = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True)
-    tarefa =  models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True, related_name='chamados')
+    tarefa = models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True, related_name='chamados')
     local_especifico = models.CharField(max_length=255)
     
     data_criacao = models.DateTimeField(auto_now_add=True)
@@ -177,6 +184,13 @@ class Chamado(models.Model):
     
     data_inicio_atv = models.DateTimeField(blank=True, null=True)
     data_fim_atv = models.DateTimeField(blank=True, null=True)
+    
+    status_chamado = models.CharField(max_length=255,choices=[
+        ('aberto', 'Aberto'),
+        ('concluido', 'Concluído'),
+        ('executando', 'Executando'),
+        ('rejeitado', 'Rejeitado'),
+    ],default='aberto')
 
     def save(self, *args, **kwargs):
         if not self.pk: 
@@ -220,6 +234,22 @@ class DetalheTarefaPreenchido(models.Model):
 
     def __str__(self):
         return f'Detalhe preenchido por {self.usuario} para {self.detalhe_tarefa}'
+    
+    
+class Imagem(models.Model):
+    TIPO_IMAGEM_CHOICES = [
+        ('cliente', 'Cliente'),
+        ('ajuste', 'Ajuste'),
+    ]
+    
+    numero_ordem = models.ForeignKey(Chamado, on_delete=models.CASCADE)
+    tarefa = models.ForeignKey(Tarefa, on_delete=models.CASCADE)
+    detalhe_tarefa = models.ForeignKey(DetalheTarefaPreenchido, related_name='imagens', on_delete=models.CASCADE)
+    imagem = models.ImageField(upload_to='imagens_tarefas/')
+    tipo_imagem = models.CharField(max_length=10, choices=TIPO_IMAGEM_CHOICES, default='cliente')  # Default set here
+
+    def __str__(self):
+        return f"{self.detalhe_tarefa} - {self.tarefa} ({self.numero_ordem.numero_ordem})"
 
 
 class Chat(models.Model):
