@@ -4,24 +4,29 @@ from contact.forms.create_user import UsuarioCreationForm
 from contact.models import Usuario
 from django.shortcuts import render, get_object_or_404
 
-
 @login_required
 def list_users_view(request):
-    user = request.user
-    if user.tipo_usuario == 'user':
-        return redirect('home')  
+    if not request.user.is_authenticated:
+        return render(request, 'contact/unauthorized.html')
+    usuarios = Usuario.objects.none()
 
-    if user.tipo_usuario == 'admin':
+    if request.user.tipo_usuario == 'admin':
         usuarios = Usuario.objects.all()
-        
-    elif user.tipo_usuario == 'manager':
-        usuarios = Usuario.objects.filter(criado_por=user)
-    
+    elif request.user.tipo_usuario == 'operador':
+        usuarios = Usuario.objects.filter(tipo_usuario__in=['operador', 'manager', 'user'])
+    elif request.user.tipo_usuario == 'manager':
+        usuarios = Usuario.objects.none()
+    elif request.user.tipo_usuario == 'user':
+        usuarios = Usuario.objects.none()
+
     return render(request, 'contact/list_user.html', {'usuarios': usuarios})
 
 
 @login_required
 def create_user_view(request):
+    if request.user.tipo_usuario not in ['admin', 'operador']:
+        return render(request, 'contact/list_user.html')
+
     if request.method == 'POST':
         form = UsuarioCreationForm(request.POST, request=request)
         if form.is_valid():

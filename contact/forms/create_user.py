@@ -21,21 +21,27 @@ class UsuarioCreationForm(forms.ModelForm):
         
         if self.request:
             user = self.request.user
+            
             if user.tipo_usuario == 'manager':
-                empresa_choices = [(user.empresa.id, user.empresa.razao_social)]
                 self.fields['empresa'].queryset = Empresa.objects.filter(id=user.empresa.id)
             elif user.tipo_usuario == 'user':
                 self.fields['empresa'].queryset = Empresa.objects.none()
                 
-            if user.tipo_usuario == 'manager':
+            if user.tipo_usuario == 'admin':
                 self.fields['tipo_usuario'].choices = [
-                    ('manager', 'Gerente'),
-                    ('user', 'Técnico'),
+                    ('admin', 'Administrador'),
+                    ('operador', 'Operador'),
+                    ('manager', 'Cliente'),
+                    ('user', 'Terceiro'),
                 ]
-            elif user.tipo_usuario == 'user':
+            elif user.tipo_usuario == 'operador':
                 self.fields['tipo_usuario'].choices = [
-                    ('user', 'Técnico'),
+                    ('operador', 'Operador'),
+                    ('manager', 'Cliente'),
+                    ('user', 'Terceiro'),
                 ]
+            else:
+                self.fields['tipo_usuario'].choices = []
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -43,5 +49,5 @@ class UsuarioCreationForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-
-
+    
+    

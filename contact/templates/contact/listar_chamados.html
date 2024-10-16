@@ -3,44 +3,45 @@
 
 {% block title %}Lista de Chamados {% endblock %}
 
-{% block content %}
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
 {% endblock %}
 
-{% if user_tipo == 'admin' or user_tipo == 'cliente' %}
-  <form method="get">
-    <select name="empresa">
-      <option value="">Selecione uma empresa</option>
-      {% for empresa in empresas %}
-      <option value="{{ empresa.nome_fantasia }}">{{ empresa.nome_fantasia }}</option>
-      {% endfor %}
-    </select>
-    <button type="submit">Filtrar</button>
-  </form>
+{% block content %}
+
+{% if user_tipo == 'admin' or user_tipo == 'operador'%}
+<form method="get">
+  <select name="empresa">
+    <option value="">Selecione uma empresa</option>
+    {% for empresa in empresas %}
+    <option value="{{ empresa.nome_fantasia }}">{{ empresa.nome_fantasia }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit">Filtrar</button>
+</form>
 {% endif %}
-{% if user_tipo == 'admin' or user_tipo == 'cliente' %}
-  <div class="grid-container">
+
+
+<div class="grid-container">
+  {% if user_tipo == 'admin' or user_tipo == 'operador' or user_tipo == 'manager' %}
     <div class="card">
       <a href="{% url 'contact:abrir_chamado' %}" class='bx bx-alarm-add'>Abrir Chamado</a>
-      <i class='bx bx-alarm-add' ></i>
+      <i class='bx bx-alarm-add'></i>
       <li><strong>Abrir Chamado</strong></li>
     </div>
-  </div>
-{% endif %}
+  {% endif %}
 
-{% for chamado in chamados %}
-  <div class="card">
-    <a href="{% url 'contact:visualizar_chamado' chamado.id %}" class="full-card-link">
-      <i class='bx bx-building'></i>
-      <li><strong>Nº Ordem:</strong>{{ chamado.numero_ordem }}</li>
-      <li><strong>Nome Fantasia:</strong>{{ chamado.empresa_nome_fantasia }}</li>
-      <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
-      <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
-      <li><strong>Status chamado :</strong> {{ chamado.status_chamado }}</li>
-    </a>
-  </div>
-{% endfor %}
-
+  {% for chamado in chamados %}
+    <div class="card">
+      <a href="{% url 'contact:visualizar_chamado' chamado.id %}" class="full-card-link">
+        <i class='bx bx-building'></i>
+        <li><strong>Nº Ordem:</strong>{{ chamado.numero_ordem }}</li>
+        <li><strong>Nome Fantasia:</strong>{{ chamado.empresa_nome_fantasia }}</li>
+        <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
+        <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
+        <li><strong>Status chamado :</strong> {{ chamado.status_chamado }}</li>
+      </a>
+    </div>
+  {% endfor %}
+</div>
 {% endblock %}

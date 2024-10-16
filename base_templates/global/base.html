@@ -32,26 +32,13 @@
         <span class="tooltip">Inicio</span>
       </li>
       <li>
-      <a href="{% url 'contact:empresas_view' %}" class="nav-link">
-          <i class='bx bx-building'></i>
-          <span class="links_name">Empresas</span>
-        </a>
-        <span class="tooltip">Empresas</span>
-      </li>
-      <li>
         <a href="{% url 'contact:listar_chamados' %}" class="nav-link">
           <i class='bx bx-phone'></i>
           <span class="links_name">Chamados</span>
         </a>
         <span class="tooltip">Chamados</span>
       </li>
-      <li>
-        <a href="{% url 'contact:list_user' %}" class="nav-link">
-          <i class='bx bx-user-circle' ></i>
-          <span class="links_name">Usuarios</span>
-        </a>
-        <span class="tooltip">Usuarios</span>
-      </li>
+      {% if  user.tipo_usuario  == 'admin' or  user.tipo_usuario  == 'operador' %}
       <li>
         <a href="{% url 'contact:configuracao' %}" class="nav-link">
           <i class='bx bxs-wrench'></i>
@@ -59,11 +46,18 @@
         </a>
         <span class="tooltip">Configurações</span>
       </li>
+      <li>
+        <a href="{% url 'contact:cadastros' %}" class="nav-link">
+          <i class='bx bx-user-circle' ></i>
+          <span class="links_name">Cadastros</span>
+        </a>
+        <span class="tooltip">Cadastros</span>
+      </li>
+      {% endif %}
     </ul>
     <div class="profile_content">
       <div class="profile">
         <div class="profile_details">
-          {% comment %} <img src="{% static 'global/images/img.jpg' %}" alt=""> {% endcomment %}
           <div class="name_job">
             <a href="{% url 'contact:profile' %}" class="nav-link">
               <div class="name">{{ user.first_name }} {{ user.last_name }}</div>

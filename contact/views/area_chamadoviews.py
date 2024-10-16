@@ -73,19 +73,6 @@ def load_informacao_chamado(request, chamado_id):
     }
     return render(request, 'contact/informacao_chamado.html', context)
 
-# @login_required
-# def load_tarefas_a_realizar(request, chamado_id):
-#     chamado = get_object_or_404(Chamado, id=chamado_id)
-#     tarefas = Tarefa.objects.filter(area=chamado.area_chamado)  # Filtrar tarefas pela área do chamado
-#     detalhes_tarefas = DetalheTarefa.objects.filter(tarefa__in=tarefas)  # Filtrar detalhes pelas tarefas
-
-#     context = {
-#         'tarefas': tarefas,
-#         'detalhes_tarefas': detalhes_tarefas,
-#         'chamado': chamado,
-#     }
-#     return render(request, 'contact/tarefas_a_realizar.html', context)
-
 @login_required
 def load_tarefas_a_realizar(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
@@ -230,7 +217,6 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
         return render(request, 'contact/tarefas_a_realizar.html', context)
 
 
-
 @login_required
 def atualizar_status_chamado_view(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
@@ -244,9 +230,9 @@ def atualizar_status_chamado_view(request, chamado_id):
             print("Status inválido recebido.")
             return redirect('contact:listar_chamados')
 
-        # Atualiza o status se o usuário for admin
-        if request.user.is_staff:
-            print(f"Atualizando status do chamado {chamado_id} para {novo_status} pelo admin {request.user.first_name}.")
+        # Atualiza o status se o usuário for admin ou operador
+        if request.user.is_staff or request.user.tipo_usuario == 'operador':
+            print(f"Atualizando status do chamado {chamado_id} para {novo_status} pelo admin/operador {request.user.first_name}.")
             chamado.status_chamado = novo_status
             chamado.save()
             return redirect('contact:listar_chamados')
@@ -254,11 +240,19 @@ def atualizar_status_chamado_view(request, chamado_id):
         # Atualiza o status se o usuário for técnico ou prestadora de serviço
         elif request.user.is_authenticated:
             # Verifica se o usuário está associado à prestadora de serviço do chamado
-            if chamado.prestadora_servico == request.user.prestadora_servico:
-                print(f"Atualizando status do chamado {chamado_id} para {novo_status} pelo técnico/prestadora {request.user.first_name}.")
-                chamado.status_chamado = novo_status
-                chamado.save()
-                return redirect('contact:listar_chamados')
+            if chamado.prestadora_servico == request.user.empresa:
+                # Permite que a prestadora de serviço altere para 'executando' ou 'concluido' apenas
+                if novo_status in ['executando', 'concluido']:
+                    print(f"Atualizando status do chamado {chamado_id} para {novo_status} pelo técnico/prestadora {request.user.first_name}.")
+                    chamado.status_chamado = novo_status
+                    chamado.save()
+                    return redirect('contact:listar_chamados')
+                else:
+                    print("Status inválido para prestadora de serviço.")
+                    return redirect('contact:listar_chamados')
 
     print("Método não permitido ou condições não atendidas.")
     return redirect('contact:listar_chamados')
+
+
+

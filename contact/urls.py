@@ -5,6 +5,7 @@ app_name = 'contact'
 
 urlpatterns = [
     path('', views.home_view, name='home'),
+    path('cadastros/', views.cadastros_view, name='cadastros'),
     path('empresas/', views.empresas_view, name='empresas_view'),
     path('empresas/adicionar/', views.adicionar_empresa_view, name='adicionar_empresa'),
     path('empresas/<int:empresa_id>/', views.empresa_detalhes_view, name='empresas_details'),
@@ -23,6 +24,7 @@ urlpatterns = [
     path('chamado/<int:chamado_id>/tarefa/<int:tarefa_id>/detalhe/<int:detalhe_tarefa_id>/', views.detalhe_tarefa_view, name='detalhe_tarefa'),
     path('chamado/<int:chamado_id>/tarefa/<int:tarefa_id>/detalhe/<int:detalhe_tarefa_id>/editar/', views.detalhe_tarefa_edit_view, name='detalhe_tarefa_edit'),
     path('chamado/<int:chamado_id>/atualizar-status/', views.atualizar_status_chamado_view, name='atualizar_status_chamado'),
+    path('chamado/<int:chamado_id>/adicionar_prestadora_servico/', views.adicionar_prestadora_servico_view, name='adicionar_prestadora_servico'),
     path('tarefas/', views.buscar_tarefas, name='buscar_tarefas'),
     path('tarefas/criar/', views.criar_tarefa, name='criar_tarefa'),
     path('ajax/load-areas/', views.ajax_load_areas, name='ajax_load_areas'),

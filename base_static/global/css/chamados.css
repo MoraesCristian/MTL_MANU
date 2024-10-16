@@ -1,37 +1,83 @@
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  html{
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
-    text-align: center;
-  }
-  body{
-    padding: min(50px, 7%);
-    height: 100vh;
-    background-color: rgb(34, 34, 60);
-  }
-  h1{
-    margin: 30px 1;
-  }
-  
-  .card{
-    padding: 2em;
-    border: 1px solid rgb(75, 82, 92);
-    border-radius: 10px;
-    background-color: #737886;
-    text-align: left;
-  }
-  
-  .grid-container{
-    display: grid;
-  
-    grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
-    gap: 15px;
-    justify-content: center;
-  }
-  
-  
+.container {
+  display: flex;
+}
+
+.sidebar {
+  width: 20%;
+}
+
+.main-content {
+  width: 80%;
+}
+
+.dynamic-content2 {
+  width: 100%;
+  height: 500px;
+  border: 1px solid #ccc;
+  overflow-y: scroll;
+  border-radius: 10px;
+}
+
+.chat-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+}
+
+#messages {
+  border: 1px solid #ddd;
+  padding: 10px;
+  height: 400px;
+  overflow-y: scroll;
+  margin-bottom: 10px;
+  background-color: #fff;
+  border-radius: 10px;
+}
+
+.message {
+  border-bottom: 1px solid #eee;
+  padding: 5px 0;
+  border-radius: 10px;
+}
+
+.message strong {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.message p {
+  margin: 0;
+  border-radius: 4px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+textarea {
+  resize: none;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  width: 96%;
+}
+
+button {
+  align-self: flex-end;
+  padding: 10px 20px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}

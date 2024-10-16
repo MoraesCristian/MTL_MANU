@@ -1,9 +1,8 @@
 <div id="tarefas-a-realizar">
-    <h3>Tarefas a Realizar para o Chamado #{{ chamado.numero_ordem }}</h3>
     <ul>
         {% for tarefa in tarefas %}
             <li>
-                <strong>{{ tarefa.descricao }}</strong>
+                <h3>Tarefas a Realizar {{ tarefa.descricao }}</h3>
                 <ul>
                     {% for detalhe in detalhes_tarefas %}
                         {% if detalhe.tarefa.id == tarefa.id %}

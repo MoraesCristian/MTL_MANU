@@ -1,93 +1,10 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{{ chamado.numero_ordem }} - {{ chamado.titulo }}</title>
-    <style>
-        .container {
-            display: flex;
-        }
-
-        .sidebar {
-            width: 20%;
-        }
-
-        .main-content {
-            width: 80%;
-        }
-
-        .dynamic-content2 {
-            width: 100%;
-            height: 500px;
-            border: 1px solid #ccc;
-            overflow-y: scroll;
-            border-radius: 10px;
-        }
-
-        .chat-container {
-            border: 1px solid #ccc;
-            padding: 10px;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-        }
-
-        #messages {
-            border: 1px solid #ddd;
-            padding: 10px;
-            height: 400px;
-            overflow-y: scroll;
-            margin-bottom: 10px;
-            background-color: #fff;
-            border-radius: 10px;
-        }
-
-        .message {
-            border-bottom: 1px solid #eee;
-            padding: 5px 0;
-            border-radius: 10px;
-        }
-
-        .message strong {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .message p {
-            margin: 0;
-            border-radius: 4px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        textarea {
-            resize: none;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            width: 96%;
-        }
-
-        button {
-            align-self: flex-end;
-            padding: 10px 20px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'global/css/chamados.css' %}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
@@ -110,6 +27,11 @@
             <div>
                 <button id="tarefas_a_realizar">Tarefas a realizar</button>
             </div>
+            {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
+            <div>
+                <button id="config_chamado">Configurações</button>
+            </div>
+            {% endif %}
             <div>
                 <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
             </div>
@@ -117,7 +39,7 @@
                 <p><strong>Prioridade Chamado:</strong> {{ chamado.prioridade_chamado }}</p>
             </div>
             {% if user.is_authenticated %}
-                {% if user.is_staff %}
+                {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
                     <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
                         {% csrf_token %}
                         <label for="status_chamado_select">Selecione o Status:</label>
@@ -129,7 +51,7 @@
                         </select>
                         <button id="atualizar_status" type="submit">Atualizar Status</button>
                     </form>
-                {% elif user.prestadora_servico == chamado.prestadora_servico %}
+                {% elif user.empresa == chamado.prestadora_servico %}
                     <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
                         {% csrf_token %}
                         <input type="hidden" name="status_chamado" value="concluido">
@@ -139,7 +61,11 @@
                     <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
                 {% endif %}
             {% endif %}
+            <div>
+                <a class="back-button" href="{% url 'contact:listar_chamados' %}">Voltar</a>
+            </div>
         </div>
+
         <div class="main-content">
             <div>
                 <h3>{{ chamado.numero_ordem }} - {{ chamado.titulo }}</h3>
@@ -201,6 +127,12 @@
             $('#tarefas_a_realizar').on('click', function() {
                 loadContent("{% url 'contact:load_tarefas_a_realizar' chamado.id %}");
             });
+
+            $('#config_chamado').on('click',function(){
+                loadContent("{% url 'contact:adicionar_prestadora_servico' chamado.id %}");
+            });
+            
+            initializeFormsAndLinks();
         });
     </script>
 </body>

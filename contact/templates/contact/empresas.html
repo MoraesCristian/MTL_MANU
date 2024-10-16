@@ -9,11 +9,13 @@
 
 {% block content %}
   <div class="grid-container">
+    {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
     <div class="card">
       <a href="{% url 'contact:adicionar_empresa' %}">Adicionar Empresa</a>
       <i class='bx bx-alarm-add' ></i>
       <li><strong>Adicionar empresa:</strong></li>
     </div>
+    {% endif %}
     {% for empresa in empresas %}
       <div class="card">
         <i class='bx bx-building'></i>
@@ -24,5 +26,4 @@
     {% endfor %}
   </div>
 {% endblock %}
-
 

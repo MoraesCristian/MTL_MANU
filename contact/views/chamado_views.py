@@ -4,12 +4,10 @@ from django.contrib.auth.decorators import login_required
 from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa,DetalheTarefaPreenchido
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse
-from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm
+from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm, AdicionarPrestadoraServicoForm
 from contact.forms.area_forms import AreaForm
 from contact.forms.tarefa_forms import TarefaForm
 from collections import defaultdict
-from django.db import IntegrityError
-
 
 
 @login_required
@@ -18,7 +16,7 @@ def listar_chamados(request):
     chamados = Chamado.objects.none() 
     empresas = None
 
-    if user.tipo_usuario == 'admin':
+    if user.tipo_usuario == 'admin' or user.tipo_usuario =='operador' :
         empresa_filter = request.GET.get('empresa')
         chamados = Chamado.objects.all()
         if empresa_filter:
@@ -33,9 +31,10 @@ def listar_chamados(request):
             chamados = chamados.filter(empresa__nome_fantasia=empresa_filter)
         empresas = Empresa.objects.filter(id=empresa_usuario.id)
 
-    elif user.tipo_usuario == 'tecnico':
-        chamados = Chamado.objects.filter(tecnico_responsavel=user)
-        empresas = Empresa.objects.filter(tecnico_responsavel=user)  # Adicione esta linha se o técnico pode estar vinculado a várias empresas
+    elif user.tipo_usuario == 'user':
+        empresa_usuario = user.empresa
+        chamados = Chamado.objects.filter(prestadora_servico=empresa_usuario)
+        empresas = Empresa.objects.filter(id=empresa_usuario.id)
 
     else:
         # Para outros tipos de usuários, como clientes, mostrando chamados vinculados à empresa deles.
@@ -54,7 +53,7 @@ def listar_chamados(request):
 def abrir_chamado(request):
     user = request.user
 
-    if user.tipo_usuario == 'cliente':
+    if user.tipo_usuario == 'manager':
         if user.empresa is None:
             return HttpResponseForbidden("Usuário não está vinculado a nenhuma empresa.")
         empresas = Empresa.objects.filter(id=user.empresa.id)
@@ -162,17 +161,47 @@ def criar_detalhe_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     
     if request.method == 'POST':
-        print(request.POST)  # Adicione esta linha para verificar os dados postados
         form = DetalheTarefaForm(request.POST, tarefa=tarefa)
         if form.is_valid():
             detalhe_tarefa = form.save(commit=False)
             detalhe_tarefa.tarefa = tarefa
             detalhe_tarefa.save()
             return redirect('contact:listar_detalhes_tarefa', tarefa_id=tarefa_id)
-        else:
-            print(form.errors)  # Mantenha essa linha para depuração
     else:
         form = DetalheTarefaForm(tarefa=tarefa)
     
     return render(request, 'contact/criar_detalhe_tarefa.html', {'form': form, 'tarefa': tarefa})
+
+@login_required
+def adicionar_prestadora_servico_view(request, chamado_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
+    
+    if request.method == 'POST':
+        form = AdicionarPrestadoraServicoForm(request.POST, instance=chamado)
+        if form.is_valid():
+            form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True})
+            return redirect('contact:visualizar_chamado', chamado_id=chamado.id)
+        else:
+            # Capture os erros de validação
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        form = AdicionarPrestadoraServicoForm(instance=chamado)
+    
+    prestadora_atual = chamado.prestadora_servico
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'contact/adicionar_prestadora_servico.html', {
+            'form': form,
+            'chamado': chamado,
+            'prestadora_atual': prestadora_atual
+        })
+    
+    return render(request, 'contact/adicionar_prestadora_servico.html', {
+        'form': form,
+        'chamado': chamado,
+        'prestadora_atual': prestadora_atual
+    })
 

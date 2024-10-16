@@ -1,0 +1,25 @@
+{% extends 'global/base.html' %}
+{% load static %}
+
+{% block title %}CADASTROS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="grid-container">
+        <div class="card">
+            <a href="{% url 'contact:empresas_view' %}"> Empresa</a>
+            <i class='bx bx-building'></i>
+            <li><strong>Adicionar empresa:</strong></li>
+        </div>
+        <div class="card">
+            <a href="{% url 'contact:list_user' %}"> Usuários</a>
+            <i class='bx bx-building'></i>
+            <li><strong>Usuários:</strong></li>
+        </div>
+
+
+    </div>
+{% endblock %}

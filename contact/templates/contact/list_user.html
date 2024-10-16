@@ -8,12 +8,14 @@
 {% block content %}
   <h1>Lista de Usuários</h1>
   <div class="grid-container">
+    {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
     <div class="card">
         <a href="{% url 'contact:create_user' %}" class="href">
             <i class='bx bx-alarm-add'></i>
             <strong>Adicionar usuário</strong>
         </a>
     </div>
+    {% endif %}
     {% for usuario in usuarios %}
       <div class="card">
           <i class='bx bx-user-circle'></i>

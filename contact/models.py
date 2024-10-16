@@ -27,8 +27,10 @@ class CustomUserManager(BaseUserManager):
 class Usuario(AbstractBaseUser, PermissionsMixin):
     USER_TYPE_CHOICES = [
         ('admin', 'Administrador'),
-        ('manager', 'Gerente'),
-        ('user', 'Técnico'),]
+        ('operador', 'Operador'),
+        ('manager', 'Cliente'),
+        ('user', 'Terceiro'),
+    ]
     id = models.AutoField(primary_key=True) 
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
@@ -47,16 +49,16 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
-    
+
     def can_create_user(self):
-        return self.tipo_usuario in ['admin', 'manager']
+        return self.tipo_usuario in ['admin', 'operador']
 
     def can_create_admin(self):
         return self.tipo_usuario == 'admin'
 
     def can_create_manager(self):
-        return self.tipo_usuario in ['admin', 'manager']
-    
+        return self.tipo_usuario in ['admin', 'operador']
+
     @property
     def tipo_usuario_display(self):
         return dict(self.USER_TYPE_CHOICES).get(self.tipo_usuario, 'Desconhecido')

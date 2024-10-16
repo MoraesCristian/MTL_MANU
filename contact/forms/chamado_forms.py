@@ -9,7 +9,7 @@ class ChamadoForm(forms.ModelForm):
         label='Empresa'
     )
     prestadora_servico = forms.ModelChoiceField(
-        queryset=Empresa.objects.none(),  # Inicialmente vazio
+        queryset=Empresa.objects.all(),  # Mostrar todas as empresas
         required=False,
         label='Terceiro'
     )
@@ -44,7 +44,6 @@ class ChamadoForm(forms.ModelForm):
         empresas = kwargs.pop('empresas', None)
         super().__init__(*args, **kwargs)
         
-        # Atualizando o queryset dos campos baseados em empresas e usuários
         if empresas is not None:
             self.fields['empresa_nome_fantasia'].queryset = empresas
             self.fields['empresa_nome_fantasia'].label_from_instance = lambda obj: obj.nome_fantasia
@@ -56,10 +55,8 @@ class ChamadoForm(forms.ModelForm):
 
         self.fields['tarefa'].queryset = Tarefa.objects.none()
         
-        # Substituindo a escolha padrão
         self.fields['area_chamado'].choices = [('', 'Selecione a área')] + list(self.fields['area_chamado'].choices)[1:]
 
-        # Atualizando o queryset de tarefas baseado na área selecionada
         if 'area_chamado' in self.data:
             try:
                 area_id = int(self.data.get('area_chamado'))
@@ -93,3 +90,13 @@ class DetalheTarefaForm(forms.ModelForm):
             self.fields['tarefa'].queryset = Tarefa.objects.filter(id=tarefa.id)
             self.fields['tarefa'].initial = tarefa
 
+class AdicionarPrestadoraServicoForm(forms.ModelForm):
+    prestadora_servico = forms.ModelChoiceField(
+        queryset=Empresa.objects.all(),
+        required=True,
+        label='Prestadora de Serviço'
+    )
+
+    class Meta:
+        model = Chamado
+        fields = ['prestadora_servico']
