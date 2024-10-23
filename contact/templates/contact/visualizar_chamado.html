@@ -38,29 +38,52 @@
             <div>
                 <p><strong>Prioridade Chamado:</strong> {{ chamado.prioridade_chamado }}</p>
             </div>
+            <div>
             {% if user.is_authenticated %}
-                {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
-                    <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
-                        {% csrf_token %}
-                        <label for="status_chamado_select">Selecione o Status:</label>
-                        <select name="status_chamado" id="status_chamado_select">
-                            <option value="aberto" {% if chamado.status_chamado == 'aberto' %}selected{% endif %}>Aberto</option>
-                            <option value="executando" {% if chamado.status_chamado == 'executando' %}selected{% endif %}>Executando</option>
-                            <option value="concluido" {% if chamado.status_chamado == 'concluido' %}selected{% endif %}>Concluído</option>
-                            <option value="rejeitado" {% if chamado.status_chamado == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
-                        </select>
-                        <button id="atualizar_status" type="submit">Atualizar Status</button>
-                    </form>
-                {% elif user.empresa == chamado.prestadora_servico %}
-                    <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="status_chamado" value="concluido">
-                        <button id="concluir" type="submit">Concluir</button>
-                    </form>
-                {% elif user.tipo_usuario == 'cliente' %}
-                    <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
+                {% if chamado.status_chamado != 'concluido' %}
+                    {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
+                        <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                            {% csrf_token %}
+                            <label for="status_chamado_select">Selecione o Status:</label>
+                            <select name="status_chamado" id="status_chamado_select">
+                                <option value="aberto" {% if chamado.status_chamado == 'aberto' %}selected{% endif %}>Aberto</option>
+                                <option value="executando" {% if chamado.status_chamado == 'executando' %}selected{% endif %}>Executando</option>
+                                <option value="concluido" {% if chamado.status_chamado == 'concluido' %}selected{% endif %}>Concluído</option>
+                                <option value="rejeitado" {% if chamado.status_chamado == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
+                            </select>
+                            <button id="atualizar_status" type="submit">Atualizar Status</button>
+                        </form>
+                    {% elif user.empresa == chamado.prestadora_servico and user.tipo_usuario != 'cliente' %}
+                        <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="status_chamado" value="executando">
+                            <button id="executar" type="submit">Executar</button>
+                        </form>
+                        <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="status_chamado" value="concluido">
+                            <button id="concluir" type="submit">Concluir</button>
+                        </form>
+                    {% elif user.tipo_usuario == 'cliente' %}
+                        <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
+                    {% endif %}
+                {% else %}
+                    {% if user.tipo_usuario == 'admin' %}
+                        <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                            {% csrf_token %}
+                            <label for="status_chamado_select">Selecione o Status:</label>
+                            <select name="status_chamado" id="status_chamado_select">
+                                <option value="aberto" {% if chamado.status_chamado == 'aberto' %}selected{% endif %}>Aberto</option>
+                                <option value="executando" {% if chamado.status_chamado == 'executando' %}selected{% endif %}>Executando</option>
+                                <option value="concluido" {% if chamado.status_chamado == 'concluido' %}selected{% endif %}>Concluído</option>
+                                <option value="rejeitado" {% if chamado.status_chamado == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
+                            </select>
+                            <button id="atualizar_status" type="submit">Atualizar Status</button>
+                        </form>
+                    {% endif %}
                 {% endif %}
             {% endif %}
+            </div>
             <div>
                 <a class="back-button" href="{% url 'contact:listar_chamados' %}">Voltar</a>
             </div>

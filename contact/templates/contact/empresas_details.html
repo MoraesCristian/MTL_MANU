@@ -19,6 +19,7 @@
       <p id="email_empresa">Email: {{ empresa.email_empresa }}</p>
       <p id="observacao">Observação: {{ empresa.observacao }}</p>
       <p id="prefixo">Prefixo: {{ empresa.prefixo }}</p>
+      <p id="filial">Empresa matrix: {{ empresa.filial_de }}</p>
       <div class="form-group button-group">
         <a href="{% url 'contact:edit_empresas' empresa.id %}" class="btn btn-primary">Editar</a>
         <a href="{% url 'contact:empresas_view' %}" class="btn btn-secondary">Voltar</a>

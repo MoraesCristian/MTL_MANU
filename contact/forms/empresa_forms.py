@@ -6,7 +6,8 @@ class EmpresaForm(forms.ModelForm):
         model = Empresa
         fields = [
             'razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 
-            'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo'
+            'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo',
+            'filial_de',
         ]
         widgets = {
             'razao_social': forms.TextInput(attrs={'id': 'razao_social', 'class': 'form-control'}),
@@ -20,13 +21,16 @@ class EmpresaForm(forms.ModelForm):
             'email_empresa': forms.EmailInput(attrs={'id': 'email_empresa', 'class': 'form-control'}),
             'observacao': forms.Textarea(attrs={'id': 'observacao', 'class': 'form-control'}),
             'prefixo': forms.TextInput(attrs={'id': 'prefixo', 'class': 'form-control'}),
+            'filial_de':forms.Select(attrs={'id': 'filial_de', 'class': 'form-control'}),
         }
         
 
 class AdicionarEmpresaForm(forms.ModelForm):
     class Meta:
         model = Empresa
-        fields = ['razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo']
+        fields = ['razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo',
+                  'filial_de',
+                  ]
         widgets = {
             'razao_social': forms.TextInput(attrs={'class': 'form-control'}),
             'nome_fantasia': forms.TextInput(attrs={'class': 'form-control'}),
@@ -39,6 +43,7 @@ class AdicionarEmpresaForm(forms.ModelForm):
             'email_empresa': forms.EmailInput(attrs={'class': 'form-control'}),
             'observacao': forms.TextInput(attrs={'class': 'form-control'}),
             'prefixo': forms.TextInput(attrs={'class': 'form-control'}),
+            'filial_de' :forms.Select(attrs={'id': 'filial_de', 'class': 'form-control'}),
         }
         
     def __init__(self, *args, **kwargs):

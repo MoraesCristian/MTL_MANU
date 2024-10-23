@@ -107,6 +107,7 @@ class Empresa(models.Model):
     observacao = models.CharField(max_length=255)
     prefixo = models.CharField(max_length=15, blank=True, default='') 
     criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas_criadas')
+    filial_de = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='filiais')
     
     def clean(self):
         self.razao_social = self.remove_special_characters(self.razao_social)

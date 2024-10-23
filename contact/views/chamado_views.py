@@ -8,15 +8,24 @@ from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm, Adicion
 from contact.forms.area_forms import AreaForm
 from contact.forms.tarefa_forms import TarefaForm
 from collections import defaultdict
+from django.db.models import Q
+from django.utils.dateparse import parse_date
 
 
 @login_required
 def listar_chamados(request):
     user = request.user
-    chamados = Chamado.objects.none() 
+    chamados = Chamado.objects.none()
     empresas = None
+    
+    empresa_filter = request.GET.get('empresa')
+    data_abertura_inicio = request.GET.get('data_abertura_inicio')
+    data_abertura_fim = request.GET.get('data_abertura_fim')
+    
+    status_chamado_filter = request.GET.get('status_chamado')
+    search = request.GET.get('search')
 
-    if user.tipo_usuario == 'admin' or user.tipo_usuario =='operador' :
+    if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador':
         empresa_filter = request.GET.get('empresa')
         chamados = Chamado.objects.all()
         if empresa_filter:
@@ -26,11 +35,11 @@ def listar_chamados(request):
     elif user.tipo_usuario == 'manager':
         empresa_filter = request.GET.get('empresa')
         empresa_usuario = user.empresa
-        chamados = Chamado.objects.filter(empresa=empresa_usuario)
+        empresas = Empresa.objects.filter(filial_de=empresa_usuario) | Empresa.objects.filter(id=empresa_usuario.id)
+        chamados = Chamado.objects.filter(empresa__in=empresas)
         if empresa_filter:
             chamados = chamados.filter(empresa__nome_fantasia=empresa_filter)
-        empresas = Empresa.objects.filter(id=empresa_usuario.id)
-
+        
     elif user.tipo_usuario == 'user':
         empresa_usuario = user.empresa
         chamados = Chamado.objects.filter(prestadora_servico=empresa_usuario)
@@ -39,9 +48,34 @@ def listar_chamados(request):
     else:
         # Para outros tipos de usuários, como clientes, mostrando chamados vinculados à empresa deles.
         empresa_usuario = user.empresa
-        chamados = Chamado.objects.filter(empresa=empresa_usuario)
-        empresas = Empresa.objects.filter(id=empresa_usuario.id)
+        empresas = Empresa.objects.filter(filial_de=empresa_usuario) | Empresa.objects.filter(id=empresa_usuario.id)
+        chamados = Chamado.objects.filter(empresa__in=empresas)
+    
+    if data_abertura_inicio:
+        data_inicio = parse_date(data_abertura_inicio)
+        if data_inicio:
+            chamados = chamados.filter(data_criacao__gte=data_inicio)
 
+    if data_abertura_fim:
+        data_fim = parse_date(data_abertura_fim)
+        if data_fim:
+            chamados = chamados.filter(data_criacao__lte=data_fim)
+
+    if status_chamado_filter:
+        chamados = chamados.filter(status_chamado=status_chamado_filter)
+        
+    if search:
+        chamados = chamados.filter(
+            Q(empresa__cnpj__icontains=search) |
+            Q(numero_ordem__icontains=search) |
+            Q(empresa_nome_fantasia__icontains=search)
+        )
+        
+    chamados = chamados.order_by(
+        'prioridade_chamado',
+        'data_criacao'  
+    )
+        
     context = {
         'chamados': chamados,
         'empresas': empresas,
@@ -204,4 +238,5 @@ def adicionar_prestadora_servico_view(request, chamado_id):
         'chamado': chamado,
         'prestadora_atual': prestadora_atual
     })
+
 

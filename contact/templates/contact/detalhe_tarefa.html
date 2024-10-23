@@ -1,4 +1,4 @@
-<div>
+<div id="detalhe_tarefa">
     <h1>{% if edit_mode %}Editar{% else %}Detalhes{% endif %} da Tarefa - {{ detalhe_tarefa.descricao }}</h1>
     <h2>Chamado #{{ chamado.numero_ordem }}</h2>
 
@@ -8,7 +8,7 @@
             {{ form.as_p }}
             <button type="submit">Salvar</button>
         </form>
-        <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe_tarefa.id %}" class="btn">Cancelar</a>
+        <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe_tarefa.id %}" class="btn ajax-link">Cancelar</a>
     {% else %}
         {% if detalhe_preenchido %}
             <p><strong>Detalhe Tarefa:</strong> {{ detalhe_preenchido.detalhe_tarefa }}</p>
@@ -21,10 +21,12 @@
         {% else %}
             <p>Não há detalhes preenchidos para esta tarefa.</p>
         {% endif %}
-        <a href="{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}" class="btn">Editar</a>
+        {% if user.tipo_usuario != 'manager'  %}
+        <a href="{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}" class="btn ajax-link">Editar</a>
+        {% endif %}
     {% endif %}
     
-    <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">Voltar para Tarefas a Realizar</a>
+    <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}" class="ajax-link">Voltar para Tarefas a Realizar</a>
 </div>
 
 <script>

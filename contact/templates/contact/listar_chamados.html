@@ -1,7 +1,7 @@
 {% extends 'global/base.html' %}
 {% load static %}
 
-{% block title %}Lista de Chamados {% endblock %}
+{% block title %}Lista de Chamados{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
@@ -9,21 +9,48 @@
 
 {% block content %}
 
-{% if user_tipo == 'admin' or user_tipo == 'operador'%}
-<form method="get">
-  <select name="empresa">
-    <option value="">Selecione uma empresa</option>
-    {% for empresa in empresas %}
-    <option value="{{ empresa.nome_fantasia }}">{{ empresa.nome_fantasia }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit">Filtrar</button>
-</form>
+{% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'manager' %}
+  <form method="get">
+    <input type="text" name="search" placeholder="Pesquisar por CNPJ, Nº Ordem ou Nome Fantasia" value="{{ request.GET.search }}">
+    <select name="empresa">
+      <option value="">Selecione uma empresa</option>
+      {% for empresa in empresas %}
+      <option value="{{ empresa.nome_fantasia }}" {% if request.GET.empresa == empresa.nome_fantasia %}selected{% endif %}>{{ empresa.nome_fantasia }}</option>
+      {% endfor %}
+    </select>
+    <input type="date" name="data_abertura_inicio" value="{{ request.GET.data_abertura_inicio }}">
+    <input type="date" name="data_abertura_fim" value="{{ request.GET.data_abertura_fim }}">
+
+    <select name="status_chamado">
+      <option value="">Selecione um status</option>
+      <option value="aberto" {% if request.GET.status_chamado == "aberto" %}selected{% endif %}>Aberto</option>
+      <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
+      <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
+      <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
+    </select>
+
+    <button type="submit">Filtrar</button>
+  </form>
+{% else %}
+  <form method="get">
+    <input type="text" name="search" placeholder="Pesquisar" value="{{ request.GET.search }}">
+    <input type="date" name="data_abertura_inicio" value="{{ request.GET.data_abertura_inicio }}">
+    <input type="date" name="data_abertura_fim" value="{{ request.GET.data_abertura_fim }}">
+
+    <select name="status_chamado">
+      <option value="">Selecione um status</option>
+      <option value="aberto" {% if request.GET.status_chamado == "aberto" %}selected{% endif %}>Aberto</option>
+      <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
+      <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
+      <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
+    </select>
+
+    <button type="submit">Filtrar</button>
+  </form>
 {% endif %}
 
-
 <div class="grid-container">
-  {% if user_tipo == 'admin' or user_tipo == 'operador' or user_tipo == 'manager' %}
+  {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'manager' %}
     <div class="card">
       <a href="{% url 'contact:abrir_chamado' %}" class='bx bx-alarm-add'>Abrir Chamado</a>
       <i class='bx bx-alarm-add'></i>
@@ -39,9 +66,10 @@
         <li><strong>Nome Fantasia:</strong>{{ chamado.empresa_nome_fantasia }}</li>
         <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
         <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
-        <li><strong>Status chamado :</strong> {{ chamado.status_chamado }}</li>
+        <li><strong>Status chamado:</strong> {{ chamado.status_chamado }}</li>
       </a>
     </div>
   {% endfor %}
 </div>
 {% endblock %}
+

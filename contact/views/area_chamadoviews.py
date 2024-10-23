@@ -4,7 +4,7 @@ from contact.models import Chamado, Chat, MensagemChat, Tarefa,DetalheTarefa, De
 from contact.forms.chamado_forms import MensagemChatForm
 from contact.forms.tarefa_forms import DetalheTarefaPreenchidoForm
 from django.http import JsonResponse
-from django.urls import reverse
+from django.core.exceptions import PermissionDenied
 
 @login_required
 def visualizar_chamado(request, chamado_id):
@@ -87,8 +87,10 @@ def load_tarefas_a_realizar(request, chamado_id):
 
     # Verifique se a requisição é AJAX
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        print('if do ajax')
         return render(request, 'contact/tarefas_a_realizar.html', context)
     else:
+        print('else fora do ajax')
         # Retorne uma resposta normal se não for uma requisição AJAX
         return render(request,'contact/tarefas_a_realizar.html', context)
 
@@ -109,13 +111,15 @@ def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
     }
     return render(request, 'contact/detalhe_tarefa.html', context)
 
-
-
 @login_required
 def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
+    
+    if chamado.status_chamado == 'concluido':
+        if request.user.tipo_usuario not in ['admin', 'operador']:
+            raise PermissionDenied("Você não tem permissão para editar este chamado.")
 
     try:
         detalhe_preenchido = DetalheTarefaPreenchido.objects.get(detalhe_tarefa=detalhe_tarefa, chamado=chamado)
@@ -213,6 +217,7 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return render(request, 'contact/tarefas_a_realizar.html', context)
     else:
+        print('else')
         # Retorne uma resposta normal se não for uma requisição AJAX
         return render(request, 'contact/tarefas_a_realizar.html', context)
 
@@ -248,11 +253,19 @@ def atualizar_status_chamado_view(request, chamado_id):
                     chamado.save()
                     return redirect('contact:listar_chamados')
                 else:
-                    print("Status inválido para prestadora de serviço.")
-                    return redirect('contact:listar_chamados')
+                    print("Status inválido recebido pelo técnico/prestadora.")
+            else:
+                print("Usuário não autorizado para alterar o status deste chamado.")
+        
+        # Caso o usuário não tenha permissão para alterar o status
+        print("Usuário não autorizado.")
+        return redirect('contact:listar_chamados')
 
-    print("Método não permitido ou condições não atendidas.")
-    return redirect('contact:listar_chamados')
+    # Renderiza o formulário com o status atual do chamado
+    context = {
+        'chamado': chamado,
+    }
+    return render(request, 'contact/visualizar_chamado.html', context)
 
 
 

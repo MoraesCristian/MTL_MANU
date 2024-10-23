@@ -8,7 +8,7 @@
 {% block content %}
   <h1>Lista de Usuários</h1>
   <div class="grid-container">
-    {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
+    {% if user.tipo_usuario == 'admin'%}
     <div class="card">
         <a href="{% url 'contact:create_user' %}" class="href">
             <i class='bx bx-alarm-add'></i>
@@ -23,7 +23,7 @@
           <ul>
             <li><strong>Nome:</strong> {{ usuario.first_name }}</li>
             <li><strong>Email:</strong> {{ usuario.email }}</li>
-            <li><strong>Cargo:</strong> {{ user.tipo_usuario_display }}</li>
+            <li><strong>Cargo:</strong> {{ usuario.tipo_usuario_display }}</li>
           </ul>
       </div>  
     {% empty %}

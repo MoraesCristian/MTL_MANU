@@ -46,7 +46,9 @@ def adicionar_empresa_view(request):
     if request.method == 'POST':
         form = AdicionarEmpresaForm(request.POST, request=request)
         if form.is_valid():
-            form.save()
+            empresa = form.save(commit=False)
+            empresa.criado_por = request.user
+            empresa.save()
             return redirect('contact:empresas_view')
     else:
         form = AdicionarEmpresaForm()

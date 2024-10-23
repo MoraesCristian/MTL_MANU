@@ -7,7 +7,7 @@
                     {% for detalhe in detalhes_tarefas %}
                         {% if detalhe.tarefa.id == tarefa.id %}
                             <li>
-                                <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe.id %}">{{ detalhe.descricao }}</a>
+                                <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe.id %}" class="ajax-link">{{ detalhe.descricao }}</a>
                                 {% for detalhe_preenchido in detalhe.detalhes_preenchidos %}
                                     {% if detalhe_preenchido.concluido %}
                                         <input type="checkbox" checked disabled>
@@ -27,4 +27,3 @@
         {% endfor %}
     </ul>
 </div>
-

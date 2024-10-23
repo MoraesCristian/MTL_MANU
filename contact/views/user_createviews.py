@@ -24,7 +24,7 @@ def list_users_view(request):
 
 @login_required
 def create_user_view(request):
-    if request.user.tipo_usuario not in ['admin', 'operador']:
+    if request.user.tipo_usuario not in ['admin']:
         return render(request, 'contact/list_user.html')
 
     if request.method == 'POST':

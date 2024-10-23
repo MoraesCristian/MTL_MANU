@@ -60,7 +60,7 @@
     $(document).ready(function() {
         $('#detalhe-tarefa-form').on('submit', function(event) {
             event.preventDefault();
-            console.log('Formulário enviado'); // Verificação
+            console.log('Formulário enviado'); 
             var formData = new FormData(this);
             $.ajaxSetup({
                 headers: {
@@ -68,22 +68,20 @@
                 }
             });
             $.ajax({
-                
-                url: window.location.href,
+                url: $(this).attr('action'),
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function(response) {
-                    
                     if (response.success) {
-                        console.log(f'sucesso?'response.success)
+                        console.log('Sucesso ajax:', response.success);
                         alert(response.message);
-                        window.location.href = "{% url 'contact:load_tarefas_a_realizar' chamado.id%}";
+                        $('#dynamic-content2').load("{% url 'contact:load_tarefas_a_realizar' chamado.id %} #tarefas-a-realizar");
                     } else {
                         var errors = response.errors;
                         for (var field in errors) {
-                            alert(field + ': ' + errors[field].join(', ')); // Mostra todos os erros para cada campo
+                            alert(field + ': ' + errors[field].join(', '));
                         }
                     }
                 },

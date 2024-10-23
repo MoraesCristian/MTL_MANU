@@ -55,6 +55,11 @@
               <label for="id_prefixo">Prefixo</label>
               {{ form.prefixo }}
           </div>
+          <div class="form-group">
+            <label for="id_filial_de">Adicione a matrix</label>
+            {{ form.filial_de }}
+          </div>
+
           <div class="form-group button-group">
               <button type="submit" class="btn btn-primary">Salvar</button>
               <a href="{% url 'contact:empresas_view' %}" class="btn btn-secondary">Cancelar</a>
