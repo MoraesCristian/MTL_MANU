@@ -10,23 +10,23 @@
 {% block content %}
 <div class="grid-container">
     <div class="card">
-        <a href="{% url 'contact:listar_areas' %}">Adicionar Área</a>
-        <i class='bx bx-alarm-add'></i>
+        <i class='bx bxs-edit-alt'></i>
+        <a href="{% url 'contact:listar_areas' %}">Listar áreas</a>
     </div>
     <div class="card">
-        <a href="{% url 'contact:listar_tarefas' %}">Adicionar Tarefa</a>
-        <i class='bx bx-task'></i>
+        <i class='bx bxs-objects-horizontal-left'></i>
+        <a href="{% url 'contact:listar_tarefas' %}">Listar Tarefa</a>
     </div>
     {% for area in areas %}
         <div class="card">
-            <i class='bx bx-area'></i>
+            <i class='bx bxs-edit-alt'></i>
             <a href="{% url 'contact:area_details' area.id %}">{{ area.nome }}</a>
             <li><strong>Descrição:</strong> {{ area.descricao }}</li>
         </div>
     {% endfor %}
     {% for tarefa in tarefas %}
         <div class="card">
-            <i class='bx bx-check-square'></i>
+            <i class='bx bxs-objects-horizontal-left'></i>
             <a href="{% url 'contact:tarefa_details' tarefa.id %}">{{ tarefa.titulo }}</a>
             <li><strong>Status:</strong> {{ tarefa.status }}</li>
         </div>

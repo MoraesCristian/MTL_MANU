@@ -1,3 +1,6 @@
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
 <div class="grid-container">
     <h2>Adicionar Prestadora de Serviço</h2>
 
@@ -7,7 +10,7 @@
         <p>Não há prestadora de serviço vinculada atualmente.</p>
     {% endif %}
 
-    <form method="post" id="adicionar-prestadora-form" action="{% url 'contact:adicionar_prestadora_servico' chamado.id %}">
+    <form method="post" action="{% url 'contact:adicionar_prestadora_servico' chamado.id %}">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">Salvar</button>
@@ -15,36 +18,4 @@
 
     <a href="{% url 'contact:visualizar_chamado' chamado.id %}">Voltar</a>
 </div>
-
-<script>
-    $(document).ready(function() {
-        $('#adicionar-prestadora-form').on('submit', function(e) {
-            e.preventDefault();
-            var $form = $(this);
-            var url = $form.attr('action');
-            var formData = $form.serialize();
-
-            $.ajax({
-                url: url,
-                method: 'POST',
-                data: formData,
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        alert('Prestadora de Serviço adicionada com sucesso.');
-                        // Atualize a página ou faça outra ação conforme necessário
-                    } else {
-                        // Exibir erros se o formulário não for válido
-                        alert('Ocorreu um erro ao adicionar a Prestadora de Serviço.');
-                        console.log(response.errors);  // Para verificar os erros no console
-                        // Aqui você pode adicionar lógica para mostrar os erros no template, se necessário
-                    }
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    alert('Ocorreu um erro ao processar a solicitação.');
-                    console.log(textStatus, errorThrown); // Log do erro no console para debug
-                }
-            });
-        });
-    });
-</script>
+{% endblock %}

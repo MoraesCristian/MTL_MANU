@@ -1,66 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
-<body>
-<div class="chat-container">
-    <h3>Chat</h3>
-    <div id="messages">
-        {% for mensagem in mensagens %}
-            <div class="message">
-                <strong>{{ mensagem.usuario.first_name }} {{ mensagem.usuario.last_name }}:</strong>
-                <p>{{ mensagem.conteudo }}</p>
-                <small>{{ mensagem.data_envio }}</small>
-            </div>
-        {% endfor %}
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
+    <div class="chat-container">
+        <h3>Chat</h3>
+        <div id="messages">
+            {% for mensagem in mensagens %}
+                <div class="message">
+                    <strong>{{ mensagem.usuario.first_name }} {{ mensagem.usuario.last_name }}:</strong>
+                    <p>{{ mensagem.conteudo }}</p>
+                    <small>{{ mensagem.data_envio }}</small>
+                </div>
+            {% endfor %}
+        </div>
+        <form method="post" action="{% url 'contact:load_chat' chamado.id %}">
+            {% csrf_token %}
+            <textarea name="mensagem" id="mensagem" rows="4" placeholder="Digite sua mensagem..."></textarea>
+            <button type="submit" id="send-button">Enviar</button>
+        </form>
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
     </div>
-    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-    <textarea id="mensagem" rows="4" placeholder="Digite sua mensagem..."></textarea>
-    <button id="send-button">Enviar</button>
-</div>
-
-<script>
-    $(document).ready(function() {
-        $('#send-button').on('click', function(event) {
-            event.preventDefault(); // Previne o comportamento padrão do botão
-
-            var mensagem = $('#mensagem').val();
-            var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
-
-            $.ajax({
-                type: 'POST',
-                url: "{% url 'contact:load_chat' chamado.id %}",
-                data: {
-                    'mensagem': mensagem,
-                    'csrfmiddlewaretoken': csrfToken
-                },
-                success: function(response) {
-                    if (response.success) {
-                        // Limpa o campo
-                        $('#mensagem').val('');
-
-                        // Adiciona a nova mensagem ao chat
-                        var messageHtml = '<div class="message">' +
-                            '<strong>' + (response.usuario.first_name || 'N/A') + ' ' + (response.usuario.last_name || 'N/A') + ':</strong>' +
-                            '<p>' + response.conteudo + '</p>' +
-                            '<small>' + response.data_envio + '</small>' +
-                            '</div>';
-                        $('#messages').append(messageHtml);
-                    } else {
-                        alert('Erro ao enviar a mensagem: ' + response.error);
-                    }
-                },
-                error: function(response) {
-                    alert('Erro ao enviar a mensagem.');
-                    console.log(response); // Loga a resposta de erro no console para depuração
-                }
-            });
-        });
-    });
-</script>
-</body>
-</html>
+{% endblock %}

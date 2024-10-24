@@ -1,18 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ chamado.numero_ordem }} - {{ chamado.titulo }}</title>
-    <style>
-        .info-block {
-            margin-bottom: 20px;
-        }
-        .info-block h3 {
-            margin-bottom: 5px;
-        }
-    </style>
-</head>
-<body>
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
     <div class="info-block">
         <h3>Informações do Chamado</h3>
         <p><strong>Número da Ordem:</strong> {{ chamado.numero_ordem }}</p>
@@ -70,5 +58,5 @@
         {% endif %}
     </div>
     {% endif %}
-</body>
-</html>
+{% endblock %}
+

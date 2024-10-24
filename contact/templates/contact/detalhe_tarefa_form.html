@@ -1,13 +1,12 @@
-<head>
-    <!-- Outros cabeçalhos -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
 
 <div>
     <h1>Editar Detalhes da Tarefa - {{ detalhe_tarefa.descricao }}</h1>
     <h2>Chamado #{{ chamado.numero_ordem }}</h2>
 
-    <form id="detalhe-tarefa-form" method="post" enctype="multipart/form-data" action="{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}">
+    <form method="post" enctype="multipart/form-data" action="{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}">
         {% csrf_token %}
         
         <div class="form-group">
@@ -56,39 +55,5 @@
     <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}" class="btn btn-secondary">Voltar para Tarefas a Realizar</a>
 </div>
 
-<script>
-    $(document).ready(function() {
-        $('#detalhe-tarefa-form').on('submit', function(event) {
-            event.preventDefault();
-            console.log('Formulário enviado'); 
-            var formData = new FormData(this);
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            });
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function(response) {
-                    if (response.success) {
-                        console.log('Sucesso ajax:', response.success);
-                        alert(response.message);
-                        $('#dynamic-content2').load("{% url 'contact:load_tarefas_a_realizar' chamado.id %} #tarefas-a-realizar");
-                    } else {
-                        var errors = response.errors;
-                        for (var field in errors) {
-                            alert(field + ': ' + errors[field].join(', '));
-                        }
-                    }
-                },
-                error: function(xhr, status, error) {
-                    alert('Ocorreu um erro ao processar a requisição. Tente novamente.');
-                }
-            });
-        });
-    });
-</script>
+
+{% endblock %}

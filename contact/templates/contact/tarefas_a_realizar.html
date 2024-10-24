@@ -1,3 +1,7 @@
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
+
 <div id="tarefas-a-realizar">
     <ul>
         {% for tarefa in tarefas %}
@@ -27,3 +31,6 @@
         {% endfor %}
     </ul>
 </div>
+
+{% endblock %}
+

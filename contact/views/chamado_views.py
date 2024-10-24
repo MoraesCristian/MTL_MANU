@@ -1,16 +1,16 @@
-from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa,DetalheTarefaPreenchido
-from django.http import HttpResponseForbidden
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm, AdicionarPrestadoraServicoForm
 from contact.forms.area_forms import AreaForm
 from contact.forms.tarefa_forms import TarefaForm
 from collections import defaultdict
+
+from django.contrib import messages
 from django.db.models import Q
 from django.utils.dateparse import parse_date
-
+ 
 
 @login_required
 def listar_chamados(request):
@@ -18,12 +18,13 @@ def listar_chamados(request):
     chamados = Chamado.objects.none()
     empresas = None
     
+    #filtros
     empresa_filter = request.GET.get('empresa')
     data_abertura_inicio = request.GET.get('data_abertura_inicio')
     data_abertura_fim = request.GET.get('data_abertura_fim')
-    
     status_chamado_filter = request.GET.get('status_chamado')
     search = request.GET.get('search')
+    prioridade_filter = request.GET.get('prioridade_chamado')
 
     if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador':
         empresa_filter = request.GET.get('empresa')
@@ -46,7 +47,6 @@ def listar_chamados(request):
         empresas = Empresa.objects.filter(id=empresa_usuario.id)
 
     else:
-        # Para outros tipos de usuários, como clientes, mostrando chamados vinculados à empresa deles.
         empresa_usuario = user.empresa
         empresas = Empresa.objects.filter(filial_de=empresa_usuario) | Empresa.objects.filter(id=empresa_usuario.id)
         chamados = Chamado.objects.filter(empresa__in=empresas)
@@ -70,6 +70,10 @@ def listar_chamados(request):
             Q(numero_ordem__icontains=search) |
             Q(empresa_nome_fantasia__icontains=search)
         )
+    if prioridade_filter:
+        chamados = chamados.filter(prioridade_chamado=prioridade_filter)
+
+    
         
     chamados = chamados.order_by(
         'prioridade_chamado',
@@ -137,6 +141,23 @@ def criar_area(request):
     
     return render(request, 'contact/criar_area.html', {'form': form})
 
+
+def criar_area(request):
+    if not (request.user.tipo_usuario == 'admin' or request.user.tipo_usuario == 'gerente'):
+        messages.error(request, "Você não tem permissão para criar áreas.")
+        return redirect('contact:listar_areas') 
+    
+    if request.method == 'POST':
+        form = AreaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('contact:listar_areas')
+    else:
+        form = AreaForm()
+    
+    return render(request, 'contact/criar_area.html', {'form': form})
+
+
 @login_required
 def listar_areas(request):
     areas = Area.objects.select_related('empresa').all()
@@ -162,6 +183,10 @@ def listar_tarefas(request):
 
 @login_required
 def criar_tarefa(request):
+    if not (request.user.tipo_usuario == 'admin' or request.user.tipo_usuario == 'gerente'):
+        messages.error(request, "Você não tem permissão para criar áreas.")
+        return redirect('contact:listar_tarefas') 
+    
     if request.method == 'POST':
         form = TarefaForm(request.POST)
         if form.is_valid():
@@ -193,6 +218,9 @@ def listar_detalhes_tarefa(request, tarefa_id):
 @login_required
 def criar_detalhe_tarefa(request, tarefa_id):
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
+    if not (request.user.tipo_usuario == 'admin' or request.user.tipo_usuario == 'gerente'):
+        messages.error(request, "Você não tem permissão para criar áreas.")
+        return redirect('contact:listar_detalhes_tarefa', tarefa_id=tarefa_id) 
     
     if request.method == 'POST':
         form = DetalheTarefaForm(request.POST, tarefa=tarefa)
@@ -209,34 +237,21 @@ def criar_detalhe_tarefa(request, tarefa_id):
 @login_required
 def adicionar_prestadora_servico_view(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
-    
+
     if request.method == 'POST':
         form = AdicionarPrestadoraServicoForm(request.POST, instance=chamado)
         if form.is_valid():
-            form.save()
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': True})
+            chamado.prestadora_servico = form.cleaned_data['prestadora_servico']
+            chamado.save()
             return redirect('contact:visualizar_chamado', chamado_id=chamado.id)
-        else:
-            # Capture os erros de validação
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                return JsonResponse({'success': False, 'errors': form.errors})
     else:
         form = AdicionarPrestadoraServicoForm(instance=chamado)
-    
+
     prestadora_atual = chamado.prestadora_servico
-    
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'contact/adicionar_prestadora_servico.html', {
-            'form': form,
-            'chamado': chamado,
-            'prestadora_atual': prestadora_atual
-        })
-    
+
     return render(request, 'contact/adicionar_prestadora_servico.html', {
         'form': form,
         'chamado': chamado,
         'prestadora_atual': prestadora_atual
     })
-
 

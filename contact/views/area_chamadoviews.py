@@ -5,6 +5,7 @@ from contact.forms.chamado_forms import MensagemChatForm
 from contact.forms.tarefa_forms import DetalheTarefaPreenchidoForm
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
+from django.utils import timezone
 
 @login_required
 def visualizar_chamado(request, chamado_id):
@@ -22,8 +23,7 @@ def visualizar_chamado(request, chamado_id):
             return redirect('contact:visualizar_chamado', chamado_id=chamado.id)
     else:
         form = MensagemChatForm()
-
-    print(f"Visualizando chamado: {chamado.id}, Status: {chamado.status_chamado}")
+        
     context = {
         'chamado': chamado,
         'chat': chat,
@@ -116,7 +116,7 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
-    
+
     if chamado.status_chamado == 'concluido':
         if request.user.tipo_usuario not in ['admin', 'operador']:
             raise PermissionDenied("Você não tem permissão para editar este chamado.")
@@ -132,9 +132,7 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
 
     if request.method == 'POST':
         form = DetalheTarefaPreenchidoForm(request.POST, request.FILES, instance=detalhe_preenchido)
-        print("POST")
         if form.is_valid():
-            print(form.is_valid())
             detalhe_preenchido = form.save(commit=False)
             detalhe_preenchido.observacao = detalhe_preenchido.observacao.strip() if detalhe_preenchido.observacao else ""
             detalhe_preenchido.detalhe_tarefa = detalhe_tarefa
@@ -142,7 +140,7 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
             detalhe_preenchido.usuario = request.user
             detalhe_preenchido.save()
 
-            # Processamento das imagens
+            # Processar imagens (sem AJAX)
             contador_clientes = 1
             contador_ajustes = 1
 
@@ -170,56 +168,24 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
                 )
                 contador_ajustes += 1
 
-            # Resposta para requisições AJAX
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                print("RESPOSTA AJAX")
-                response_data = {
-                    'success': True,
-                    'message': 'Detalhe da tarefa atualizado com sucesso.'
-                }
-                return JsonResponse(response_data)
-
-        else:
-            # Adicione logs para depurar erros
-            print("Erros de validação do formulário:", form.errors)
-            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-                response_data = {
-                    'success': False,
-                    'errors': form.errors
-                }
-                return JsonResponse(response_data)
+            return redirect('contact:detalhe_tarefa', chamado.id, tarefa.id, detalhe_tarefa.id)
 
     else:
-        print('dentro do form else')
         form = DetalheTarefaPreenchidoForm(instance=detalhe_preenchido)
-
-        context = {
-            'chamado': chamado,
-            'tarefa': tarefa,
-            'detalhe_tarefa': detalhe_tarefa,
-            'detalhe_preenchido': detalhe_preenchido,
-            'imagens_clientes': imagens_clientes,
-            'imagens_ajustes': imagens_ajustes,
-            'form': form,
-            'edit_mode': True,
-            'is_new': detalhe_preenchido is None
-        }
-
-        return render(request, 'contact/detalhe_tarefa_form.html', context)
 
     context = {
         'chamado': chamado,
         'tarefa': tarefa,
-        'detalhe_tarefa': detalhe_tarefa
+        'detalhe_tarefa': detalhe_tarefa,
+        'detalhe_preenchido': detalhe_preenchido,
+        'imagens_clientes': imagens_clientes,
+        'imagens_ajustes': imagens_ajustes,
+        'form': form,
+        'edit_mode': True,
+        'is_new': detalhe_preenchido is None
     }
 
-    # Verifique se a requisição é AJAX
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'contact/tarefas_a_realizar.html', context)
-    else:
-        print('else')
-        # Retorne uma resposta normal se não for uma requisição AJAX
-        return render(request, 'contact/tarefas_a_realizar.html', context)
+    return render(request, 'contact/detalhe_tarefa_form.html', context)
 
 
 @login_required
@@ -230,38 +196,48 @@ def atualizar_status_chamado_view(request, chamado_id):
         novo_status = request.POST.get('status_chamado')
         print(f"Recebido novo status: {novo_status}")
 
-        # Validação do novo status
         if novo_status not in ['aberto', 'executando', 'concluido', 'rejeitado']:
-            print("Status inválido recebido.")
             return redirect('contact:listar_chamados')
 
-        # Atualiza o status se o usuário for admin ou operador
+        redirection_url = 'contact:listar_chamados'
+        redirection_args = {}
+
         if request.user.is_staff or request.user.tipo_usuario == 'operador':
-            print(f"Atualizando status do chamado {chamado_id} para {novo_status} pelo admin/operador {request.user.first_name}.")
             chamado.status_chamado = novo_status
-            chamado.save()
-            return redirect('contact:listar_chamados')
 
-        # Atualiza o status se o usuário for técnico ou prestadora de serviço
+            if novo_status == 'aberto':
+                redirection_url = 'contact:visualizar_chamado'
+                redirection_args = {'chamado_id': chamado.id}
+            elif novo_status == 'executando':
+                chamado.data_inicio_atv = timezone.now()
+                redirection_url = 'contact:visualizar_chamado'
+                redirection_args = {'chamado_id': chamado.id}
+            elif novo_status == 'concluido':
+                chamado.data_fim_atv = timezone.now()
+            elif novo_status == 'rejeitado':
+                redirection_url = 'contact:listar_chamados'
+
+            chamado.save()
+            return redirect(redirection_url, **redirection_args)
+
         elif request.user.is_authenticated:
-            # Verifica se o usuário está associado à prestadora de serviço do chamado
             if chamado.prestadora_servico == request.user.empresa:
-                # Permite que a prestadora de serviço altere para 'executando' ou 'concluido' apenas
                 if novo_status in ['executando', 'concluido']:
-                    print(f"Atualizando status do chamado {chamado_id} para {novo_status} pelo técnico/prestadora {request.user.first_name}.")
                     chamado.status_chamado = novo_status
+                    
+                    if novo_status == 'executando':
+                        chamado.data_inicio_atv = timezone.now()
+                        redirection_url = 'contact:visualizar_chamado'
+                        redirection_args = {'chamado_id': chamado.id}
+                    elif novo_status == 'concluido':
+                        chamado.data_fim_atv = timezone.now()
+                        redirection_url = 'contact:listar_chamados'
+
                     chamado.save()
-                    return redirect('contact:listar_chamados')
-                else:
-                    print("Status inválido recebido pelo técnico/prestadora.")
-            else:
-                print("Usuário não autorizado para alterar o status deste chamado.")
-        
-        # Caso o usuário não tenha permissão para alterar o status
-        print("Usuário não autorizado.")
+                    return redirect(redirection_url, **redirection_args)
+
         return redirect('contact:listar_chamados')
 
-    # Renderiza o formulário com o status atual do chamado
     context = {
         'chamado': chamado,
     }

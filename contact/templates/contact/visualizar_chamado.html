@@ -3,41 +3,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ chamado.numero_ordem }} - {{ chamado.titulo }}</title>
     <link rel="stylesheet" href="{% static 'global/css/chamados.css' %}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <div class="container">
+    <header class="fixed-header">
+        <h1>Chamado {{ chamado.numero_ordem }}</h1>
+    </header>
+    <div class="container content">
         <div class="sidebar">
-            <div>
+            <div class="sub-container">
                 <h3>Data abertura:</h3>
                 <p id="data_abertura">{{ chamado.data_criacao }}</p>
             </div>
-            <div>
+            <div class="sub-container">
                 <h3>Data fechamento:</h3>
-                <p id="data_fechamento">{{ chamado.data_fechamento }}</p>
+                <p id="data_fechamento">{{ chamado.data_fim_atv }}</p>
             </div>
             <div>
-                <button id="chat">CHAT</button>
+                <a href="{% url 'contact:load_chat' chamado.id %}">
+                    <button id="chat">CHAT</button>
+                </a>
             </div>
             <div>
-                <button id="informacao_chamado">INFORMAÇÃO DO CHAMADO</button>
+                <a href="{% url 'contact:load_informacao_chamado' chamado.id %}">
+                    <button id="informacao_chamado">INFORMAÇÃO DO CHAMADO</button>
+                </a>
             </div>
             <div>
-                <button id="tarefas_a_realizar">Tarefas a realizar</button>
+                <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">
+                    <button id="tarefas_a_realizar">Tarefas a realizar</button>
+                </a>
             </div>
             {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
             <div>
-                <button id="config_chamado">Configurações</button>
+                <a href="{% url 'contact:adicionar_prestadora_servico' chamado.id %}">
+                    <button id="config_chamado">Configurações</button>
+                </a>
             </div>
             {% endif %}
-            <div>
-                <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
-            </div>
-            <div>
-                <p><strong>Prioridade Chamado:</strong> {{ chamado.prioridade_chamado }}</p>
-            </div>
             <div>
             {% if user.is_authenticated %}
                 {% if chamado.status_chamado != 'concluido' %}
@@ -85,78 +90,27 @@
             {% endif %}
             </div>
             <div>
-                <a class="back-button" href="{% url 'contact:listar_chamados' %}">Voltar</a>
+                <button class="back-button" href="{% url 'contact:listar_chamados' %}">Voltar</button>
             </div>
         </div>
 
         <div class="main-content">
-            <div>
-                <h3>{{ chamado.numero_ordem }} - {{ chamado.titulo }}</h3>
-                <p id="informacoes_cliente">{{ chamado.cliente_nome }}</p>
-                <p id="cliente_telefone">{{ chamado.cliente_telefone }}</p>
-                <p id="cliente_email">{{ chamado.cliente_email }}</p>
+            <div class="sub-container">
+                <h2 id="chamado-titulo">Detalhes do Chamado</h2>
+                <p id="chamado-titulo">Título: {{ chamado.titulo }}</p>
+                <p id="chamado-descricao">Descrição: {{ chamado.descricao }}</p>
+                <p id="chamado-tipo-manutencao">Tipo de Manutenção: {{ chamado.tipo_manutencao }}</p>
+                <p id="chamado-localizacao">Localização: {{ chamado.localizacao_atv }}</p>
+                <p id="chamado-local-especifico">Local Específico: {{ chamado.local_especifico }}</p>
+                <p id="chamado-prioridade">Prioridade Chamado: {{ chamado.prioridade_chamado }}</p>
+                <p id="chamado-status">Status: {{ chamado.status_chamado }}</p>
             </div>
-            <div id="dynamic-content2" class="dynamic-content2">
-                <div class="info-block">
-                    <h3>Informações do Chamado</h3>
-                    <p><strong>Número da Ordem:</strong> {{ chamado.numero_ordem }}</p>
-                    <p><strong>Título:</strong> {{ chamado.titulo }}</p>
-                    <p><strong>Descrição:</strong> {{ chamado.descricao }}</p>
-                    <p><strong>Tipo de Manutenção:</strong> {{ chamado.get_tipo_manutencao_display }}</p>
-                    <p><strong>Localização da Atividade:</strong> {{ chamado.get_localizacao_atv_display }}</p>
-                    <p><strong>Prioridade do Chamado:</strong> {{ chamado.get_prioridade_chamado_display }}</p>
-                    
-                    {% if chamado.area_chamado %}
-                    <p><strong>Área do Chamado:</strong> {{ chamado.area_chamado.nome }}</p>
-                    {% endif %}
-                    
-                    {% if chamado.tarefa %}
-                    <p><strong>Tarefa:</strong> {{ chamado.tarefa.descricao }}</p>
-                    {% endif %}
-                    
-                    <p><strong>Local Específico:</strong> {{ chamado.local_especifico }}</p>
-                    <p><strong>Data de Criação:</strong> {{ chamado.data_criacao }}</p>
-                    <p><strong>Data de Início da Atividade:</strong> {{ chamado.data_inicio_atv }}</p>
-                    <p><strong>Data de Fim da Atividade:</strong> {{ chamado.data_fim_atv }}</p>
-                </div>
+            <div class="dynamic-content2" id="dynamicContent">
+                {% block content %}
+                {% endblock %}
             </div>
         </div>
     </div>
-
-    <script>
-        $(document).ready(function() {
-            function loadContent(url) {
-                $.get(url, function(data) {
-                    $('#dynamic-content2').html(data);
-                    initializeFormsAndLinks();
-                });
-            }
-            function initializeFormsAndLinks() {
-                $('#dynamic-content2 a').on('click', function(e) {
-                    e.preventDefault();
-                    var url = $(this).attr('href');
-                    loadContent(url);
-                });
-            }
-
-            $('#chat').on('click', function() {
-                loadContent("{% url 'contact:load_chat' chamado.id %}");
-            });
-
-            $('#informacao_chamado').on('click', function() {
-                loadContent("{% url 'contact:load_informacao_chamado' chamado.id %}");
-            });
-
-            $('#tarefas_a_realizar').on('click', function() {
-                loadContent("{% url 'contact:load_tarefas_a_realizar' chamado.id %}");
-            });
-
-            $('#config_chamado').on('click',function(){
-                loadContent("{% url 'contact:adicionar_prestadora_servico' chamado.id %}");
-            });
-            
-            initializeFormsAndLinks();
-        });
-    </script>
+    <script src="{% static 'global/js/chamados.js' %}"></script>
 </body>
 </html>
