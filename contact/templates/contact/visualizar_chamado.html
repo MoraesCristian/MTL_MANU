@@ -9,7 +9,7 @@
 </head>
 <body>
     <header class="fixed-header">
-        <h1>Chamado {{ chamado.numero_ordem }}</h1>
+        <h3>Chamado {{ chamado.numero_ordem }}</h3>
     </header>
     <div class="container content">
         <div class="sidebar">
@@ -19,16 +19,22 @@
             </div>
             <div class="sub-container">
                 <h3>Data fechamento:</h3>
-                <p id="data_fechamento">{{ chamado.data_fim_atv }}</p>
+                <p id="data_fechamento">
+                    {% if chamado.data_fim_atv %}
+                        {{ chamado.data_fim_atv }}
+                    {% else %}
+                        Não Concluído
+                    {% endif %}
+                </p>
             </div>
             <div>
                 <a href="{% url 'contact:load_chat' chamado.id %}">
-                    <button id="chat">CHAT</button>
+                    <button id="chat">Chat</button>
                 </a>
             </div>
             <div>
                 <a href="{% url 'contact:load_informacao_chamado' chamado.id %}">
-                    <button id="informacao_chamado">INFORMAÇÃO DO CHAMADO</button>
+                    <button id="informacao_chamado">Informação do Chamado</button>
                 </a>
             </div>
             <div>
@@ -90,13 +96,13 @@
             {% endif %}
             </div>
             <div>
-                <button class="back-button" href="{% url 'contact:listar_chamados' %}">Voltar</button>
+                <button class="back-button" onclick="window.location.href='{% url 'contact:listar_chamados' %}';">Voltar</button>
             </div>
         </div>
 
         <div class="main-content">
             <div class="sub-container">
-                <h2 id="chamado-titulo">Detalhes do Chamado</h2>
+                <h3 id="chamado-titulo">Detalhes do Chamado</h3>
                 <p id="chamado-titulo">Título: {{ chamado.titulo }}</p>
                 <p id="chamado-descricao">Descrição: {{ chamado.descricao }}</p>
                 <p id="chamado-tipo-manutencao">Tipo de Manutenção: {{ chamado.tipo_manutencao }}</p>

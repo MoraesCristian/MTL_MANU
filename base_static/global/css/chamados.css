@@ -16,18 +16,20 @@ body {
 
 /* Sidebar */
 .sidebar {
-  flex: 1; /* Flexível, ocupará espaço proporcionalmente */
-  min-width: 200px; /* Largura mínima */
-  max-width: 300px; /* Largura máxima */
-  padding: 15px; /* Adiciona um espaçamento interno */
-  background-color: #f4f4f4; /* Cor de fundo */
-  border-right: 1px solid #ccc; /* Borda direita */
+  flex: 1; 
+  min-width: 200px; 
+  max-width: 300px; 
+  padding: 15px; 
+  background-color: #f4f4f4; 
+  border-right: 1px solid #ccc;
+  margin-top: 25px;
 }
 
 /* Conteúdo principal */
 .main-content {
   flex: 3; /* Flexível, ocupará mais espaço que a sidebar */
   padding: 15px; /* Adiciona um espaçamento interno */
+  margin-top: 25px;
 }
 
 .fixed-header {
@@ -54,7 +56,12 @@ body {
   overflow-y: auto; /* Rola apenas se necessário */
   border-radius: 10px;
   margin-top: 1px; /* Margem superior */
+  margin-bottom: 10px;
   padding: 10px;
+}
+
+h3{
+  text-align: center;
 }
 
 /* Estilo da área dinâmica */
@@ -101,6 +108,16 @@ textarea {
   resize: vertical; /* Permite o redimensionamento vertical */
 }
 
+ul {
+  list-style-type: none; /* Remove as bolinhas */
+  padding-left: 0; /* Remove o recuo padrão */
+}
+
+li {
+  margin: 0;
+  padding: 0;
+}
+
 /* Botão */
 button {
   width: 100%;
@@ -117,6 +134,28 @@ button {
 /* Hover do botão */
 button:hover {
   background-color: #0056b3;
+}
+
+.card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.card:hover {
+  background-color: #e0e0e0;
+  transform: scale(1.02);
 }
 
 /* Responsividade */

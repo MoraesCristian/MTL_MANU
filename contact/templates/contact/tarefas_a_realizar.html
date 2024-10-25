@@ -11,14 +11,11 @@
                     {% for detalhe in detalhes_tarefas %}
                         {% if detalhe.tarefa.id == tarefa.id %}
                             <li>
-                                <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe.id %}" class="ajax-link">{{ detalhe.descricao }}</a>
-                                {% for detalhe_preenchido in detalhe.detalhes_preenchidos %}
-                                    {% if detalhe_preenchido.concluido %}
-                                        <input type="checkbox" checked disabled>
-                                    {% else %}
-                                        <input type="checkbox" disabled>
-                                    {% endif %}
-                                {% endfor %}
+                                <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe.id %}" class="card-link">
+                                    <div class="card">
+                                        <span>{{ detalhe.descricao }}</span>
+                                    </div>
+                                </a>
                             </li>
                         {% endif %}
                     {% empty %}
@@ -33,4 +30,3 @@
 </div>
 
 {% endblock %}
-

@@ -104,6 +104,10 @@ def abrir_chamado(request):
             chamado = form.save(commit=False)
             chamado.criado_por = request.user
             chamado.empresa = form.cleaned_data['empresa_nome_fantasia']
+            
+            if chamado.area_chamado and chamado.tarefa:
+                chamado.titulo = f'{chamado.tarefa}'
+
             chamado.save()
             if chamado.tarefa:
                 detalhes = DetalheTarefa.objects.filter(tarefa=chamado.tarefa)
@@ -122,6 +126,7 @@ def abrir_chamado(request):
         form = ChamadoForm(user=user, empresas=empresas)
     
     return render(request, 'contact/abrir_chamado.html', {'form': form})
+
 
 
 def buscar_tarefas(request):

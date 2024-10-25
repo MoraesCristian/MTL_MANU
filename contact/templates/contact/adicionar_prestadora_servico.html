@@ -2,20 +2,20 @@
 
 {% block content %}
 <div class="grid-container">
-    <h2>Adicionar Prestadora de Serviço</h2>
-
-    {% if prestadora_atual %}
-        <p>Prestadora de Serviço Atual: {{ prestadora_atual.nome_fantasia }}</p>
-    {% else %}
-        <p>Não há prestadora de serviço vinculada atualmente.</p>
-    {% endif %}
-
-    <form method="post" action="{% url 'contact:adicionar_prestadora_servico' chamado.id %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Salvar</button>
-    </form>
-
-    <a href="{% url 'contact:visualizar_chamado' chamado.id %}">Voltar</a>
+    <h3>Adicionar Prestadora de Serviço</h3>
+    <div class="sub-container">
+        {% if prestadora_atual %}
+            <p>Prestadora de Serviço Atual: {{ prestadora_atual.nome_fantasia }}</p>
+        {% else %}
+            <p>Não há prestadora de serviço vinculada atualmente.</p>
+        {% endif %}
+    </div>
+    <div class="sub-container">
+        <form method="post" action="{% url 'contact:adicionar_prestadora_servico' chamado.id %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Salvar</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

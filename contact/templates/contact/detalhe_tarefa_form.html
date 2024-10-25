@@ -3,57 +3,97 @@
 {% block content %}
 
 <div>
-    <h1>Editar Detalhes da Tarefa - {{ detalhe_tarefa.descricao }}</h1>
-    <h2>Chamado #{{ chamado.numero_ordem }}</h2>
+    <h3>Detalhes da Tarefa - {{ detalhe_tarefa.descricao }}</h3>
 
     <form method="post" enctype="multipart/form-data" action="{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}">
         {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="id_fotos_clientes">Fotos Clientes</label>
-            <input type="file" name="fotos_clientes" id="id_fotos_clientes" class="form-control-file" multiple>
-            {% if detalhe_preenchido %}
-                <p>Fotos Cliente:</p>
-                <div class="image-gallery">
-                    {% for imagem in imagens_clientes %}
-                        <a href="{{ imagem.imagem.url }}" target="_blank">
-                            <img src="{{ imagem.imagem.url }}" alt="Foto Cliente" style="width: 100px; height: auto; margin-right: 10px;">
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
+        <div class="sub-container">
+            <div class="form-group">
+                <label for="id_fotos_clientes">Fotos antes Ajustes</label>
+                <input type="file" name="fotos_clientes" id="id_fotos_clientes" class="form-control-file" multiple accept="image/*">
+                {% if detalhe_preenchido %}
+                    <p>Fotos antes Ajustes:</p>
+                    <div id="image-gallery">
+                        {% for imagem in imagens_clientes %}
+                            <div class="image-container">
+                                <a href="{{ imagem.imagem.url }}" target="_blank">
+                                    <img src="{{ imagem.imagem.url }}" alt="Foto Cliente" style="width: 100px; height: auto; margin-right: 10px;">
+                                </a>
+                                <form method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="imagem_id" value="{{ imagem.id }}">
+                                    <button type="submit" name="excluir_imagem" class="btn btn-danger btn-sm">Excluir</button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="id_fotos_ajustes">Fotos Ajustes</label>
-            <input type="file" name="fotos_ajustes" id="id_fotos_ajustes" class="form-control-file" multiple>
-            {% if detalhe_preenchido %}
+        <div class="sub-container">
+            <div class="form-group">
+                <label for="id_fotos_ajustes">Fotos Ajustes</label>
+                <input type="file" name="fotos_ajustes" id="id_fotos_ajustes" class="form-control-file" multiple accept="image/*">
+                {% if detalhe_preenchido %}
                 <p>Fotos Ajustes:</p>
                 <div class="image-gallery">
                     {% for imagem in imagens_ajustes %}
-                        <a href="{{ imagem.imagem.url }}" target="_blank">
-                            <img src="{{ imagem.imagem.url }}" alt="Foto Ajuste" style="width: 100px; height: auto; margin-right: 10px;">
-                        </a>
+                        <div class="image-container">
+                            <a href="{{ imagem.imagem.url }}" target="_blank">
+                                <img src="{{ imagem.imagem.url }}" alt="Foto Ajuste" style="width: 100px; height: auto; margin-right: 10px;">
+                            </a>
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="imagem_id" value="{{ imagem.id }}">
+                                <button type="submit" name="excluir_imagem" class="btn btn-danger btn-sm">Excluir</button>
+                            </form>
+                        </div>
                     {% endfor %}
                 </div>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="id_observacao">Observação</label>
-            <textarea name="observacao" id="id_observacao" class="form-control" rows="4">{% if detalhe_preenchido and detalhe_preenchido.observacao %}{{ detalhe_preenchido.observacao }}{% endif %}</textarea>
+        
+        <div class="sub-container">
+            <div class="form-group">
+                <label for="id_observacao">Observação</label>
+                <textarea name="observacao" id="id_observacao" class="form-control sub-container" rows="4">{% if detalhe_preenchido and detalhe_preenchido.observacao %}{{ detalhe_preenchido.observacao }}{% endif %}</textarea>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="id_concluido">Concluído</label>
-            <input type="checkbox" name="concluido" id="id_concluido" class="form-check-input" {% if detalhe_preenchido and detalhe_preenchido.concluido %}checked{% endif %}>
+        
+        <div class="sub-container">
+            <div class="form-group">
+                <label for="id_concluido">Concluído</label>
+                <input type="checkbox" name="concluido" id="id_concluido" class="form-check-input" {% if detalhe_preenchido and detalhe_preenchido.concluido %}checked{% endif %}>
+            </div>
         </div>
 
         <button type="submit" class="btn btn-primary">Salvar</button>
     </form>
-
-    <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}" class="btn btn-secondary">Voltar para Tarefas a Realizar</a>
+    <button type="button" onclick="location.href='{% url 'contact:load_tarefas_a_realizar' chamado.id %}'" class="btn btn-secondary" id="voltar_link">Voltar para Tarefas a Realizar</button>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputClientes = document.getElementById('id_fotos_clientes');
+        const inputAjustes = document.getElementById('id_fotos_ajustes');
+
+        // Função para limitar o número de arquivos
+        function limitarArquivos(input) {
+            input.addEventListener('change', function () {
+                const maxFiles = 5;
+                const files = input.files;
+
+                if (files.length > maxFiles) {
+                    alert(`Você pode enviar no máximo ${maxFiles} arquivos.`);
+                    input.value = ''; // Limpa a seleção
+                }
+            });
+        }
+
+        limitarArquivos(inputClientes);
+        limitarArquivos(inputAjustes);
+    });
+</script>
 
 {% endblock %}

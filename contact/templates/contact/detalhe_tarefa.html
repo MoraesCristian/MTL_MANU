@@ -1,39 +1,50 @@
-
 {% extends 'contact/visualizar_chamado.html' %}
 
 {% block content %}
     <div id="detalhe_tarefa">
-        <h1>Detalhes da Tarefa - {{ detalhe_tarefa.descricao }}</h1>
-        <h2>Chamado #{{ chamado.numero_ordem }}</h2>
-
+        <h3 id="tarefa_descricao">Realizar - {{ detalhe_tarefa.descricao }}</h3>
         {% if detalhe_preenchido %}
-            <p><strong>Detalhe Tarefa:</strong> {{ detalhe_preenchido.detalhe_tarefa }}</p>
-            <p><strong>Chamado:</strong> {{ detalhe_preenchido.chamado }}</p>
-            <p><strong>Usuário:</strong> {{ detalhe_preenchido.usuario }}</p>
-            <p><strong>Fotos Clientes:</strong> 
-                {% if detalhe_preenchido.fotos_clientes %}
-                    <img src="{{ detalhe_preenchido.fotos_clientes.url }}" alt="Foto Clientes" style="max-width: 200px; max-height: 200px;">
-                {% else %}
-                    N/A
-                {% endif %}
-            </p>
-            <p><strong>Fotos Ajustes:</strong> 
-                {% if detalhe_preenchido.fotos_ajustes %}
-                    <img src="{{ detalhe_preenchido.fotos_ajustes.url }}" alt="Foto Ajustes" style="max-width: 200px; max-height: 200px;">
-                {% else %}
-                    N/A
-                {% endif %}
-            </p>
-            <p><strong>Observação:</strong> {{ detalhe_preenchido.observacao }}</p>
-            <p><strong>Concluído:</strong> {{ detalhe_preenchido.concluido|yesno:"Sim,Não" }}</p>
+            <p class="sub-container"><strong id="usuario_label">Usuário:</strong> <span id="usuario_nome">{{ detalhe_preenchido.usuario }}</span></p>
+            <div  class="sub-container">
+                <p><strong id="fotos_clientes_label">Fotos Clientes:</strong>
+                    {% if imagens_clientes %}
+                        <div class="image-gallery">
+                            {% for imagem in imagens_clientes %}
+                                <a href="{{ imagem.imagem.url }}" target="_blank">
+                                    <img src="{{ imagem.imagem.url }}" alt="Foto Cliente" style="width: 100px; height: auto; margin-right: 10px;">
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <span id="foto_clientes_na">N/A</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="sub-container">
+                <p><strong id="fotos_ajustes_label">Fotos Ajustes:</strong>
+                    {% if imagens_ajustes %}
+                        <div class="image-gallery">
+                            {% for imagem in imagens_ajustes %}
+                                <a href="{{ imagem.imagem.url }}" target="_blank">
+                                    <img src="{{ imagem.imagem.url }}" alt="Foto Ajustes" style="width: 100px; height: auto; margin-right: 10px;">
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <span id="foto_ajustes_na">N/A</span>
+                    {% endif %}
+                </p>
+            </div>
+            <p class="sub-container"><strong id="observacao_label">Observação:</strong> <span id="observacao_text">{{ detalhe_preenchido.observacao }}</span></p>
+            <p class="sub-container"><strong id="concluido_label">Concluído:</strong> <span id="concluido_status">{{ detalhe_preenchido.concluido|yesno:"Sim,Não" }}</span></p>
         {% else %}
-            <p>Não há detalhes preenchidos para esta tarefa.</p>
+            <p id="detalhes_na">Não há detalhes preenchidos para esta tarefa.</p>
         {% endif %}
-        {% if user.tipo_usuario != 'manager'  %}
-        <a href="{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}" class="btn ajax-link">Editar</a>
+        
+        {% if user.tipo_usuario != 'manager' %}
+            <button type="button" onclick="location.href='{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}'" class="btn btn-primary" id="editar_link">Editar</button>
         {% endif %}
 
-        <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">Voltar para Tarefas a Realizar</a>
+        <button type="button" onclick="location.href='{% url 'contact:load_tarefas_a_realizar' chamado.id %}'" class="btn btn-secondary" id="voltar_link">Voltar para Tarefas a Realizar</button>
     </div>
-
 {% endblock %}

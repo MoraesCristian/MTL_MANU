@@ -320,8 +320,6 @@ body{
     margin: 10px;
 }
 
-
-
 .sidebar.active ~ .home_content{
     width: calc(100% - 240px);
     left: 240px;
@@ -333,18 +331,17 @@ body{
     overflow: auto; 
     background-color: rgb(13, 13, 20);
     box-sizing: border-box;
-    display: flex;             /* Adiciona flexbox */
-    flex-direction: column;    /* Alinha os itens em coluna */
-    align-items: center;      /* Centraliza horizontalmente */
-    justify-content: center;   /* Centraliza verticalmente */
-    height: 100%;             /* Certifique-se de que ocupa toda a altura */
+    display: flex;             
+    flex-direction: column;    
+    align-items: center;      
+    justify-content: center;   
+    height: 100%;             
     
 }
 
-/* Estilo para esconder a barra de rolagem */
 .home_content::-webkit-scrollbar {
     width: 0px;
-    background: transparent; /* Opcional: deixa o fundo transparente */
+    background: transparent; 
 }
 
 /* Firefox */
