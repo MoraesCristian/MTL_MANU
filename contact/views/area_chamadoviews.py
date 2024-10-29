@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.shortcuts import render, get_object_or_404, redirect
-from contact.models import Chamado, Chat, MensagemChat, Tarefa,DetalheTarefa, DetalheTarefaPreenchido,Imagem
+from contact.models import Chamado, Chat, MensagemChat, Tarefa,DetalheTarefa, DetalheTarefaPreenchido,Imagem,ImagemChamado
 from contact.forms.chamado_forms import MensagemChatForm
 from contact.forms.tarefa_forms import DetalheTarefaPreenchidoForm
 from django.http import JsonResponse
@@ -41,32 +42,30 @@ def load_chat(request, chamado_id):
     if request.method == 'POST':
         mensagem_texto = request.POST.get('mensagem')
         if mensagem_texto:
-            # Cria a nova mensagem
             MensagemChat.objects.create(chat=chat, usuario=request.user, conteudo=mensagem_texto)
-            # Redireciona para o mesmo chat
             return redirect('contact:load_chat', chamado_id=chamado.id)
         else:
-            # Se a mensagem estiver vazia, você pode optar por adicionar um erro ao contexto
             error = "Mensagem vazia."
     else:
         error = None
-
     mensagens = chat.mensagens.all()
-
     context = {
         'mensagens': mensagens,
         'chamado': chamado,
         'error': error
     }
     return render(request, 'contact/chat.html', context)
+
 @login_required
 def load_informacao_chamado(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
+    imagens = ImagemChamado.objects.filter(chamado=chamado)
     context = {
         'chamado': chamado,
         'empresa': chamado.empresa,
         'prestadora_servico': chamado.prestadora_servico,
         'tecnico_responsavel': chamado.tecnico_responsavel,
+        'imagens': imagens,
     }
     return render(request, 'contact/informacao_chamado.html', context)
 
@@ -133,37 +132,85 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
         imagens_ajustes = []
 
     if request.method == 'POST':
-        if 'excluir_imagem' in request.POST:
-            imagem_id = request.POST.get('imagem_id')
-            try:
-                imagem = Imagem.objects.get(id=imagem_id)
-                imagem.delete()
-            except Imagem.DoesNotExist:
-                pass  # Imagem não existe, não faz nada
-
-            return redirect('contact:detalhe_tarefa', chamado.id, tarefa.id, detalhe_tarefa.id)
-
         form = DetalheTarefaPreenchidoForm(request.POST, request.FILES, instance=detalhe_preenchido)
         if form.is_valid():
             detalhe_preenchido = form.save(commit=False)
+            detalhe_preenchido.observacao = detalhe_preenchido.observacao.strip() if detalhe_preenchido.observacao else ""
             detalhe_preenchido.detalhe_tarefa = detalhe_tarefa
             detalhe_preenchido.chamado = chamado
             detalhe_preenchido.usuario = request.user
             detalhe_preenchido.save()
 
-            # Salvar imagens aqui...
+            # Limitar o número de imagens de clientes
+            imagens_clientes_existentes = imagens_clientes.count()
+            contador_clientes = imagens_clientes_existentes + 1
+
+            for imagem in request.FILES.getlist('fotos_clientes'):
+                if contador_clientes > 4:
+                    break  # Interrompe a adição se o limite for alcançado
+                novo_nome_imagem = f"{chamado.numero_ordem}_detalhe_{detalhe_tarefa.id}_cliente_{contador_clientes}.jpg"
+                imagem.name = novo_nome_imagem
+                Imagem.objects.create(
+                    detalhe_tarefa=detalhe_preenchido,
+                    numero_ordem=chamado,
+                    tarefa=tarefa,
+                    imagem=imagem,
+                    tipo_imagem='cliente'
+                )
+                contador_clientes += 1
+
+            # Limitar o número de imagens de ajustes
+            imagens_ajustes_existentes = imagens_ajustes.count()
+            contador_ajustes = imagens_ajustes_existentes + 1
+
+            for imagem in request.FILES.getlist('fotos_ajustes'):
+                if contador_ajustes > 4:
+                    break  # Interrompe a adição se o limite for alcançado
+                novo_nome_imagem = f"{chamado.numero_ordem}_detalhe_{detalhe_tarefa.id}_ajuste_{contador_ajustes}.jpg"
+                imagem.name = novo_nome_imagem
+                Imagem.objects.create(
+                    detalhe_tarefa=detalhe_preenchido,
+                    numero_ordem=chamado,
+                    tarefa=tarefa,
+                    imagem=imagem,
+                    tipo_imagem='ajuste'
+                )
+                contador_ajustes += 1
 
             return redirect('contact:detalhe_tarefa', chamado.id, tarefa.id, detalhe_tarefa.id)
+
     else:
         form = DetalheTarefaPreenchidoForm(instance=detalhe_preenchido)
 
     context = {
-        'form': form,
+        'chamado': chamado,
+        'tarefa': tarefa,
+        'detalhe_tarefa': detalhe_tarefa,
         'detalhe_preenchido': detalhe_preenchido,
         'imagens_clientes': imagens_clientes,
         'imagens_ajustes': imagens_ajustes,
+        'form': form,
+        'edit_mode': True,
+        'is_new': detalhe_preenchido is None
     }
+
     return render(request, 'contact/detalhe_tarefa_form.html', context)
+
+
+@login_required
+@require_POST
+def excluir_imagem(request, imagem_id):
+    try:
+        imagem = Imagem.objects.get(id=imagem_id)
+        # Verifica se o usuário tem permissão para excluir a imagem
+        if request.user.tipo_usuario in ['admin', 'operador'] or imagem.detalhe_tarefa.usuario == request.user:
+            imagem.delete()
+            return JsonResponse({'success': True, 'message': 'Imagem excluída com sucesso.'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Permissão negada.'}, status=403)
+    except Imagem.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Imagem não encontrada.'}, status=404)
+
 
 
 @login_required

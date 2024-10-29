@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa,DetalheTarefaPreenchido
+from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa,DetalheTarefaPreenchido, ImagemChamado
 from django.http import HttpResponseForbidden, JsonResponse
-from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm, AdicionarPrestadoraServicoForm
+from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm, AdicionarPrestadoraServicoForm, ImagemChamadoForm
 from contact.forms.area_forms import AreaForm
 from contact.forms.tarefa_forms import TarefaForm
 from collections import defaultdict
@@ -99,7 +99,7 @@ def abrir_chamado(request):
         empresas = Empresa.objects.all()
         
     if request.method == 'POST':
-        form = ChamadoForm(request.POST, user=user, empresas=empresas)
+        form = ChamadoForm(request.POST, request.FILES, user=user, empresas=empresas)
         if form.is_valid():
             chamado = form.save(commit=False)
             chamado.criado_por = request.user
@@ -109,11 +109,13 @@ def abrir_chamado(request):
                 chamado.titulo = f'{chamado.tarefa}'
 
             chamado.save()
+
+            imagens = request.FILES.getlist('imagens')
+            for imagem in imagens:
+                ImagemChamado.objects.create(chamado=chamado, imagem=imagem)
+            
             if chamado.tarefa:
                 detalhes = DetalheTarefa.objects.filter(tarefa=chamado.tarefa)
-                for detalhe in detalhes:
-                    print(f"- {detalhe.descricao}")
-                
                 for detalhe in detalhes:
                     DetalheTarefaPreenchido.objects.create(
                         detalhe_tarefa=detalhe,
@@ -126,7 +128,6 @@ def abrir_chamado(request):
         form = ChamadoForm(user=user, empresas=empresas)
     
     return render(request, 'contact/abrir_chamado.html', {'form': form})
-
 
 
 def buscar_tarefas(request):

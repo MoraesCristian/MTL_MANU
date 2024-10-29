@@ -64,6 +64,20 @@ h3{
   text-align: center;
 }
 
+.chamado-imagens {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.chamado-imagem {
+  margin: 10px;
+}
+
+.chamado-imagem img {
+  width: 150px;  /* Ajuste o tamanho da miniatura conforme necessário */
+  height: auto;
+}
+
 /* Estilo da área dinâmica */
 .dynamic-content2 {
   width: 100%;

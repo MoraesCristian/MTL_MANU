@@ -15,15 +15,11 @@
                     <p>Fotos antes Ajustes:</p>
                     <div id="image-gallery">
                         {% for imagem in imagens_clientes %}
-                            <div class="image-container">
+                            <div style="display: inline-block; position: relative; margin-right: 10px;">
                                 <a href="{{ imagem.imagem.url }}" target="_blank">
-                                    <img src="{{ imagem.imagem.url }}" alt="Foto Cliente" style="width: 100px; height: auto; margin-right: 10px;">
+                                    <img src="{{ imagem.imagem.url }}" alt="Foto Cliente" style="width: 100px; height: auto;">
                                 </a>
-                                <form method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="imagem_id" value="{{ imagem.id }}">
-                                    <button type="submit" name="excluir_imagem" class="btn btn-danger btn-sm">Excluir</button>
-                                </form>
+                                <button type="button" class="delete-image-btn" data-id="{{ imagem.id }}" style="position: absolute; top: 5px; right: 5px; background-color: transparent; border: none; color: red; font-size: 20px; font-weight: bold; cursor: pointer;">&times;</button>
                             </div>
                         {% endfor %}
                     </div>
@@ -38,15 +34,11 @@
                 <p>Fotos Ajustes:</p>
                 <div class="image-gallery">
                     {% for imagem in imagens_ajustes %}
-                        <div class="image-container">
+                        <div style="display: inline-block; position: relative; margin-right: 10px;">
                             <a href="{{ imagem.imagem.url }}" target="_blank">
-                                <img src="{{ imagem.imagem.url }}" alt="Foto Ajuste" style="width: 100px; height: auto; margin-right: 10px;">
+                                <img src="{{ imagem.imagem.url }}" alt="Foto Ajuste" style="width: 100px; height: auto;">
                             </a>
-                            <form method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="imagem_id" value="{{ imagem.id }}">
-                                <button type="submit" name="excluir_imagem" class="btn btn-danger btn-sm">Excluir</button>
-                            </form>
+                            <button type="button" class="delete-image-btn" data-id="{{ imagem.id }}" style="position: absolute; top: 5px; right: 5px; background-color: transparent; border: none; color: red; font-size: 20px; font-weight: bold; cursor: pointer;">&times;</button>
                         </div>
                     {% endfor %}
                 </div>
@@ -81,18 +73,39 @@
         // Função para limitar o número de arquivos
         function limitarArquivos(input) {
             input.addEventListener('change', function () {
-                const maxFiles = 5;
-                const files = input.files;
-
-                if (files.length > maxFiles) {
-                    alert(`Você pode enviar no máximo ${maxFiles} arquivos.`);
-                    input.value = ''; // Limpa a seleção
+                if (this.files.length > 5) {
+                    alert('Você pode selecionar no máximo 5 fotos.');
+                    this.value = ''; // Limpa o campo
                 }
             });
         }
 
         limitarArquivos(inputClientes);
         limitarArquivos(inputAjustes);
+
+        // Função para excluir imagem
+        document.querySelectorAll('.delete-image-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const imageId = this.getAttribute('data-id');
+                const csrfToken = '{{ csrf_token }}';
+
+                fetch(`{% url 'contact:excluir_imagem' 0 %}`.replace('0', imageId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: JSON.stringify({ 'image_id': imageId })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        this.closest('div').remove(); // Remove o contêiner da imagem do DOM
+                    } else {
+                        alert('Erro ao excluir a imagem.');
+                    }
+                });
+            });
+        });
     });
 </script>
 

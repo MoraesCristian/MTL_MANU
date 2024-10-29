@@ -1,10 +1,10 @@
 import re
+from tkinter import NO
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db.models import UniqueConstraint
 
 
@@ -238,7 +238,15 @@ class DetalheTarefaPreenchido(models.Model):
     def __str__(self):
         return f'Detalhe preenchido por {self.usuario} para {self.detalhe_tarefa}'
     
-    
+
+class ImagemChamado(models.Model):
+    chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE, related_name='imagens')
+    imagem = models.ImageField(upload_to='imagens_chamados/',blank=True, null=True)
+    data_upload = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'Imagem para o chamado {self.chamado.id}'
+
 class Imagem(models.Model):
     TIPO_IMAGEM_CHOICES = [
         ('cliente', 'Cliente'),

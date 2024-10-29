@@ -1,5 +1,7 @@
+from tkinter import Widget
+from typing import Required
 from django import forms
-from contact.models import Chamado, Tarefa, Empresa, Usuario,  MensagemChat, DetalheTarefa
+from contact.models import Chamado, Tarefa, Empresa, Usuario,  MensagemChat, DetalheTarefa, ImagemChamado
 
 
 class ChamadoForm(forms.ModelForm):
@@ -18,13 +20,18 @@ class ChamadoForm(forms.ModelForm):
         required=False,
         label='Técnico Responsável'
     )
-
+    imagens = forms.FileField(
+        required=False, 
+        label='Imagens'
+    )
+     
     class Meta:
         model = Chamado
         fields = [
             'empresa_nome_fantasia', 'localizacao_atv', 'tipo_manutencao',
             'area_chamado', 'tarefa', 'descricao', 'local_especifico',
-            'prioridade_chamado', 'prestadora_servico', 'tecnico_responsavel'
+            'prioridade_chamado', 'prestadora_servico', 'tecnico_responsavel',
+            'imagens',
         ]
         widgets = {
             'empresa_nome_fantasia': forms.Select(attrs={'required': True}),
@@ -36,7 +43,7 @@ class ChamadoForm(forms.ModelForm):
             'local_especifico': forms.TextInput(attrs={'required': True}),
             'prioridade_chamado': forms.Select(attrs={'required': True}),
             'prestadora_servico': forms.Select(attrs={'required': False}),
-            'tecnico_responsavel': forms.Select(attrs={'required': False}),
+            'imagens': forms.ClearableFileInput(attrs={'required': False}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -66,7 +73,13 @@ class ChamadoForm(forms.ModelForm):
         elif self.instance.pk:
             self.fields['tarefa'].queryset = self.instance.area_chamado.tarefas.all()
 
-
+class ImagemChamadoForm(forms.ModelForm):
+    class Meta:
+        model = ImagemChamado
+        fields = ['imagem']
+        widgets = {
+            'imagem': forms.ClearableFileInput({'class': 'form-control-file'}),
+        }
 class MensagemChatForm(forms.ModelForm):
     class Meta:
         model = MensagemChat

@@ -23,6 +23,21 @@
         <p><strong>Data de Criação:</strong> {{ chamado.data_criacao }}</p>
         <p><strong>Data de Início da Atividade:</strong> {{ chamado.data_inicio_atv }}</p>
         <p><strong>Data de Fim da Atividade:</strong> {{ chamado.data_fim_atv }}</p>
+        
+        {% if imagens %}
+        <h4>Imagens do Chamado</h4>
+        <div class="chamado-imagens">
+            {% for imagem in imagens %}
+                <div class="chamado-imagem">
+                    <a href="{{ imagem.imagem.url }}" target="_blank">
+                        <img src="{{ imagem.imagem.url }}" alt="Imagem do Chamado {{ forloop.counter }}" class="img-thumbnail">
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p>Nenhuma imagem foi adicionada a este chamado.</p>
+        {% endif %}
     </div>
 
     <div class="sub-container">

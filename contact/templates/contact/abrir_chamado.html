@@ -9,24 +9,45 @@
     <div class="grid-container">
         <div class="card">
             <h1>Abrir Chamado</h1>
-            <form method="post" action="{% url 'contact:abrir_chamado' %}" class="form-chamado" >
+            <form method="post" enctype="multipart/form-data" action="{% url 'contact:abrir_chamado' %}" class="form-chamado">
                 {% csrf_token %}
-                <label for="id_empresa_nome_fantasia">Empresa:</label>
-                {{ form.empresa_nome_fantasia }}
-                <label for="id_localizacao_atv">Localização:</label>
-                {{ form.localizacao_atv }}
-                <label for="id_tipo_manutencao">Tipo de Manutenção:</label>
-                {{ form.tipo_manutencao }}
-                <label for="id_area_chamado">Área:</label>
-                {{ form.area_chamado }}
-                <label for="id_tarefa">Tarefa:</label>
-                {{ form.tarefa }}
-                <label for="id_descricao">Descrição:</label>
-                {{ form.descricao }}
-                <label for="id_local_especifico">Local Específico:</label>
-                {{ form.local_especifico }}
-                <label for="id_prioridade_chamado">Prioridade:</label>
-                {{ form.prioridade_chamado }}            
+                <div class="form-group">
+                    <label for="id_empresa_nome_fantasia">Empresa:</label>
+                    {{ form.empresa_nome_fantasia }}
+                </div>
+                <div class="form-group">
+                    <label for="id_localizacao_atv">Localização:</label>
+                    {{ form.localizacao_atv }}
+                </div>
+                <div class="form-group">
+                    <label for="id_tipo_manutencao">Tipo de Manutenção:</label>
+                    {{ form.tipo_manutencao }}
+                </div>
+                <div class="form-group">
+                    <label for="id_area_chamado">Área:</label>
+                    {{ form.area_chamado }}
+                </div>
+                <div class="form-group">
+                    <label for="id_tarefa">Tarefa:</label>
+                    {{ form.tarefa }}
+                </div>
+                <div class="form-group">
+                    <label for="id_descricao">Descrição:</label>
+                    {{ form.descricao }}
+                </div>
+                <div class="form-group">
+                    <label for="id_local_especifico">Local Específico:</label>
+                    {{ form.local_especifico }}
+                </div>
+                <div class="form-group">
+                    <label for="id_prioridade_chamado">Prioridade:</label>
+                    {{ form.prioridade_chamado }}
+                </div>
+                <div class="form-group">
+                    <label for="id_imagens">Adicionar Fotos:</label>
+                    <input type="file" name="imagens" id="id_imagens" multiple>
+                    <small>Selecione uma ou mais imagens.</small>
+                </div>
                 <div class="form-group button-group">
                     <button type="submit" class="btn btn-primary">Criar Chamado</button>
                     <a href="{% url 'contact:listar_chamados' %}" class="btn btn-secondary">Voltar</a>
