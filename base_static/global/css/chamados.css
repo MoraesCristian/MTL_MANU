@@ -73,11 +73,16 @@ h3{
   margin: 10px;
 }
 
+
 .chamado-imagem img {
   width: 150px;  /* Ajuste o tamanho da miniatura conforme necessário */
   height: auto;
 }
 
+.miniatura {
+  width: 150px; /* Largura da miniatura */
+  height: auto; /* Mantém a proporção da imagem */
+}
 /* Estilo da área dinâmica */
 .dynamic-content2 {
   width: 100%;

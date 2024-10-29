@@ -38,16 +38,24 @@ def visualizar_chamado(request, chamado_id):
 def load_chat(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
     chat, created = Chat.objects.get_or_create(chamado=chamado)
-
+    
     if request.method == 'POST':
         mensagem_texto = request.POST.get('mensagem')
-        if mensagem_texto:
-            MensagemChat.objects.create(chat=chat, usuario=request.user, conteudo=mensagem_texto)
+        imagem = request.FILES.get('imagem')
+        
+        if mensagem_texto or imagem:
+            mensagem = MensagemChat.objects.create(
+                chat=chat, 
+                usuario=request.user, 
+                conteudo=mensagem_texto, 
+                imagem=imagem
+            )
             return redirect('contact:load_chat', chamado_id=chamado.id)
         else:
             error = "Mensagem vazia."
     else:
         error = None
+
     mensagens = chat.mensagens.all()
     context = {
         'mensagens': mensagens,
@@ -55,6 +63,7 @@ def load_chat(request, chamado_id):
         'error': error
     }
     return render(request, 'contact/chat.html', context)
+
 
 @login_required
 def load_informacao_chamado(request, chamado_id):
@@ -97,18 +106,16 @@ def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
     detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
     detalhe_preenchido = get_object_or_404(DetalheTarefaPreenchido, detalhe_tarefa=detalhe_tarefa, chamado=chamado)
 
-    # Supondo que o modelo Imagem tenha um campo chamado tipo que distingue entre cliente e ajuste
-    imagens_clientes = chamado.imagem_set.filter(tipo_imagem='cliente')  # Filtra imagens de cliente
-    imagens_ajustes = chamado.imagem_set.filter(tipo_imagem='ajuste')    # Filtra imagens de ajuste
+    imagens_clientes = chamado.imagem_set.filter(tipo_imagem='cliente') 
+    imagens_ajustes = chamado.imagem_set.filter(tipo_imagem='ajuste') 
 
     context = {
         'chamado': chamado,
         'tarefa': tarefa,
         'detalhe_tarefa': detalhe_tarefa,
         'detalhe_preenchido': detalhe_preenchido,
-        'imagens_clientes': imagens_clientes,  # Adiciona as imagens de clientes ao contexto
-        'imagens_ajustes': imagens_ajustes,      # Adiciona as imagens de ajustes ao contexto
-        'edit_mode': False,
+        'imagens_clientes': imagens_clientes,
+        'imagens_ajustes': imagens_ajustes,   
     }
     return render(request, 'contact/detalhe_tarefa.html', context)
 

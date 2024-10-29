@@ -266,10 +266,9 @@ class Imagem(models.Model):
 class Chat(models.Model):
     chamado = models.OneToOneField(Chamado, on_delete=models.CASCADE, related_name='chat')
 
-
 class MensagemChat(models.Model):
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE, related_name='mensagens')
     usuario = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    conteudo = models.TextField()
+    conteudo = models.TextField(blank=True)
+    imagem = models.ImageField(upload_to='imagens_chat/', blank=True, null=True)
     data_envio = models.DateTimeField(auto_now_add=True)
-

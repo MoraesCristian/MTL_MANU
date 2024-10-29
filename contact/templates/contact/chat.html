@@ -8,15 +8,26 @@
                 <div class="message">
                     <strong>{{ mensagem.usuario.first_name }} {{ mensagem.usuario.last_name }}:</strong>
                     <p>{{ mensagem.conteudo }}</p>
+                    {% if mensagem.imagem %}
+                        <div class="chat-imagem">
+                            <a href="{{ mensagem.imagem.url }}" target="_blank">
+                                <img src="{{ mensagem.imagem.url }}" alt="Imagem do Chat {{ forloop.counter }}" class="img-thumbnail miniatura">
+                            </a>
+                        </div>
+                    {% endif %}
                     <small>{{ mensagem.data_envio }}</small>
                 </div>
             {% endfor %}
         </div>
-        <form method="post" action="{% url 'contact:load_chat' chamado.id %}">
+        
+        <!-- Formulário de Mensagem e Imagem -->
+        <form method="post" action="{% url 'contact:load_chat' chamado.id %}" enctype="multipart/form-data">
             {% csrf_token %}
             <textarea name="mensagem" id="mensagem" rows="4" placeholder="Digite sua mensagem..."></textarea>
+            <input type="file" name="imagem" accept="image/*" capture="camera">
             <button type="submit" id="send-button">Enviar</button>
         </form>
+
         {% if error %}
             <div class="error">{{ error }}</div>
         {% endif %}
