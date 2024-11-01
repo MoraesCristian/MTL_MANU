@@ -94,7 +94,7 @@ def abrir_chamado(request):
     if user.tipo_usuario == 'manager':
         if user.empresa is None:
             return HttpResponseForbidden("Usuário não está vinculado a nenhuma empresa.")
-        empresas = Empresa.objects.filter(id=user.empresa.id)
+        empresas = Empresa.objects.filter(Q(id=user.empresa.id) | Q(filial_de=user.empresa))
     else:
         empresas = Empresa.objects.all()
         

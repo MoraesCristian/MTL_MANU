@@ -1,12 +1,17 @@
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
-from django.shortcuts import render, get_object_or_404, redirect
+import base64
 from contact.models import Chamado, Chat, MensagemChat, Tarefa,DetalheTarefa, DetalheTarefaPreenchido,Imagem,ImagemChamado
 from contact.forms.chamado_forms import MensagemChatForm
 from contact.forms.tarefa_forms import DetalheTarefaPreenchidoForm
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
+from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse
 
 @login_required
 def visualizar_chamado(request, chamado_id):
@@ -228,7 +233,7 @@ def atualizar_status_chamado_view(request, chamado_id):
         novo_status = request.POST.get('status_chamado')
         print(f"Recebido novo status: {novo_status}")
 
-        if novo_status not in ['aberto', 'executando', 'concluido', 'rejeitado']:
+        if novo_status not in ['aberto', 'executando', 'concluido', 'rejeitado', 'assinatura']:
             return redirect('contact:listar_chamados')
 
         redirection_url = 'contact:listar_chamados'
@@ -246,6 +251,12 @@ def atualizar_status_chamado_view(request, chamado_id):
                 redirection_args = {'chamado_id': chamado.id}
             elif novo_status == 'concluido':
                 chamado.data_fim_atv = timezone.now()
+                redirection_url = 'contact:view_signature'
+                redirection_args = {'chamado_id': chamado.id}
+            elif novo_status == 'assinatura':
+                chamado.data_fim_chamado = timezone.now()
+                redirection_url = 'contact:view_signature'
+                redirection_args = {'chamado_id': chamado.id}
             elif novo_status == 'rejeitado':
                 redirection_url = 'contact:listar_chamados'
 
@@ -254,25 +265,76 @@ def atualizar_status_chamado_view(request, chamado_id):
 
         elif request.user.is_authenticated:
             if chamado.prestadora_servico == request.user.empresa:
-                if novo_status in ['executando', 'concluido']:
+                if novo_status in ['executando', 'concluido', 'assinatura']:
                     chamado.status_chamado = novo_status
-                    
+
                     if novo_status == 'executando':
                         chamado.data_inicio_atv = timezone.now()
+                        # Adiciona o redirecionamento específico para o tipo_user 'user'
+                        if request.user.tipo_usuario == 'user':
+                            return redirect('contact:load_tarefas_a_realizar', chamado.id)  # Altere o nome da URL se necessário
                         redirection_url = 'contact:visualizar_chamado'
                         redirection_args = {'chamado_id': chamado.id}
                     elif novo_status == 'concluido':
                         chamado.data_fim_atv = timezone.now()
-                        redirection_url = 'contact:listar_chamados'
+                        redirection_url = 'contact:view_signature'
+                        redirection_args = {'chamado_id': chamado.id}
+                    elif novo_status == 'assinatura':
+                        chamado.data_fim_chamado = timezone.now()
+                        redirection_url = 'contact:view_signature'
+                        redirection_args = {'chamado_id': chamado.id}
 
                     chamado.save()
                     return redirect(redirection_url, **redirection_args)
 
         return redirect('contact:listar_chamados')
 
+
+
+@csrf_exempt
+def save_signature(request, chamado_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
+
+    if request.method == 'POST':
+        assinatura = request.POST.get('assinatura')
+        nome_assinante = request.POST.get('nome_assinante')
+        email_assinante = request.POST.get('email_assinante')
+
+        if not assinatura or not nome_assinante or not email_assinante:
+            return HttpResponseBadRequest("Todos os campos são obrigatórios.")
+
+        try:
+            formato, imgstr = assinatura.split(';base64,')
+            img_data = base64.b64decode(imgstr)
+            chamado.assinatura.save(f'chamado_{chamado_id}_assinatura.png', ContentFile(img_data), save=True)
+            chamado.nome_assinante = nome_assinante
+            chamado.email_assinante = email_assinante
+            chamado.status_chamado = 'concluido'
+            chamado.data_fim_chamado = timezone.now()
+            chamado.save()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Erro ao salvar a assinatura: {str(e)}")
+
+        return HttpResponseRedirect(reverse('contact:view_signature', args=[chamado.id]))
+
+    elif request.method == 'GET':
+        context = {
+            'chamado': chamado,
+            'assinatura_existente': chamado.assinatura.url if chamado.assinatura else None,
+            'nome_assinante': chamado.nome_assinante,
+            'email_assinante': chamado.email_assinante,
+        }
+        return render(request, 'contact/assinature.html', context)
+
+    return HttpResponseBadRequest("Método não permitido.")
+
+
+def view_signature(request, chamado_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
     context = {
         'chamado': chamado,
+        'assinatura_existente': chamado.assinatura.url if chamado.assinatura else None,
+        'nome_assinante': chamado.nome_assinante,
+        'email_assinante': chamado.email_assinante,
     }
-    return render(request, 'contact/visualizar_chamado.html', context)
-
-
+    return render(request, 'contact/assinature_view.html', context)

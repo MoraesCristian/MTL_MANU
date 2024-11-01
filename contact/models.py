@@ -187,13 +187,19 @@ class Chamado(models.Model):
     
     data_inicio_atv = models.DateTimeField(blank=True, null=True)
     data_fim_atv = models.DateTimeField(blank=True, null=True)
+    data_fim_chamado = models.DateTimeField(blank=True, null=True)
     
     status_chamado = models.CharField(max_length=255,choices=[
         ('aberto', 'Aberto'),
         ('concluido', 'Concluído'),
         ('executando', 'Executando'),
         ('rejeitado', 'Rejeitado'),
+        ('assinatura', 'Aguardando assinatura')
     ],default='aberto')
+    
+    assinatura = models.ImageField(upload_to='signatures/', null=True, blank=True)
+    nome_assinante = models.CharField(max_length=255, blank=True)
+    email_assinante = models.EmailField(blank=True)
 
     def save(self, *args, **kwargs):
         if not self.pk: 

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ chamado.numero_ordem }} - {{ chamado.titulo }}</title>
     <link rel="stylesheet" href="{% static 'global/css/chamados.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
 </head>
 <body>
     <header class="fixed-header">
@@ -20,8 +21,8 @@
             <div class="sub-container">
                 <h3>Data fechamento:</h3>
                 <p id="data_fechamento">
-                    {% if chamado.data_fim_atv %}
-                        {{ chamado.data_fim_atv }}
+                    {% if chamado.data_fim_chamado %}
+                        {{ chamado.data_fim_chamado }}
                     {% else %}
                         Não Concluído
                     {% endif %}
@@ -49,6 +50,14 @@
                 </a>
             </div>
             {% endif %}
+            {% if user.tipo_usuario == 'user' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'admin' %}
+            <div>
+                <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
+                    <button id="signature">Assinatura</button>
+                </a>
+            </div>
+            {% endif %}
+            
             <div>
             {% if user.is_authenticated %}
                 {% if chamado.status_chamado != 'concluido' %}
@@ -72,7 +81,7 @@
                         </form>
                         <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
                             {% csrf_token %}
-                            <input type="hidden" name="status_chamado" value="concluido">
+                            <input type="hidden" name="status_chamado" value="assinatura">
                             <button id="concluir" type="submit">Concluir</button>
                         </form>
                     {% elif user.tipo_usuario == 'cliente' %}
@@ -117,6 +126,5 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'global/js/chamados.js' %}"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@
         <h3 id="tarefa_descricao">Realizar - {{ detalhe_tarefa.descricao }}</h3>
         {% if detalhe_preenchido %}
             <p class="sub-container"><strong id="usuario_label">Usuário:</strong> <span id="usuario_nome">{{ detalhe_preenchido.usuario }}</span></p>
-            <div  class="sub-container">
+            <div class="sub-container">
                 <p><strong id="fotos_clientes_label">Fotos Clientes:</strong>
                     {% if imagens_clientes %}
                         <div class="image-gallery">
@@ -41,7 +41,7 @@
             <p id="detalhes_na">Não há detalhes preenchidos para esta tarefa.</p>
         {% endif %}
         
-        {% if user.tipo_usuario != 'manager' or chamado.status_chamado == 'concluido' %}
+        {% if user.tipo_usuario != 'manager' and chamado.status_chamado != 'concluido' %}
             <button type="button" onclick="location.href='{% url 'contact:detalhe_tarefa_edit' chamado.id tarefa.id detalhe_tarefa.id %}'" class="btn btn-primary" id="editar_link">Editar</button>
         {% endif %}
 

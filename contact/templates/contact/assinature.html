@@ -1,0 +1,76 @@
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
+<h3>Assinatura do Chamado</h3>
+
+<div>
+    {% if assinatura_existente %}
+        <p>Assinatura Existente:</p>
+        <img src="{{ assinatura_existente }}" alt="Assinatura Existente">
+    {% else %}
+        <p>Nenhuma assinatura existente encontrada.</p>
+    {% endif %}
+    <p>Assine no quadrando a baixo::</p>
+    <div id="signature-pad-container">
+        <canvas id="signature-pad"></canvas>
+    </div>
+    <button id="clearButton">Limpar</button>
+    <form id="signature-form" method="POST" action="{% url 'contact:save_signature' chamado_id=chamado.id %}">
+        {% csrf_token %}
+        <small>Se a Assinatura não estiver adequada, clique no botão "Limpar" e assine novamente dentro do quadro.</small>
+        <div class="actions">
+            <input type="hidden" id="assinatura" name="assinatura">
+            <label for="nome_assinante">Nome do Assinante:</label>
+            <input type="text" id="nome_assinante" name="nome_assinante" value="{{ nome_assinante }}" required>
+            <label for="email_assinante">Email do Assinante:</label>
+            <input type="email" id="email_assinante" name="email_assinante" value="{{ email_assinante }}" required>
+            <button type="submit">Salvar Assinatura</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const canvas = document.getElementById('signature-pad');
+        const container = document.getElementById('signature-pad-container');
+        const signaturePad = new SignaturePad(canvas);
+        const clearButton = document.getElementById('clearButton');
+        const form = document.getElementById('signature-form');
+    
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = container.offsetWidth * ratio;
+            canvas.height = container.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+            signaturePad.clear();
+        }
+    
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+    
+        clearButton.addEventListener('click', () => {
+            signaturePad.clear();
+        });
+    
+        form.addEventListener('submit', function (event) {
+            if (signaturePad.isEmpty()) {
+                alert("Por favor, forneça uma assinatura primeiro.");
+                event.preventDefault();
+                return;
+            }
+            const signatureData = signaturePad.toDataURL('image/png');
+            document.getElementById('assinatura').value = signatureData;
+        });
+    
+        {% if assinatura_existente %}
+        const img = new Image();
+        img.src = "{{ assinatura_existente }}";
+        img.onload = function() {
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        {% endif %}
+    });
+</script>
+
+{% endblock %}

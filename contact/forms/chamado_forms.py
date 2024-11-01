@@ -1,5 +1,3 @@
-from tkinter import Widget
-from typing import Required
 from django import forms
 from contact.models import Chamado, Tarefa, Empresa, Usuario,  MensagemChat, DetalheTarefa, ImagemChamado
 
@@ -31,7 +29,7 @@ class ChamadoForm(forms.ModelForm):
             'empresa_nome_fantasia', 'localizacao_atv', 'tipo_manutencao',
             'area_chamado', 'tarefa', 'descricao', 'local_especifico',
             'prioridade_chamado', 'prestadora_servico', 'tecnico_responsavel',
-            'imagens',
+            'imagens'
         ]
         widgets = {
             'empresa_nome_fantasia': forms.Select(attrs={'required': True}),
@@ -72,6 +70,28 @@ class ChamadoForm(forms.ModelForm):
                 pass
         elif self.instance.pk:
             self.fields['tarefa'].queryset = self.instance.area_chamado.tarefas.all()
+
+class AssinaturaForm(forms.ModelForm):
+    nome_assinante = forms.CharField(
+        required=True,
+        label='Nome do Assinante',
+        widget=forms.TextInput(attrs={'required': True})
+    )
+    email_assinante = forms.EmailField(
+        required=True,
+        label='Email do Assinante',
+        widget=forms.EmailInput(attrs={'required': True})
+    )
+    assinatura = forms.ImageField(
+        required=True,
+        label='Assinatura',
+        widget=forms.ClearableFileInput(attrs={'required': True})
+    )
+
+    class Meta:
+        model = Chamado
+        fields = ['nome_assinante', 'email_assinante', 'assinatura']
+
 
 class ImagemChamadoForm(forms.ModelForm):
     class Meta:
