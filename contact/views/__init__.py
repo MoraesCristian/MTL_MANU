@@ -6,3 +6,4 @@ from .user_createviews import *
 from .area_chamadoviews import *
 from .configuracoes_views import *
 from .cadastros_views import *
+from .documentacao_chamados import *

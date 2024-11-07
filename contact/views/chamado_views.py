@@ -11,36 +11,30 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils.dateparse import parse_date
  
-
 @login_required
 def listar_chamados(request):
     user = request.user
-    chamados = Chamado.objects.none()
+    chamados = Chamado.objects.none()  # Inicia com uma QuerySet vazia
     empresas = None
-    
-    #filtros
-    empresa_filter = request.GET.get('empresa')
+
+    # Filtros
+    empresa_filter = request.GET.get('empresa_id')  # Ajuste aqui para capturar a empresa pelo ID
     data_abertura_inicio = request.GET.get('data_abertura_inicio')
     data_abertura_fim = request.GET.get('data_abertura_fim')
     status_chamado_filter = request.GET.get('status_chamado')
     search = request.GET.get('search')
     prioridade_filter = request.GET.get('prioridade_chamado')
 
-    if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador':
-        empresa_filter = request.GET.get('empresa')
-        chamados = Chamado.objects.all()
-        if empresa_filter:
-            chamados = chamados.filter(empresa__nome_fantasia=empresa_filter)
-        empresas = Empresa.objects.all()
+    # Filtragem baseada no tipo de usuário
+    if user.tipo_usuario in ['admin', 'operador']:
+        empresas = Empresa.objects.all()  # Admins e operadores podem ver todas as empresas
+        chamados = Chamado.objects.all()  # Inicia com todos os chamados
 
     elif user.tipo_usuario == 'manager':
-        empresa_filter = request.GET.get('empresa')
         empresa_usuario = user.empresa
         empresas = Empresa.objects.filter(filial_de=empresa_usuario) | Empresa.objects.filter(id=empresa_usuario.id)
         chamados = Chamado.objects.filter(empresa__in=empresas)
-        if empresa_filter:
-            chamados = chamados.filter(empresa__nome_fantasia=empresa_filter)
-        
+
     elif user.tipo_usuario == 'user':
         empresa_usuario = user.empresa
         chamados = Chamado.objects.filter(prestadora_servico=empresa_usuario)
@@ -50,7 +44,11 @@ def listar_chamados(request):
         empresa_usuario = user.empresa
         empresas = Empresa.objects.filter(filial_de=empresa_usuario) | Empresa.objects.filter(id=empresa_usuario.id)
         chamados = Chamado.objects.filter(empresa__in=empresas)
-    
+
+    # Aplicando filtros
+    if empresa_filter:
+        chamados = chamados.filter(empresa_id=empresa_filter)
+
     if data_abertura_inicio:
         data_inicio = parse_date(data_abertura_inicio)
         if data_inicio:
@@ -63,29 +61,31 @@ def listar_chamados(request):
 
     if status_chamado_filter:
         chamados = chamados.filter(status_chamado=status_chamado_filter)
-        
+
     if search:
         chamados = chamados.filter(
             Q(empresa__cnpj__icontains=search) |
             Q(numero_ordem__icontains=search) |
             Q(empresa_nome_fantasia__icontains=search)
         )
+
     if prioridade_filter:
         chamados = chamados.filter(prioridade_chamado=prioridade_filter)
 
-    
-        
+    # Ordenação dos chamados
     chamados = chamados.order_by(
         'prioridade_chamado',
-        'data_criacao'  
+        'data_criacao'
     )
-        
+
     context = {
         'chamados': chamados,
         'empresas': empresas,
+        'empresa_id': empresa_filter,  # Passando o ID da empresa selecionada para o contexto
         'user_tipo': user.tipo_usuario,
     }
     return render(request, 'contact/listar_chamados.html', context)
+
 
 @login_required
 def abrir_chamado(request):

@@ -354,3 +354,85 @@ body{
     -ms-overflow-style: none;  /* Oculta a barra de rolagem no IE e Edge */
 }
 
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Ocupa 100% da altura da janela */
+    margin: 10px;
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+}
+
+.chart-top, .chart-bot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    height: 50%; /* Ocupa 50% da altura da dashboard-container */
+}
+
+.chart-container, .chart-container-bot {
+    flex: 0 1 65%; /* Ocupa 65% da largura */
+    min-width: 300px; /* Largura mínima para responsividade */
+    border: 1px solid #ccc; /* Apenas para visualização */
+    border-radius: 10px;
+    padding: 10px; /* Espaçamento interno */
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+}
+
+.chart-status, .chart-status-bot {
+    padding: 1em;
+    flex: 0 1 30%; /* Ocupa 30% da largura */
+    min-width: 150px; /* Largura mínima para responsividade */
+    border: 1px solid #ccc; /* Apenas para visualização */
+    border-radius: 10px;
+    padding: 10px; /* Espaçamento interno */
+    text-align: left;
+    text-decoration: none;
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .chart-container, .chart-status, .chart-bot, .chart-container-bot {
+        flex: 1 1 100%; /* Ocupa 100% da largura em telas menores */
+    }
+}
+/* Estilos para os indicadores de status */
+.status-indicator {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Cores específicas para cada status */
+.status-indicator.aberto {
+    background-color: #1500ff;
+}
+
+.status-indicator.concluido {
+    background-color: #00FF00; 
+}
+
+.status-indicator.executando {
+    background-color: #FFFF00; 
+}
+
+.status-indicator.rejeitado {
+    background-color: #FF0000; 
+}
+
+.status-indicator.assinatura {
+    background-color: #e0bb00; 
+}
+
+.status-indicator.outro {
+    background-color: #CCCCCC;
+}
+
+/* Estilos para os links de status */
+.status-link {
+    text-decoration: none;
+    margin-left: 5px;
+    vertical-align: middle;
+}

@@ -1,0 +1,46 @@
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
+<div id="documentacao_chamado">
+    <h3>Documentação do Chamado: {{ chamado.titulo }}</h3>
+    <button type="button" >
+        Gerar PDF
+    </button>
+
+    <div class="sub-container">
+        {% for detalhe in detalhes_preenchidos %}
+            <div class="detalhe-tarefa">
+                <p><strong>Tarefa:</strong> {{ detalhe.detalhe_tarefa.descricao }}</p>
+                <p><strong>Usuário:</strong> {{ detalhe.usuario }}</p>
+                <p><strong>Observação:</strong> {{ detalhe.observacao|default:"Nenhuma observação." }}</p>
+                <p><strong>Concluído:</strong> {{ detalhe.concluido|yesno:"Sim,Não" }}</p>
+                <div class="sub-container">
+                    <p><strong>Fotos Clientes:</strong></p>
+                    {% if detalhe.fotos_clientes %}
+                        <div class="image-gallery">
+                            <a href="{{ detalhe.fotos_clientes.url }}" target="_blank">
+                                <img src="{{ detalhe.fotos_clientes.url }}" alt="Foto Cliente" style="width: 100px; height: auto; margin-right: 10px;">
+                            </a>
+                        </div>
+                    {% else %}
+                        <p>N/A</p>
+                    {% endif %}
+                </div>
+                <div class="sub-container">
+                    <p><strong>Fotos Ajustes:</strong></p>
+                    {% if detalhe.fotos_ajustes %}
+                        <div class="image-gallery">
+                            <a href="{{ detalhe.fotos_ajustes.url }}" target="_blank">
+                                <img src="{{ detalhe.fotos_ajustes.url }}" alt="Foto Ajuste" style="width: 100px; height: auto; margin-right: 10px;">
+                            </a>
+                        </div>
+                    {% else %}
+                        <p>N/A</p>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

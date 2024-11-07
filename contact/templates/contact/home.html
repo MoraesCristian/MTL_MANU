@@ -1,6 +1,104 @@
 {% extends 'global/base.html' %}
 
 {% block content %}
-  <h1>Bem-vindo, {{ user.first_name }} {{ user.last_name }}</h1>
-  <!-- Conteúdo específico da página home -->
-{% endblock content %}
+<div class="dashboard-container">
+    <h2 class="dashboard-title">Bem-vindo, {{ user.first_name }} {{ user.last_name }}</h2>
+
+    <form method="GET" action="{% url 'home' %}" class="filter-form">
+        <label for="empresa" class="filter-label">Filtrar por Empresa:</label>
+        <select name="empresa_id" id="empresa" class="filter-select">
+            <option value="">Todas as Empresas</option>
+            {% for empresa in empresas %}
+                <option value="{{ empresa.id }}" {% if empresa_id == empresa.id %}selected{% endif %}>
+                    {{ empresa.nome_fantasia }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="date_filter" class="filter-label">Filtrar por Data:</label>
+        <select name="date_filter" id="date_filter" class="filter-select">
+            <option value="">Todos os Dias</option>
+            <option value="7" {% if date_filter == '7' %}selected{% endif %}>Últimos 7 dias</option>
+            <option value="30" {% if date_filter == '30' %}selected{% endif %}>Últimos 30 dias</option>
+            <option value="60" {% if date_filter == '60' %}selected{% endif %}>Últimos 60 dias</option>
+            <option value="90" {% if date_filter == '90' %}selected{% endif %}>Últimos 90 dias</option>
+        </select>
+
+        <button type="submit" class="filter-button">Filtrar</button>
+    </form>
+    <div class="chart-top">
+        <div class="chart-container">
+            <canvas id="statusChart"></canvas>
+        </div>
+        <div class="chart-status">
+            <h3 class="status-title">Totais por Status</h3>
+            <div class="status-list">
+                {% for status, total in status_totals.items %}
+                    <div class="status-item">
+                        <span class="status-indicator {{ status|lower }}"></span>
+                        <a href="{% url 'contact:listar_chamados' %}?status_chamado={{ status }}&empresa_id={{ empresa_id }}" class="status-link {{ status|lower }}">
+                            {{ status }} - {{ total }}
+                        </a><br>
+                    </div>
+                {% empty %}
+                    <p class="status-empty">Nenhum dado disponível</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="chart-bot">
+        <div class="chart-container-bot">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('statusChart').getContext('2d');
+    var statusChart = new Chart(ctx, {
+        type: 'pie',
+        data: {{ graph_data|safe }},
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+
+    var barCtx = document.getElementById('barChart').getContext('2d');
+    var barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {{ bar_chart_data|safe }},
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Meses'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Quantidade de Chamados'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

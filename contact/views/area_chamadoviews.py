@@ -338,3 +338,19 @@ def view_signature(request, chamado_id):
         'email_assinante': chamado.email_assinante,
     }
     return render(request, 'contact/assinature_view.html', context)
+
+@login_required
+def documentacao_chamado_view(request, chamado_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
+    detalhes_preenchidos = DetalheTarefaPreenchido.objects.filter(chamado=chamado)
+
+    imagens_clientes = chamado.imagem_set.filter(tipo_imagem='cliente')
+    imagens_ajustes = chamado.imagem_set.filter(tipo_imagem='ajuste')
+
+    context = {
+        'chamado': chamado,
+        'detalhes_preenchidos': detalhes_preenchidos,
+        'imagens_clientes': imagens_clientes,
+        'imagens_ajustes': imagens_ajustes,
+    }
+    return render(request, 'contact/documentacao_chamado.html', context)

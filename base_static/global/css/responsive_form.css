@@ -35,7 +35,7 @@ h1 {
     text-align: left;
     color: inherit;
     width: 60%; /* Ajuste para a largura desejada */
-    margin: 0px auto; /* Centraliza o card horizontalmente e adiciona margem superior */
+    margin: 5px auto; /* Centraliza o card horizontalmente e adiciona margem superior */
     text-decoration: none;
 }
 .card a{

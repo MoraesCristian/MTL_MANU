@@ -57,6 +57,12 @@
                 </a>
             </div>
             {% endif %}
+            <div>
+                <a href="{% url 'contact:documentacao_chamado' chamado_id=chamado.id %}">
+                    <button id="signature">Documentação</button>
+                </a>
+            </div>
+
             
             <div>
             {% if user.is_authenticated %}

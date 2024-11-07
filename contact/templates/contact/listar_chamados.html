@@ -28,11 +28,11 @@
       <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
       <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
     </select>
-    <select name="prioridade_chamado" id="prioridade_chamado">
+    <select name="prioridade_chamado">
       <option value="">--Todos--</option>
-      <option value="Alta">Alta</option>
-      <option value="Normal">Normal</option>
-      <option value="Baixa">Baixa</option>
+      <option value="Alta" {% if request.GET.prioridade_chamado == "Alta" %}selected{% endif %}>Alta</option>
+      <option value="Normal" {% if request.GET.prioridade_chamado == "Normal" %}selected{% endif %}>Normal</option>
+      <option value="Baixa" {% if request.GET.prioridade_chamado == "Baixa" %}selected{% endif %}>Baixa</option>
     </select>
     <button type="submit">Filtrar</button>
   </form>
@@ -49,11 +49,11 @@
       <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
       <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
     </select>
-    <select name="prioridade_chamado" id="prioridade_chamado">
+    <select name="prioridade_chamado">
       <option value="">--Todos--</option>
-      <option value="Alta">Alta</option>
-      <option value="Normal">Normal</option>
-      <option value="Baixa">Baixa</option>
+      <option value="Alta" {% if request.GET.prioridade_chamado == "Alta" %}selected{% endif %}>Alta</option>
+      <option value="Normal" {% if request.GET.prioridade_chamado == "Normal" %}selected{% endif %}>Normal</option>
+      <option value="Baixa" {% if request.GET.prioridade_chamado == "Baixa" %}selected{% endif %}>Baixa</option>
     </select>
     <button type="submit">Filtrar</button>
   </form>
@@ -72,8 +72,8 @@
     <div class="card">
       <a href="{% url 'contact:visualizar_chamado' chamado.id %}" class="full-card-link">
         <i class='bx bx-building'></i>
-        <li><strong>Nº Ordem:</strong>{{ chamado.numero_ordem }}</li>
-        <li><strong>Nome Fantasia:</strong>{{ chamado.empresa_nome_fantasia }}</li>
+        <li><strong>Nº Ordem:</strong> {{ chamado.numero_ordem }}</li>
+        <li><strong>Nome Fantasia:</strong> {{ chamado.empresa_nome_fantasia }}</li>
         <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
         <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
         <li><strong>Status chamado:</strong> {{ chamado.status_chamado }}</li>
@@ -82,4 +82,3 @@
   {% endfor %}
 </div>
 {% endblock %}
-
