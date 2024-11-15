@@ -19,29 +19,29 @@
                                 <a href="{{ imagem.imagem.url }}" target="_blank">
                                     <img src="{{ imagem.imagem.url }}" alt="Foto Cliente" style="width: 100px; height: auto;">
                                 </a>
-                                <button type="button" class="delete-image-btn" data-id="{{ imagem.id }}" style="position: absolute; top: 5px; right: 5px; background-color: transparent; border: none; color: red; font-size: 20px; font-weight: bold; cursor: pointer;">&times;</button>
+                                {% if can_delete_images %}
+                                    <button type="button" class="btn btn-danger btn-sm delete-image" data-image-id="{{ imagem.id }}">Excluir</button>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     </div>
                 {% endif %}
-            </div>
-        </div>
-        <div class="sub-container">
-            <div class="form-group">
                 <label for="id_fotos_ajustes">Fotos Ajustes</label>
                 <input type="file" name="fotos_ajustes" id="id_fotos_ajustes" class="form-control-file" multiple accept="image/*">
                 {% if detalhe_preenchido %}
-                <p>Fotos Ajustes:</p>
-                <div class="image-gallery">
-                    {% for imagem in imagens_ajustes %}
-                        <div style="display: inline-block; position: relative; margin-right: 10px;">
-                            <a href="{{ imagem.imagem.url }}" target="_blank">
-                                <img src="{{ imagem.imagem.url }}" alt="Foto Ajuste" style="width: 100px; height: auto;">
-                            </a>
-                            <button type="button" class="delete-image-btn" data-id="{{ imagem.id }}" style="position: absolute; top: 5px; right: 5px; background-color: transparent; border: none; color: red; font-size: 20px; font-weight: bold; cursor: pointer;">&times;</button>
-                        </div>
-                    {% endfor %}
-                </div>
+                    <p>Fotos Ajustes:</p>
+                    <div id="image-gallery">
+                        {% for imagem in imagens_ajustes %}
+                            <div style="display: inline-block; position: relative; margin-right: 10px;">
+                                <a href="{{ imagem.imagem.url }}" target="_blank">
+                                    <img src="{{ imagem.imagem.url }}" alt="Foto Ajuste" style="width: 100px; height: auto;">
+                                </a>
+                                {% if can_delete_images %}
+                                    <button type="button" class="btn btn-danger btn-sm delete-image" data-image-id="{{ imagem.id }}">Excluir</button>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% endif %}
             </div>
         </div>
@@ -69,44 +69,48 @@
     document.addEventListener('DOMContentLoaded', function () {
         const inputClientes = document.getElementById('id_fotos_clientes');
         const inputAjustes = document.getElementById('id_fotos_ajustes');
-
+    
         // Função para limitar o número de arquivos
         function limitarArquivos(input) {
             input.addEventListener('change', function () {
-                if (this.files.length > 5) {
-                    alert('Você pode selecionar no máximo 5 fotos.');
-                    this.value = ''; // Limpa o campo
+                console.log('Arquivos selecionados: ', this.files.length); // Log do número de arquivos
+                if (this.files.length > 4) {
+                    alert('Você só pode selecionar no máximo 4 arquivos.');
+                    this.value = ''; // Limpa o input
                 }
             });
         }
-
+    
         limitarArquivos(inputClientes);
         limitarArquivos(inputAjustes);
 
-        // Função para excluir imagem
-        document.querySelectorAll('.delete-image-btn').forEach(button => {
+        // Adicionar evento para os botões de exclusão
+        const deleteButtons = document.querySelectorAll('.delete-image');
+        deleteButtons.forEach(button => {
             button.addEventListener('click', function () {
-                const imageId = this.getAttribute('data-id');
-                const csrfToken = '{{ csrf_token }}';
-
-                fetch(`{% url 'contact:excluir_imagem' 0 %}`.replace('0', imageId), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
-                    body: JSON.stringify({ 'image_id': imageId })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        this.closest('div').remove(); // Remove o contêiner da imagem do DOM
-                    } else {
-                        alert('Erro ao excluir a imagem.');
-                    }
-                });
+                const imageId = this.getAttribute('data-image-id');
+                const confirmDelete = confirm('Tem certeza que deseja excluir esta imagem?');
+                if (confirmDelete) {
+                    fetch(`{% url 'contact:delete_image' %}?image_id=${imageId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Remove a imagem do DOM
+                            this.parentElement.remove();
+                        } else {
+                            alert('Falha ao excluir a imagem.');
+                        }
+                    });
+                }
             });
         });
     });
 </script>
+
 
 {% endblock %}

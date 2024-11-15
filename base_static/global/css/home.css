@@ -365,17 +365,26 @@ body{
 .chart-top, .chart-bot {
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 10px;
     height: 50%; /* Ocupa 50% da altura da dashboard-container */
+    box-sizing: border-box; /* Inclui padding e border no tamanho total */
+    margin-bottom: 10px;
 }
 
 .chart-container, .chart-container-bot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
     flex: 0 1 65%; /* Ocupa 65% da largura */
     min-width: 300px; /* Largura mínima para responsividade */
     border: 1px solid #ccc; /* Apenas para visualização */
     border-radius: 10px;
     padding: 10px; /* Espaçamento interno */
     box-sizing: border-box; /* Inclui padding e border no tamanho total */
+    height: 100%; /* Ocupa 100% da altura do contêiner pai */
+    margin-top: 10px;
+    overflow: hidden; /* Evita que o gráfico ultrapasse os limites do contêiner */
 }
 
 .chart-status, .chart-status-bot {
@@ -384,19 +393,49 @@ body{
     min-width: 150px; /* Largura mínima para responsividade */
     border: 1px solid #ccc; /* Apenas para visualização */
     border-radius: 10px;
-    padding: 10px; /* Espaçamento interno */
     text-align: left;
     text-decoration: none;
-    box-sizing: border-box; /* Inclui padding e border no tamanho total */
-    height: auto;
+    height: 100%; /* Ocupa 100% da altura do contêiner pai */
+    margin-top: 10px;
+    box-sizing: border-box; /* Inclui padding e border no cálculo da largura */
 }
 
 @media (max-width: 768px) {
-    .chart-container, .chart-status, .chart-bot, .chart-container-bot {
-        flex: 1 1 100%; /* Ocupa 100% da largura em telas menores */
+    /* Para telas menores que 768px */
+    .dashboard-container {
+        padding: 10px; /* Adiciona padding para evitar que o conteúdo encoste nas bordas da tela */
+    }
+    .chart-top, .chart-bot {
+        flex-direction: column; /* Disposição em coluna */
+        height: auto; /* A altura se ajusta automaticamente */
+    }
+    .chart-container, .chart-container-bot, .chart-status, .chart-status-bot {
+        flex: 1 1 100%; /* Em telas pequenas, ocupe 100% da largura */
+        height: auto; /* Deixe a altura ser ajustada automaticamente */
+        max-width: 100%; /* Garante que o gráfico não ultrapasse a tela */
+        margin-top: 10px;
+    }
+    .chart-container-bot {
+        max-height: 300px; /* Ajuste a altura máxima para dispositivos móveis */
+        overflow: auto; /* Permita rolagem em telas menores */
+    }
+    .chart-status {
+        margin-top: 10px;
+        flex: 1 1 100%; /* Deixe a área de status ocupar 100% em telas pequenas */
+        min-width: 100%; /* Garante que a largura não seja menor que 100% */
+        padding: 10px; /* Adiciona espaçamento interno */
+    }
+    .filter-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filter-label, .filter-select, .filter-button {
+        width: 100%;
     }
 }
-/* Estilos para os indicadores de status */
+
 .status-indicator {
     display: inline-block;
     width: 15px;

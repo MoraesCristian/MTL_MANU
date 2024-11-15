@@ -12,10 +12,10 @@
 {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'manager' %}
   <form method="get">
     <input type="text" name="search" placeholder="Pesquisar" value="{{ request.GET.search }}">
-    <select name="empresa">
+    <select name="empresa_id">
       <option value="">Selecione uma empresa</option>
       {% for empresa in empresas %}
-      <option value="{{ empresa.nome_fantasia }}" {% if request.GET.empresa == empresa.nome_fantasia %}selected{% endif %}>{{ empresa.nome_fantasia }}</option>
+      <option value="{{ empresa.id }}" {% if request.GET.empresa_id == empresa.id|stringformat:"s" %}selected{% endif %}>{{ empresa.nome_fantasia }}</option>
       {% endfor %}
     </select>
     <input type="date" name="data_abertura_inicio" value="{{ request.GET.data_abertura_inicio }}">

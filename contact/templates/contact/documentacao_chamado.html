@@ -14,6 +14,8 @@
                 <p><strong>Usuário:</strong> {{ detalhe.usuario }}</p>
                 <p><strong>Observação:</strong> {{ detalhe.observacao|default:"Nenhuma observação." }}</p>
                 <p><strong>Concluído:</strong> {{ detalhe.concluido|yesno:"Sim,Não" }}</p>
+
+                <!-- Exibindo fotos do cliente -->
                 <div class="sub-container">
                     <p><strong>Fotos Clientes:</strong></p>
                     {% if detalhe.fotos_clientes %}
@@ -26,6 +28,8 @@
                         <p>N/A</p>
                     {% endif %}
                 </div>
+
+                <!-- Exibindo fotos de ajustes -->
                 <div class="sub-container">
                     <p><strong>Fotos Ajustes:</strong></p>
                     {% if detalhe.fotos_ajustes %}

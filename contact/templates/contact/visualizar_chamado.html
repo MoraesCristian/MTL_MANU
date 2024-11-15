@@ -1,6 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,11 +15,11 @@
     <div class="container content">
         <div class="sidebar">
             <div class="sub-container">
-                <h3>Data abertura:</h3>
+                <h3>Data Abertura:</h3>
                 <p id="data_abertura">{{ chamado.data_criacao }}</p>
             </div>
             <div class="sub-container">
-                <h3>Data fechamento:</h3>
+                <h3>Data Fechamento:</h3>
                 <p id="data_fechamento">
                     {% if chamado.data_fim_chamado %}
                         {{ chamado.data_fim_chamado }}
@@ -38,32 +38,65 @@
                     <button id="informacao_chamado">Informação do Chamado</button>
                 </a>
             </div>
-            <div>
-                <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">
-                    <button id="tarefas_a_realizar">Tarefas a realizar</button>
-                </a>
-            </div>
-            {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
-            <div>
-                <a href="{% url 'contact:adicionar_prestadora_servico' chamado.id %}">
-                    <button id="config_chamado">Configurações</button>
-                </a>
-            </div>
+            {% if user.tipo_usuario == 'user' %}
+                {% if chamado.status_chamado != 'aberto' %}
+                    <div>
+                        <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">
+                            <button id="tarefas_a_realizar">Tarefas a Realizar</button>
+                        </a>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div>
+                    <a href="{% url 'contact:load_tarefas_a_realizar' chamado.id %}">
+                        <button id="tarefas_a_realizar">Tarefas a Realizar</button>
+                    </a>
+                </div>
             {% endif %}
-            {% if user.tipo_usuario == 'user' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'admin' %}
-            <div>
-                <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
-                    <button id="signature">Assinatura</button>
-                </a>
-            </div>
+            {% if user.tipo_usuario == 'user' %}
+                {% if chamado.status_chamado == 'assinatura' %}
+                    <div>
+                        <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
+                            <button id="signature">Assinatura</button>
+                        </a>
+                    </div>
+                {% endif %}
+            {% elif user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'cliente' %}
+                <div>
+                    <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
+                        <button id="signature">Assinatura</button>
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
+                <div>
+                    <a href="{% url 'contact:adicionar_prestadora_servico' chamado.id %}">
+                        <button id="config_chamado">Configurações</button>
+                    </a>
+                </div>
+            {% endif %}
+            {% if user.tipo_usuario == 'user' %}
+                {% if chamado.status_chamado == 'concluido' %}
+                    <div>
+                        <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
+                            <button id="signature">Assinatura</button>
+                        </a>
+                    </div>
+                {% endif %}
+            {% elif user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'cliente' %}
+                <div>
+                    <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
+                        <button id="signature">Assinatura</button>
+                    </a>
+                </div>
             {% endif %}
             <div>
                 <a href="{% url 'contact:documentacao_chamado' chamado_id=chamado.id %}">
-                    <button id="signature">Documentação</button>
+                    <button id="documentacao">Documentação</button>
                 </a>
             </div>
 
-            
             <div>
             {% if user.is_authenticated %}
                 {% if chamado.status_chamado != 'concluido' %}
@@ -79,17 +112,22 @@
                             </select>
                             <button id="atualizar_status" type="submit">Atualizar Status</button>
                         </form>
-                    {% elif user.empresa == chamado.prestadora_servico and user.tipo_usuario != 'cliente' %}
-                        <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="status_chamado" value="executando">
-                            <button id="executar" type="submit">Executar</button>
-                        </form>
-                        <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="status_chamado" value="assinatura">
-                            <button id="concluir" type="submit">Concluir</button>
-                        </form>
+                        {% elif user.empresa == chamado.prestadora_servico and user.tipo_usuario != 'cliente' %}
+                            {%if chamado.status_chamado != 'assinatura'%}
+                                <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status_chamado" value="executando">
+                                    <button id="executar" type="submit">Executar</button>
+                                </form>
+                            {% endif %}
+                        {% if chamado.status_chamado == 'executando' %}
+                            <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status_chamado" value="assinatura">
+                                <button id="concluir" type="submit">Concluir</button>
+                            </form>
+                        {% endif %}
+                                
                     {% elif user.tipo_usuario == 'cliente' %}
                         <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
                     {% endif %}
@@ -110,6 +148,7 @@
                 {% endif %}
             {% endif %}
             </div>
+
             <div>
                 <button class="back-button" onclick="window.location.href='{% url 'contact:listar_chamados' %}';">Voltar</button>
             </div>
@@ -132,5 +171,6 @@
             </div>
         </div>
     </div>
+{% block extra_js %}{% endblock %}
 </body>
 </html>

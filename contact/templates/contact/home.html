@@ -8,11 +8,11 @@
         <label for="empresa" class="filter-label">Filtrar por Empresa:</label>
         <select name="empresa_id" id="empresa" class="filter-select">
             <option value="">Todas as Empresas</option>
-            {% for empresa in empresas %}
-                <option value="{{ empresa.id }}" {% if empresa_id == empresa.id %}selected{% endif %}>
-                    {{ empresa.nome_fantasia }}
-                </option>
-            {% endfor %}
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.id }}" {% if empresa.id == empresa_selecionada_id %}selected{% endif %}>
+                        {{ empresa.nome_fantasia }}
+                    </option>
+                {% endfor %}
         </select>
 
         <label for="date_filter" class="filter-label">Filtrar por Data:</label>
@@ -29,6 +29,7 @@
     <div class="chart-top">
         <div class="chart-container">
             <canvas id="statusChart"></canvas>
+            <div id="totalChamados" style="text-align: center; font-weight: bold; margin-top: 10px;"></div>
         </div>
         <div class="chart-status">
             <h3 class="status-title">Totais por Status</h3>
@@ -36,13 +37,14 @@
                 {% for status, total in status_totals.items %}
                     <div class="status-item">
                         <span class="status-indicator {{ status|lower }}"></span>
-                        <a href="{% url 'contact:listar_chamados' %}?status_chamado={{ status }}&empresa_id={{ empresa_id }}" class="status-link {{ status|lower }}">
-                            {{ status }} - {{ total }}
+                        <a href="{% url 'contact:listar_chamados' %}?status_chamado={{ status }}&empresa_id={{ empresa_selecionada_id }}" class="status-link {{ status|lower }}">
+                            {{ status|capfirst }} - {{ total }}
                         </a><br>
                     </div>
                 {% empty %}
                     <p class="status-empty">Nenhum dado disponível</p>
                 {% endfor %}
+                <p class="total-number">Total de chamados: {{ total_chamados }}</p>
             </div>
         </div>
     </div>
@@ -67,6 +69,10 @@
                 legend: {
                     display: true,
                     position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: '{{ title }}'
                 }
             }
         }

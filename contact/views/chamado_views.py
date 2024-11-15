@@ -63,6 +63,9 @@ def listar_chamados(request):
         chamados = chamados.filter(status_chamado=status_chamado_filter)
 
     if search:
+        # Adicionando debug para verificar o valor de search
+        print(f"Valor de search: {search}")
+        
         chamados = chamados.filter(
             Q(empresa__cnpj__icontains=search) |
             Q(numero_ordem__icontains=search) |

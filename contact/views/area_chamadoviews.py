@@ -12,6 +12,8 @@ from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+import json
+
 
 @login_required
 def visualizar_chamado(request, chamado_id):
@@ -86,8 +88,8 @@ def load_informacao_chamado(request, chamado_id):
 @login_required
 def load_tarefas_a_realizar(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
-    tarefas = Tarefa.objects.filter(area=chamado.area_chamado)
-    detalhes_tarefas = DetalheTarefa.objects.filter(tarefa__in=tarefas)
+    tarefas = Tarefa.objects.filter(id=chamado.tarefa.id)
+    detalhes_tarefas = DetalheTarefa.objects.filter(tarefa=chamado.tarefa)
 
     context = {
         'chamado': chamado,
@@ -95,32 +97,37 @@ def load_tarefas_a_realizar(request, chamado_id):
         'detalhes_tarefas': detalhes_tarefas
     }
 
-    # Verifique se a requisição é AJAX
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        print('if do ajax')
-        return render(request, 'contact/tarefas_a_realizar.html', context)
-    else:
-        print('else fora do ajax')
-        # Retorne uma resposta normal se não for uma requisição AJAX
-        return render(request,'contact/tarefas_a_realizar.html', context)
-
+    return render(request, 'contact/tarefas_a_realizar.html', context)
+    
+    
 @login_required
 def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
+    # Obtém o chamado, tarefa e detalhe_tarefa correspondentes
     chamado = get_object_or_404(Chamado, id=chamado_id)
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
-    detalhe_preenchido = get_object_or_404(DetalheTarefaPreenchido, detalhe_tarefa=detalhe_tarefa, chamado=chamado)
 
-    imagens_clientes = chamado.imagem_set.filter(tipo_imagem='cliente') 
-    imagens_ajustes = chamado.imagem_set.filter(tipo_imagem='ajuste') 
+    # Obtém o detalhe preenchido correspondente ao chamado e detalhe da tarefa
+    detalhe_preenchido = DetalheTarefaPreenchido.objects.filter(
+        detalhe_tarefa=detalhe_tarefa, chamado=chamado
+    ).first()  # Usamos first() para pegar o primeiro ou None, caso não exista
 
+    # Filtra as imagens associadas a esse detalhe específico, separando as de clientes e ajustes
+    imagens_clientes = Imagem.objects.filter(
+        detalhe_tarefa=detalhe_preenchido, tipo_imagem='cliente'
+    ) 
+    imagens_ajustes = Imagem.objects.filter(
+        detalhe_tarefa=detalhe_preenchido, tipo_imagem='ajuste'
+    )
+
+    # Passa os dados para o template
     context = {
         'chamado': chamado,
         'tarefa': tarefa,
         'detalhe_tarefa': detalhe_tarefa,
         'detalhe_preenchido': detalhe_preenchido,
         'imagens_clientes': imagens_clientes,
-        'imagens_ajustes': imagens_ajustes,   
+        'imagens_ajustes': imagens_ajustes,
     }
     return render(request, 'contact/detalhe_tarefa.html', context)
 
@@ -136,8 +143,8 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
 
     try:
         detalhe_preenchido = DetalheTarefaPreenchido.objects.get(detalhe_tarefa=detalhe_tarefa, chamado=chamado)
-        imagens_clientes = detalhe_preenchido.imagens.filter(tipo_imagem='cliente')
-        imagens_ajustes = detalhe_preenchido.imagens.filter(tipo_imagem='ajuste')
+        imagens_clientes = Imagem.objects.filter(detalhe_tarefa=detalhe_preenchido, tipo_imagem='cliente')
+        imagens_ajustes = Imagem.objects.filter(detalhe_tarefa=detalhe_preenchido, tipo_imagem='ajuste')
     except DetalheTarefaPreenchido.DoesNotExist:
         detalhe_preenchido = None
         imagens_clientes = []
@@ -203,66 +210,78 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
         'imagens_ajustes': imagens_ajustes,
         'form': form,
         'edit_mode': True,
-        'is_new': detalhe_preenchido is None
+        'is_new': detalhe_preenchido is None,
+        'can_delete_images': request.user.tipo_usuario in ['admin', 'operador','user']  # Passar a permissão para o template
     }
 
     return render(request, 'contact/detalhe_tarefa_form.html', context)
 
-
-@login_required
-@require_POST
-def excluir_imagem(request, imagem_id):
-    try:
-        imagem = Imagem.objects.get(id=imagem_id)
-        # Verifica se o usuário tem permissão para excluir a imagem
-        if request.user.tipo_usuario in ['admin', 'operador'] or imagem.detalhe_tarefa.usuario == request.user:
-            imagem.delete()
-            return JsonResponse({'success': True, 'message': 'Imagem excluída com sucesso.'})
+@csrf_exempt
+def delete_image(request):
+    if request.method == 'POST':
+        image_id = request.GET.get('image_id')
+        if image_id:
+            try:
+                imagem = Imagem.objects.get(id=image_id)
+                imagem.delete()
+                return JsonResponse({'status': 'success'})
+            except Imagem.DoesNotExist:
+                return JsonResponse({'status': 'error', 'message': 'Imagem não encontrada'})
         else:
-            return JsonResponse({'success': False, 'message': 'Permissão negada.'}, status=403)
-    except Imagem.DoesNotExist:
-        return JsonResponse({'success': False, 'message': 'Imagem não encontrada.'}, status=404)
-
-
+            return JsonResponse({'status': 'error', 'message': 'ID da imagem não fornecido'})
+    return JsonResponse({'status': 'error', 'message': 'Requisição inválida'})
 
 @login_required
 def atualizar_status_chamado_view(request, chamado_id):
+    # Obtém o chamado com o ID fornecido
     chamado = get_object_or_404(Chamado, id=chamado_id)
 
     if request.method == 'POST':
+        # Obtém o novo status do chamado
         novo_status = request.POST.get('status_chamado')
         print(f"Recebido novo status: {novo_status}")
 
+        # Validações para garantir que o status é um dos valores válidos
         if novo_status not in ['aberto', 'executando', 'concluido', 'rejeitado', 'assinatura']:
             return redirect('contact:listar_chamados')
 
+        # Inicializa as variáveis de redirecionamento
         redirection_url = 'contact:listar_chamados'
         redirection_args = {}
 
+        # Lógica de permissão para administradores e operadores
         if request.user.is_staff or request.user.tipo_usuario == 'operador':
             chamado.status_chamado = novo_status
 
+            # Se o status for "aberto", define o redirecionamento
             if novo_status == 'aberto':
                 redirection_url = 'contact:visualizar_chamado'
                 redirection_args = {'chamado_id': chamado.id}
+            # Se o status for "executando", inicia a atividade e define o redirecionamento
             elif novo_status == 'executando':
                 chamado.data_inicio_atv = timezone.now()
-                redirection_url = 'contact:visualizar_chamado'
+                # Redireciona para a página de tarefas a realizar
+                redirection_url = 'contact:load_tarefas_a_realizar'
                 redirection_args = {'chamado_id': chamado.id}
+            # Se o status for "concluido", finaliza a atividade e define o redirecionamento
             elif novo_status == 'concluido':
                 chamado.data_fim_atv = timezone.now()
                 redirection_url = 'contact:view_signature'
                 redirection_args = {'chamado_id': chamado.id}
+            # Se o status for "assinatura", finaliza o chamado e define o redirecionamento
             elif novo_status == 'assinatura':
                 chamado.data_fim_chamado = timezone.now()
                 redirection_url = 'contact:view_signature'
                 redirection_args = {'chamado_id': chamado.id}
+            # Se o status for "rejeitado", apenas retorna para a lista de chamados
             elif novo_status == 'rejeitado':
                 redirection_url = 'contact:listar_chamados'
 
+            # Salva o chamado
             chamado.save()
             return redirect(redirection_url, **redirection_args)
 
+        # Lógica para prestadora de serviço
         elif request.user.is_authenticated:
             if chamado.prestadora_servico == request.user.empresa:
                 if novo_status in ['executando', 'concluido', 'assinatura']:
@@ -270,10 +289,8 @@ def atualizar_status_chamado_view(request, chamado_id):
 
                     if novo_status == 'executando':
                         chamado.data_inicio_atv = timezone.now()
-                        # Adiciona o redirecionamento específico para o tipo_user 'user'
-                        if request.user.tipo_usuario == 'user':
-                            return redirect('contact:load_tarefas_a_realizar', chamado.id)  # Altere o nome da URL se necessário
-                        redirection_url = 'contact:visualizar_chamado'
+                        # Redireciona para a página de tarefas a realizar
+                        redirection_url = 'contact:load_tarefas_a_realizar'
                         redirection_args = {'chamado_id': chamado.id}
                     elif novo_status == 'concluido':
                         chamado.data_fim_atv = timezone.now()
@@ -284,12 +301,12 @@ def atualizar_status_chamado_view(request, chamado_id):
                         redirection_url = 'contact:view_signature'
                         redirection_args = {'chamado_id': chamado.id}
 
+                    # Salva o chamado
                     chamado.save()
                     return redirect(redirection_url, **redirection_args)
 
+        # Caso o status não tenha sido atualizado ou o usuário não tenha permissão, retorna para a lista de chamados
         return redirect('contact:listar_chamados')
-
-
 
 @csrf_exempt
 def save_signature(request, chamado_id):
@@ -342,8 +359,11 @@ def view_signature(request, chamado_id):
 @login_required
 def documentacao_chamado_view(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
+    
+    # Pegando todos os detalhes preenchidos associados ao chamado
     detalhes_preenchidos = DetalheTarefaPreenchido.objects.filter(chamado=chamado)
 
+    # Pegando as imagens associadas ao chamado
     imagens_clientes = chamado.imagem_set.filter(tipo_imagem='cliente')
     imagens_ajustes = chamado.imagem_set.filter(tipo_imagem='ajuste')
 
