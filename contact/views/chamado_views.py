@@ -132,6 +132,13 @@ def abrir_chamado(request):
     
     return render(request, 'contact/abrir_chamado.html', {'form': form})
 
+@login_required
+def load_empresa_address(request):
+    empresa_id = request.GET.get('empresa_id')
+    empresa = Empresa.objects.get(id=empresa_id)
+    address = f"{empresa.logradouro}, {empresa.estado}"
+    return JsonResponse({'address': address})
+
 
 def buscar_tarefas(request):
     area_id = request.GET.get('area')

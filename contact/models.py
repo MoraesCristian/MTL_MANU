@@ -200,6 +200,7 @@ class Chamado(models.Model):
     assinatura = models.ImageField(upload_to='signatures/', null=True, blank=True)
     nome_assinante = models.CharField(max_length=255, blank=True)
     email_assinante = models.EmailField(blank=True)
+    cargo_assinante = models.CharField(max_length=255, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.pk: 

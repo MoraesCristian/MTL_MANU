@@ -10,73 +10,102 @@
 {% block content %}
 
 {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'manager' %}
-  <form method="get">
-    <input type="text" name="search" placeholder="Pesquisar" value="{{ request.GET.search }}">
-    <select name="empresa_id">
-      <option value="">Selecione uma empresa</option>
-      {% for empresa in empresas %}
-      <option value="{{ empresa.id }}" {% if request.GET.empresa_id == empresa.id|stringformat:"s" %}selected{% endif %}>{{ empresa.nome_fantasia }}</option>
-      {% endfor %}
-    </select>
-    <input type="date" name="data_abertura_inicio" value="{{ request.GET.data_abertura_inicio }}">
-    <input type="date" name="data_abertura_fim" value="{{ request.GET.data_abertura_fim }}">
-
-    <select name="status_chamado">
-      <option value="">Selecione um status</option>
-      <option value="aberto" {% if request.GET.status_chamado == "aberto" %}selected{% endif %}>Aberto</option>
-      <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
-      <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
-      <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
-    </select>
-    <select name="prioridade_chamado">
-      <option value="">--Todos--</option>
-      <option value="Alta" {% if request.GET.prioridade_chamado == "Alta" %}selected{% endif %}>Alta</option>
-      <option value="Normal" {% if request.GET.prioridade_chamado == "Normal" %}selected{% endif %}>Normal</option>
-      <option value="Baixa" {% if request.GET.prioridade_chamado == "Baixa" %}selected{% endif %}>Baixa</option>
-    </select>
-    <button type="submit">Filtrar</button>
+  <form method="get" class="filter-form">
+    <div class="form-group">
+      <input type="text" name="search" placeholder="Pesquisar" value="{{ request.GET.search }}">
+    </div>
+    <div class="form-group">
+      <select name="empresa_id">
+        <option value="">Selecione uma empresa</option>
+        {% for empresa in empresas %}
+        <option value="{{ empresa.id }}" {% if request.GET.empresa_id == empresa.id|stringformat:"s" %}selected{% endif %}>{{ empresa.nome_fantasia }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <input type="date" name="data_abertura_inicio" value="{{ request.GET.data_abertura_inicio }}">
+    </div>
+    <div class="form-group">
+      <input type="date" name="data_abertura_fim" value="{{ request.GET.data_abertura_fim }}">
+    </div>
+    <div class="form-group">
+      <select name="status_chamado">
+        <option value="">Selecione um status</option>
+        <option value="aberto" {% if request.GET.status_chamado == "aberto" %}selected{% endif %}>Aberto</option>
+        <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
+        <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
+        <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
+        <option value="assinatura" {% if request.GET.status_chamado == "assinatura" %}selected{% endif %}>Assinatura</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <select name="prioridade_chamado">
+        <option value="">--Todos--</option>
+        <option value="Alta" {% if request.GET.prioridade_chamado == "Alta" %}selected{% endif %}>Alta</option>
+        <option value="Normal" {% if request.GET.prioridade_chamado == "Normal" %}selected{% endif %}>Normal</option>
+        <option value="Baixa" {% if request.GET.prioridade_chamado == "Baixa" %}selected{% endif %}>Baixa</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="filter-button">Filtrar</button>
+    </div>
   </form>
 {% else %}
-  <form method="get">
-    <input type="text" name="search" placeholder="Pesquisar" value="{{ request.GET.search }}">
-    <input type="date" name="data_abertura_inicio" value="{{ request.GET.data_abertura_inicio }}">
-    <input type="date" name="data_abertura_fim" value="{{ request.GET.data_abertura_fim }}">
-
-    <select name="status_chamado">
-      <option value="">Selecione um status</option>
-      <option value="aberto" {% if request.GET.status_chamado == "aberto" %}selected{% endif %}>Aberto</option>
-      <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
-      <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
-      <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
-    </select>
-    <select name="prioridade_chamado">
-      <option value="">--Todos--</option>
-      <option value="Alta" {% if request.GET.prioridade_chamado == "Alta" %}selected{% endif %}>Alta</option>
-      <option value="Normal" {% if request.GET.prioridade_chamado == "Normal" %}selected{% endif %}>Normal</option>
-      <option value="Baixa" {% if request.GET.prioridade_chamado == "Baixa" %}selected{% endif %}>Baixa</option>
-    </select>
-    <button type="submit">Filtrar</button>
+  <form method="get" class="filter-form">
+    <div class="form-group">
+      <input type="text" name="search" placeholder="Pesquisar" value="{{ request.GET.search }}">
+    </div>
+    <div class="form-group">
+      <input type="date" name="data_abertura_inicio" value="{{ request.GET.data_abertura_inicio }}">
+    </div>
+    <div class="form-group">
+      <input type="date" name="data_abertura_fim" value="{{ request.GET.data_abertura_fim }}">
+    </div>
+    <div class="form-group">
+      <select name="status_chamado">
+        <option value="">Selecione um status</option>
+        <option value="aberto" {% if request.GET.status_chamado == "aberto" %}selected{% endif %}>Aberto</option>
+        <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
+        <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
+        <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
+        <option value="assinatura" {% if request.GET.status_chamado == "assinatura" %}selected{% endif %}>Assinatura</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <select name="prioridade_chamado">
+        <option value="">--Todos--</option>
+        <option value="Alta" {% if request.GET.prioridade_chamado == "Alta" %}selected{% endif %}>Alta</option>
+        <option value="Normal" {% if request.GET.prioridade_chamado == "Normal" %}selected{% endif %}>Normal</option>
+        <option value="Baixa" {% if request.GET.prioridade_chamado == "Baixa" %}selected{% endif %}>Baixa</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="filter-button">Filtrar</button>
+    </div>
   </form>
 {% endif %}
 
 <div class="grid-container">
   {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'manager' %}
-    <div class="card">
-      <a href="{% url 'contact:abrir_chamado' %}" class='bx bx-alarm-add'>Abrir Chamado</a>
-      <i class='bx bx-alarm-add'></i>
-      <li><strong>Abrir Chamado</strong></li>
+    <div class="card abrir-chamado-card">
+      <a href="{% url 'contact:abrir_chamado' %}" class="full-card-link">
+        <i class='bx bx-alarm-add'></i>
+        <strong>Abrir Chamado</strong>
+      </a>
     </div>
   {% endif %}
 
   {% for chamado in chamados %}
     <div class="card">
-      <a href="{% url 'contact:visualizar_chamado' chamado.id %}" class="full-card-link">
+      <a href="{% url 'contact:load_informacao_chamado' chamado.id %}" class="full-card-link">
         <i class='bx bx-building'></i>
-        <li><strong>Nº Ordem:</strong> {{ chamado.numero_ordem }}</li>
-        <li><strong>Nome Fantasia:</strong> {{ chamado.empresa_nome_fantasia }}</li>
-        <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
-        <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
-        <li><strong>Status chamado:</strong> {{ chamado.status_chamado }}</li>
+        <ul class="card-list">
+          <li><strong>Nº Chamado:</strong> {{ chamado.numero_ordem }}</li>
+          <li><strong>Nome Fantasia:</strong> {{ chamado.empresa_nome_fantasia }}</li>
+          <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
+          <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
+          <li><strong>Status:</strong> {{ chamado.status_chamado }}</li>
+        </ul>
       </a>
     </div>
   {% endfor %}

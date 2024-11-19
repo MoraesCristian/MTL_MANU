@@ -1,38 +1,106 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html{
+html {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: white;
   text-align: center;
 }
 
-body{
+body {
   padding: min(50px, 7%);
   height: 100vh;
   background-color: rgb(34, 34, 60);
 }
 
-h1{
+h1 {
   margin: 30px 1;
 }
 
-.card{
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-form .form-group {
+  flex: 1 1 calc(25% - 1rem); /* Adjust percentage as needed */
+  min-width: 150px; /* Minimum width for each form group */
+}
+
+.filter-form .form-group input,
+.filter-form .form-group select,
+.filter-button {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.filter-button {
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border: none;
+}
+
+.filter-button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  .filter-form .form-group {
+    flex: 1 1 calc(50% - 1rem); /* Adjust to fit two items per row on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-form .form-group {
+    flex: 1 1 100%; /* Full width for each item on very small screens */
+  }
+}
+
+
+.card {
   padding: 1em;
   border: 1px solid rgb(75, 82, 92);
   border-radius: 10px;
   background-color: #737886;
   text-align: left;
   text-decoration: none;
+  font-size: 20px;
 }
 
-.grid-container{
+.card.abrir-chamado-card {
+  text-align: center; /* Centraliza o texto e o ícone */
+}
+
+.card .full-card-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-list {
+  list-style-type: none;  /* Remove os pontos */
+  padding: 0;  /* Remove o padding padrão */
+}
+
+.card .full-card-link i {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 15px;
   justify-content: center;
 }
-

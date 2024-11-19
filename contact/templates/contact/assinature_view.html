@@ -7,6 +7,7 @@
     </div>
     <p><strong>Nome do Assinante:</strong> {{ nome_assinante }}</p>
     <p><strong>Email do Assinante:</strong> {{ email_assinante }}</p>
+    <p><strong>Cargo:</strong> {{ cargo_assinante }}</p>
     {% if chamado.status_chamado != 'concluido' %}
         <a href="{% url 'contact:save_signature' chamado.id %}"><button>Editar</button></a>
     {% endif %}

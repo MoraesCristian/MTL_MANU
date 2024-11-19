@@ -8,12 +8,9 @@ from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
-import json
-
 
 @login_required
 def visualizar_chamado(request, chamado_id):
@@ -102,17 +99,14 @@ def load_tarefas_a_realizar(request, chamado_id):
     
 @login_required
 def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
-    # Obtém o chamado, tarefa e detalhe_tarefa correspondentes
     chamado = get_object_or_404(Chamado, id=chamado_id)
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
 
-    # Obtém o detalhe preenchido correspondente ao chamado e detalhe da tarefa
     detalhe_preenchido = DetalheTarefaPreenchido.objects.filter(
         detalhe_tarefa=detalhe_tarefa, chamado=chamado
-    ).first()  # Usamos first() para pegar o primeiro ou None, caso não exista
+    ).first()
 
-    # Filtra as imagens associadas a esse detalhe específico, separando as de clientes e ajustes
     imagens_clientes = Imagem.objects.filter(
         detalhe_tarefa=detalhe_preenchido, tipo_imagem='cliente'
     ) 
@@ -120,7 +114,6 @@ def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
         detalhe_tarefa=detalhe_preenchido, tipo_imagem='ajuste'
     )
 
-    # Passa os dados para o template
     context = {
         'chamado': chamado,
         'tarefa': tarefa,
@@ -233,55 +226,46 @@ def delete_image(request):
 
 @login_required
 def atualizar_status_chamado_view(request, chamado_id):
-    # Obtém o chamado com o ID fornecido
     chamado = get_object_or_404(Chamado, id=chamado_id)
 
     if request.method == 'POST':
-        # Obtém o novo status do chamado
         novo_status = request.POST.get('status_chamado')
-        print(f"Recebido novo status: {novo_status}")
 
-        # Validações para garantir que o status é um dos valores válidos
         if novo_status not in ['aberto', 'executando', 'concluido', 'rejeitado', 'assinatura']:
             return redirect('contact:listar_chamados')
-
-        # Inicializa as variáveis de redirecionamento
+        
         redirection_url = 'contact:listar_chamados'
         redirection_args = {}
 
-        # Lógica de permissão para administradores e operadores
         if request.user.is_staff or request.user.tipo_usuario == 'operador':
             chamado.status_chamado = novo_status
 
-            # Se o status for "aberto", define o redirecionamento
             if novo_status == 'aberto':
                 redirection_url = 'contact:visualizar_chamado'
                 redirection_args = {'chamado_id': chamado.id}
-            # Se o status for "executando", inicia a atividade e define o redirecionamento
+
             elif novo_status == 'executando':
                 chamado.data_inicio_atv = timezone.now()
-                # Redireciona para a página de tarefas a realizar
                 redirection_url = 'contact:load_tarefas_a_realizar'
                 redirection_args = {'chamado_id': chamado.id}
-            # Se o status for "concluido", finaliza a atividade e define o redirecionamento
+                
             elif novo_status == 'concluido':
                 chamado.data_fim_atv = timezone.now()
                 redirection_url = 'contact:view_signature'
                 redirection_args = {'chamado_id': chamado.id}
-            # Se o status for "assinatura", finaliza o chamado e define o redirecionamento
+
             elif novo_status == 'assinatura':
                 chamado.data_fim_chamado = timezone.now()
                 redirection_url = 'contact:view_signature'
                 redirection_args = {'chamado_id': chamado.id}
-            # Se o status for "rejeitado", apenas retorna para a lista de chamados
+
             elif novo_status == 'rejeitado':
                 redirection_url = 'contact:listar_chamados'
 
-            # Salva o chamado
+
             chamado.save()
             return redirect(redirection_url, **redirection_args)
 
-        # Lógica para prestadora de serviço
         elif request.user.is_authenticated:
             if chamado.prestadora_servico == request.user.empresa:
                 if novo_status in ['executando', 'concluido', 'assinatura']:
@@ -289,7 +273,6 @@ def atualizar_status_chamado_view(request, chamado_id):
 
                     if novo_status == 'executando':
                         chamado.data_inicio_atv = timezone.now()
-                        # Redireciona para a página de tarefas a realizar
                         redirection_url = 'contact:load_tarefas_a_realizar'
                         redirection_args = {'chamado_id': chamado.id}
                     elif novo_status == 'concluido':
@@ -301,11 +284,9 @@ def atualizar_status_chamado_view(request, chamado_id):
                         redirection_url = 'contact:view_signature'
                         redirection_args = {'chamado_id': chamado.id}
 
-                    # Salva o chamado
                     chamado.save()
                     return redirect(redirection_url, **redirection_args)
 
-        # Caso o status não tenha sido atualizado ou o usuário não tenha permissão, retorna para a lista de chamados
         return redirect('contact:listar_chamados')
 
 @csrf_exempt
@@ -316,6 +297,7 @@ def save_signature(request, chamado_id):
         assinatura = request.POST.get('assinatura')
         nome_assinante = request.POST.get('nome_assinante')
         email_assinante = request.POST.get('email_assinante')
+        cargo_assinante = request.POST.get('cargo_assinante')
 
         if not assinatura or not nome_assinante or not email_assinante:
             return HttpResponseBadRequest("Todos os campos são obrigatórios.")
@@ -326,6 +308,7 @@ def save_signature(request, chamado_id):
             chamado.assinatura.save(f'chamado_{chamado_id}_assinatura.png', ContentFile(img_data), save=True)
             chamado.nome_assinante = nome_assinante
             chamado.email_assinante = email_assinante
+            chamado.cargo_assinante = cargo_assinante
             chamado.status_chamado = 'concluido'
             chamado.data_fim_chamado = timezone.now()
             chamado.save()
@@ -340,6 +323,7 @@ def save_signature(request, chamado_id):
             'assinatura_existente': chamado.assinatura.url if chamado.assinatura else None,
             'nome_assinante': chamado.nome_assinante,
             'email_assinante': chamado.email_assinante,
+            'cargo_assinante': chamado.cargo_assinante,
         }
         return render(request, 'contact/assinature.html', context)
 
@@ -353,6 +337,7 @@ def view_signature(request, chamado_id):
         'assinatura_existente': chamado.assinatura.url if chamado.assinatura else None,
         'nome_assinante': chamado.nome_assinante,
         'email_assinante': chamado.email_assinante,
+        'cargo_assinante': chamado.cargo_assinante,        
     }
     return render(request, 'contact/assinature_view.html', context)
 

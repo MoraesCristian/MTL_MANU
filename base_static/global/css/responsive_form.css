@@ -37,6 +37,7 @@ h1 {
     width: 60%; /* Ajuste para a largura desejada */
     margin: 5px auto; /* Centraliza o card horizontalmente e adiciona margem superior */
     text-decoration: none;
+    margin-bottom: 10px;
 }
 .card a{
     text-decoration: none;

@@ -8,11 +8,11 @@
         <label for="empresa" class="filter-label">Filtrar por Empresa:</label>
         <select name="empresa_id" id="empresa" class="filter-select">
             <option value="">Todas as Empresas</option>
-                {% for empresa in empresas %}
-                    <option value="{{ empresa.id }}" {% if empresa.id == empresa_selecionada_id %}selected{% endif %}>
-                        {{ empresa.nome_fantasia }}
-                    </option>
-                {% endfor %}
+            {% for empresa in empresas %}
+                <option value="{{ empresa.id }}" {% if empresa.id == empresa_selecionada_id %}selected{% endif %}>
+                    {{ empresa.nome_fantasia }}
+                </option>
+            {% endfor %}
         </select>
 
         <label for="date_filter" class="filter-label">Filtrar por Data:</label>
@@ -26,6 +26,7 @@
 
         <button type="submit" class="filter-button">Filtrar</button>
     </form>
+    
     <div class="chart-top">
         <div class="chart-container">
             <canvas id="statusChart"></canvas>
@@ -48,6 +49,7 @@
             </div>
         </div>
     </div>
+    
     <div class="chart-bot">
         <div class="chart-container-bot">
             <canvas id="barChart"></canvas>

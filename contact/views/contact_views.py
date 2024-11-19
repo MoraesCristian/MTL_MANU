@@ -1,16 +1,14 @@
-import plotly.express as px
 import pandas as pd   
 from datetime import timedelta
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import PasswordResetView
+from django.db.models.functions import TruncMonth
 from django.contrib import messages
 from django.db.models import Count, Q
-from django.db.models.functions import ExtractMonth
 from django.utils import timezone
 from contact.models import Chamado, Empresa
-from django.db.models.functions import TruncMonth
 
 
 def login_view(request):
@@ -40,7 +38,8 @@ def home_view(request):
     cnpj_padrao = '00.000.000/0000-00'
 
     chamados = None
-    chamados_por_mes = None
+    chamados_por_mes_abertos = None
+    chamados_por_mes_concluidos = None
     title = 'Chamados por Status'
     status_totals = {}
 
@@ -64,94 +63,56 @@ def home_view(request):
         date_limit = timezone.now() - timedelta(days=90)
 
     if user.tipo_usuario in ['admin', 'operador']:
-        chamados = Chamado.objects.values('status_chamado').annotate(total=Count('id'))
-
-        if date_limit:
-            chamados = chamados.filter(data_criacao__gte=date_limit)
-        
         if empresa_selecionada_id:
-            chamados = chamados.filter(empresa_id=empresa_selecionada_id).values('status_chamado').annotate(total=Count('id'))
+            empresas_ids = list(Empresa.objects.filter(Q(id=empresa_selecionada_id) | Q(filial_de_id=empresa_selecionada_id)).values_list('id', flat=True))
+            chamados = Chamado.objects.filter(empresa_id__in=empresas_ids)
             empresa_nome_fantasia = Empresa.objects.filter(id=empresa_selecionada_id).values_list('nome_fantasia', flat=True).first()
             title = f'Chamados por Status - {empresa_nome_fantasia}'
         else:
+            chamados = Chamado.objects.all()
             title = 'Chamados por Status - Todas as Empresas'
-
-        chamados_por_mes = Chamado.objects.all()
-        total_chamados = chamados.count()
-
-        if empresa_selecionada_id:
-            chamados_por_mes = chamados_por_mes.filter(empresa_id=empresa_selecionada_id)
-        if date_limit:
-            chamados_por_mes = chamados_por_mes.filter(data_criacao__gte=date_limit)
-
-        chamados_por_mes = chamados_por_mes.annotate(mes=TruncMonth('data_criacao')).values('mes').annotate(
-            abertos=Count('id', filter=Q(status_chamado='aberto')),
-            concluidos=Count('id', filter=Q(status_chamado='concluido'))
-        ).order_by('mes')
-        
-    elif user.tipo_usuario == 'user':
-        empresas_vinculadas = Empresa.objects.filter(id__in=Chamado.objects.filter(prestadora_servico=user.empresa).values('empresa_id')).values_list('id', flat=True)
-
-        chamados = Chamado.objects.filter(empresa_id__in=empresas_vinculadas).values('status_chamado').annotate(total=Count('id'))
-
-        if date_limit:
-            chamados = chamados.filter(data_criacao__gte=date_limit)
-
-        empresas_vinculadas_queryset = Empresa.objects.filter(id__in=empresas_vinculadas).values('id', 'nome_fantasia')
-
-        total_chamados = chamados.count()
-
-        chamados_por_mes = Chamado.objects.filter(empresa_id__in=empresas_vinculadas).annotate(mes=TruncMonth('data_criacao')).values('mes').annotate(
-            abertos=Count('id', filter=Q(status_chamado='aberto')),
-            concluidos=Count('id', filter=Q(status_chamado='concluido'))
-        ).order_by('mes')
-
-        if date_limit:
-            chamados_por_mes = chamados_por_mes.filter(mes__gte=date_limit)
 
     elif user.tipo_usuario == 'manager':
         user_empresa = user.empresa
-        if Empresa.objects.filter(filial_de=user_empresa).exists():
-            empresas_visiveis = list(Empresa.objects.filter(filial_de=user_empresa).values_list('id', flat=True))
-            empresas_visiveis.append(user_empresa.id)
+        empresas_visiveis = list(Empresa.objects.filter(Q(id=user_empresa.id) | Q(filial_de=user_empresa)).values_list('id', flat=True))
+        if empresa_selecionada_id:
+            if int(empresa_selecionada_id) in empresas_visiveis:
+                empresas_ids = list(Empresa.objects.filter(Q(id=empresa_selecionada_id) | Q(filial_de_id=empresa_selecionada_id)).values_list('id', flat=True))
+                chamados = Chamado.objects.filter(empresa_id__in=empresas_ids)
+                empresa_nome_fantasia = Empresa.objects.filter(id=empresa_selecionada_id).values_list('nome_fantasia', flat=True).first()
+                title = f'Chamados por Status - {empresa_nome_fantasia}'
+            else:
+                chamados = Chamado.objects.none()  # Nenhuma empresa selecionada visível
         else:
-            empresas_visiveis = [user_empresa.id]
-        chamados = Chamado.objects.filter(empresa_id__in=empresas_visiveis).values('status_chamado').annotate(total=Count('id'))
-        if date_limit:
-            chamados = chamados.filter(data_criacao__gte=date_limit)
-        
-        title = f'Chamados por Status - {user_empresa.nome_fantasia}'
-        
-        total_chamados = chamados.count()
-        
-        if empresa_selecionada_id and int(empresa_selecionada_id) in empresas_visiveis:
-            chamados = chamados.filter(empresa_id=empresa_selecionada_id).values('status_chamado').annotate(total=Count('id'))
-            if date_limit:
-                chamados = chamados.filter(data_criacao__gte=date_limit)
-            empresa_nome_fantasia = Empresa.objects.filter(id=empresa_selecionada_id).values_list('nome_fantasia', flat=True).first()
-            title = f'Chamados por Status - {empresa_nome_fantasia}'
-        empresas_visiveis_queryset = Empresa.objects.filter(id__in=empresas_visiveis).values('id', 'nome_fantasia')
+            chamados = Chamado.objects.filter(empresa_id__in=empresas_visiveis)
+            title = f'Chamados por Status - {user_empresa.nome_fantasia} e Filiais'
 
-        chamados_por_mes = Chamado.objects.filter(empresa_id__in=empresas_visiveis)
-        if empresa_selecionada_id and int(empresa_selecionada_id) in empresas_visiveis:
-            chamados_por_mes = chamados_por_mes.filter(empresa_id=empresa_selecionada_id)
-        
-        chamados_por_mes = chamados_por_mes.annotate(mes=TruncMonth('data_criacao')).values('mes').annotate(
-            abertos=Count('id', filter=Q(status_chamado='aberto')),
-            concluidos=Count('id', filter=Q(status_chamado='concluido'))
-        ).order_by('mes')
+    elif user.tipo_usuario == 'user':
+        chamados = Chamado.objects.filter(prestadora_servico=user.empresa)
+        title = f'Chamados por Status - {user.empresa.nome_fantasia}'
 
-        if date_limit:
-            chamados_por_mes = chamados_por_mes.filter(mes__gte=date_limit)
+    if date_limit:
+        chamados = chamados.filter(data_criacao__gte=date_limit)
 
-    # Aqui, agregamos os dados por tipo de usuário
-    df = pd.DataFrame(list(chamados))
+    # Contagem de chamados abertos por mês
+    chamados_por_mes_abertos = chamados.annotate(mes=TruncMonth('data_criacao')).values('mes').annotate(
+        abertos=Count('id')
+    ).order_by('mes')
+
+    # Contagem de chamados concluídos por mês
+    chamados_por_mes_concluidos = chamados.filter(status_chamado='concluido').annotate(mes=TruncMonth('data_fim_chamado')).values('mes').annotate(
+        concluidos=Count('id')
+    ).order_by('mes')
+
+    status_totals = chamados.values('status_chamado').annotate(total=Count('id')).order_by()
+
+    df = pd.DataFrame(list(status_totals))
 
     if df.empty:
         df = pd.DataFrame({'status_chamado': ['Nenhum dado'], 'total': [0]})
     else:
         status_totals = df.set_index('status_chamado')['total'].to_dict()
-        
+
     graph_data = {
         'labels': df['status_chamado'].tolist(),
         'datasets': [{
@@ -160,44 +121,81 @@ def home_view(request):
         }]
     }
 
-    meses = [chamado['mes'].strftime('%B') for chamado in chamados_por_mes]
-    chamados_abertos = [chamado['abertos'] for chamado in chamados_por_mes]
-    chamados_concluidos = [chamado['concluidos'] for chamado in chamados_por_mes]
+    # Tradução manual dos meses
+    meses_traduzidos = {
+        1: 'Janeiro',
+        2: 'Fevereiro',
+        3: 'Março',
+        4: 'Abril',
+        5: 'Maio',
+        6: 'Junho',
+        7: 'Julho',
+        8: 'Agosto',
+        9: 'Setembro',
+        10: 'Outubro',
+        11: 'Novembro',
+        12: 'Dezembro'
+    }
+
+    meses_abertos = [meses_traduzidos[chamado['mes'].month] for chamado in chamados_por_mes_abertos]
+    chamados_abertos = [chamado['abertos'] for chamado in chamados_por_mes_abertos]
+
+    meses_concluidos = [meses_traduzidos[chamado['mes'].month] for chamado in chamados_por_mes_concluidos]
+    chamados_concluidos = [chamado['concluidos'] for chamado in chamados_por_mes_concluidos]
+
+    # Garantir que os meses estejam alinhados
+    todos_os_meses = sorted(set(meses_abertos + meses_concluidos), key=lambda x: list(meses_traduzidos.values()).index(x))
+
+    chamados_abertos_por_mes = {mes: 0 for mes in todos_os_meses}
+    chamados_concluidos_por_mes = {mes: 0 for mes in todos_os_meses}
+
+    for chamado in chamados_por_mes_abertos:
+        mes = meses_traduzidos[chamado['mes'].month]
+        chamados_abertos_por_mes[mes] = chamado['abertos']
+
+    for chamado in chamados_por_mes_concluidos:
+        mes = meses_traduzidos[chamado['mes'].month]
+        chamados_concluidos_por_mes[mes] = chamado['concluidos']
 
     bar_chart_data = {
-        'labels': meses,
+        'labels': todos_os_meses,
         'datasets': [
             {
                 'label': 'Chamados Abertos',
-                'data': chamados_abertos,
+                'data': [chamados_abertos_por_mes[mes] for mes in todos_os_meses],
                 'backgroundColor': '#1500ff'
             },
             {
                 'label': 'Chamados Concluídos',
-                'data': chamados_concluidos,
+                'data': [chamados_concluidos_por_mes[mes] for mes in todos_os_meses],
                 'backgroundColor': '#09c600'
             }
         ]
     }
 
     if user.tipo_usuario == 'manager':
-        empresas = empresas_visiveis_queryset
+        empresas = Empresa.objects.filter(Q(id=user_empresa.id) | Q(filial_de=user_empresa)).values('id', 'nome_fantasia')
+        
     elif user.tipo_usuario == 'user':
-        empresas = empresas_vinculadas_queryset
+        empresas_ids = Chamado.objects.filter(prestadora_servico=user.empresa).values_list('empresa_id', flat=True).distinct()
+        empresas = Empresa.objects.filter(id__in=empresas_ids).values('id', 'nome_fantasia')
+    
     else:
         empresas = Empresa.objects.values('id', 'nome_fantasia').order_by('nome_fantasia')
 
     return render(request, 'contact/home.html', {
         'title': title,
         'chamados': chamados,
-        'total_chamados': total_chamados,
-        'status_totals': status_totals, 
+        'total_chamados': chamados.count(),
+        'status_totals': status_totals,
         'graph_data': graph_data,
         'bar_chart_data': bar_chart_data,
         'empresas': empresas,
         'empresa_selecionada_id': empresa_selecionada_id,
         'date_filter': date_filter
     })
+
+
     
 @login_required
 def logout_view(request):
