@@ -101,8 +101,11 @@
         <i class='bx bx-building'></i>
         <ul class="card-list">
           <li><strong>Nº Chamado:</strong> {{ chamado.numero_ordem }}</li>
+          <li><strong>Titulo:</strong> {{ chamado.titulo }}</li>
           <li><strong>Nome Fantasia:</strong> {{ chamado.empresa_nome_fantasia }}</li>
+          <li><strong>Tipo de manuntenção:</strong> {{ chamado.tipo_manutencao }}</li>
           <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
+          <li><strong>Data Limite:</strong> {{ chamado.data_limite_atendimento }}</li>
           <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
           <li><strong>Status:</strong> {{ chamado.status_chamado }}</li>
         </ul>

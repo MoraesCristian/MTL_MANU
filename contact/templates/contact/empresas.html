@@ -22,6 +22,9 @@
         <a href="{% url 'contact:empresas_details' empresa.id %}">{{ empresa.razao_social }}</a>
         <li><strong>Nome Fantasia:</strong>{{ empresa.nome_fantasia }}</li>
         <li><strong>CNPJ:</strong> {{ empresa.cnpj }}</li>
+        <li><strong>Telefone:</strong> {{ empresa.telefone }}</li>
+        <li><strong>Email:</strong> {{ empresa.email_empresa }}</li>
+        <li><strong>Endereço:</strong> {{ empresa.logradouro }}</li>
       </div>
     {% endfor %}
   </div>

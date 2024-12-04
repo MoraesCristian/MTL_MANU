@@ -19,12 +19,37 @@
       <p id="email_empresa">Email: {{ empresa.email_empresa }}</p>
       <p id="observacao">Observação: {{ empresa.observacao }}</p>
       <p id="prefixo">Prefixo: {{ empresa.prefixo }}</p>
-      <p id="filial">Empresa matrix: {{ empresa.filial_de }}</p>
+      <p id="filial">Empresa Matriz: {{ empresa.filial_de }}</p>
+
+      <h2>Tempos de Manutenção</h2>
+      {% for tempo in tempos_manutencao %}
+        <p>{{ tempo.get_tipo_manutencao_display }}: {{ tempo.tempo }}</p>
+      {% empty %}
+        <p>Sem informações de tempo de manutenção.</p>
+      {% endfor %}
+
+      <h2>Documentos da Empresa</h2>
+      <h3>Financeiro</h3>
+      {% for documento in documentos_financeiro %}
+        <p>{{ documento.descricao }}: <a href="{{ documento.documento.url }}" target="_blank">Visualizar</a></p>
+        <a href="{% url 'contact:delete_documento' documento.id empresa.id %}" class="btn btn-danger btn-sm">Deletar</a></p>
+      {% empty %}
+        <p>Sem documentos financeiros disponíveis.</p>
+      {% endfor %}
+
+      <h3>Contrato</h3>
+      {% for documento in documentos_contrato %}
+        <p>{{ documento.descricao }}: <a href="{{ documento.documento.url }}" target="_blank">Visualizar</a></p>
+        <a href="{% url 'contact:delete_documento' documento.id empresa.id %}" class="btn btn-danger btn-sm">Deletar</a></p>
+      {% empty %}
+        <p>Sem documentos de contrato disponíveis.</p>
+      {% endfor %}
+
       <div class="form-group button-group">
         <a href="{% url 'contact:edit_empresas' empresa.id %}" class="btn btn-primary">Editar</a>
+        <a href="{% url 'contact:add_documento' empresa.id %}" class="btn btn-primary">Adicionar documentos</a>
         <a href="{% url 'contact:empresas_view' %}" class="btn btn-secondary">Voltar</a>
       </div>
     </div>
   </div>
 {% endblock %}
-

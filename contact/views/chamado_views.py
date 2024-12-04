@@ -14,21 +14,18 @@ from django.utils.dateparse import parse_date
 @login_required
 def listar_chamados(request):
     user = request.user
-    chamados = Chamado.objects.none()  # Inicia com uma QuerySet vazia
+    chamados = Chamado.objects.none()
     empresas = None
-
-    # Filtros
-    empresa_filter = request.GET.get('empresa_id')  # Ajuste aqui para capturar a empresa pelo ID
+    empresa_filter = request.GET.get('empresa_id')
     data_abertura_inicio = request.GET.get('data_abertura_inicio')
     data_abertura_fim = request.GET.get('data_abertura_fim')
     status_chamado_filter = request.GET.get('status_chamado')
     search = request.GET.get('search')
     prioridade_filter = request.GET.get('prioridade_chamado')
 
-    # Filtragem baseada no tipo de usuário
     if user.tipo_usuario in ['admin', 'operador']:
-        empresas = Empresa.objects.all()  # Admins e operadores podem ver todas as empresas
-        chamados = Chamado.objects.all()  # Inicia com todos os chamados
+        empresas = Empresa.objects.all()
+        chamados = Chamado.objects.all()
 
     elif user.tipo_usuario == 'manager':
         empresa_usuario = user.empresa
@@ -45,7 +42,6 @@ def listar_chamados(request):
         empresas = Empresa.objects.filter(filial_de=empresa_usuario) | Empresa.objects.filter(id=empresa_usuario.id)
         chamados = Chamado.objects.filter(empresa__in=empresas)
 
-    # Aplicando filtros
     if empresa_filter:
         chamados = chamados.filter(empresa_id=empresa_filter)
 
@@ -63,9 +59,6 @@ def listar_chamados(request):
         chamados = chamados.filter(status_chamado=status_chamado_filter)
 
     if search:
-        # Adicionando debug para verificar o valor de search
-        print(f"Valor de search: {search}")
-        
         chamados = chamados.filter(
             Q(empresa__cnpj__icontains=search) |
             Q(numero_ordem__icontains=search) |
@@ -74,8 +67,7 @@ def listar_chamados(request):
 
     if prioridade_filter:
         chamados = chamados.filter(prioridade_chamado=prioridade_filter)
-
-    # Ordenação dos chamados
+        
     chamados = chamados.order_by(
         'prioridade_chamado',
         'data_criacao'
@@ -84,7 +76,7 @@ def listar_chamados(request):
     context = {
         'chamados': chamados,
         'empresas': empresas,
-        'empresa_id': empresa_filter,  # Passando o ID da empresa selecionada para o contexto
+        'empresa_id': empresa_filter,
         'user_tipo': user.tipo_usuario,
     }
     return render(request, 'contact/listar_chamados.html', context)

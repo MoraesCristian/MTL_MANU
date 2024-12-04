@@ -3,19 +3,16 @@
 {% block content %}
 <div id="documentacao_chamado">
     <h3>Documentação do Chamado: {{ chamado.titulo }}</h3>
-    <button type="button" >
-        Gerar PDF
-    </button>
-
+    <div class="form-group button-group">
+        <a href="{% url 'contact:download_documentacao_chamado_pdf' chamado.id %}" class="btn btn-primary">Download PDF</a>
+    </div>
     <div class="sub-container">
         {% for detalhe in detalhes_preenchidos %}
             <div class="detalhe-tarefa">
                 <p><strong>Tarefa:</strong> {{ detalhe.detalhe_tarefa.descricao }}</p>
                 <p><strong>Usuário:</strong> {{ detalhe.usuario }}</p>
                 <p><strong>Observação:</strong> {{ detalhe.observacao|default:"Nenhuma observação." }}</p>
-                <p><strong>Concluído:</strong> {{ detalhe.concluido|yesno:"Sim,Não" }}</p>
-
-                <!-- Exibindo fotos do cliente -->
+                <p><strong>Concluído:</strong> {{ detalhe.concluido|yesno:"Sim,N/A" }}</p>
                 <div class="sub-container">
                     <p><strong>Fotos Clientes:</strong></p>
                     {% if detalhe.fotos_clientes %}

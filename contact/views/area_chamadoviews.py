@@ -12,6 +12,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
 
+
+
 @login_required
 def visualizar_chamado(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
@@ -52,7 +54,8 @@ def load_chat(request, chamado_id):
                 chat=chat, 
                 usuario=request.user, 
                 conteudo=mensagem_texto, 
-                imagem=imagem
+                imagem=imagem,
+                empresa=request.user.empresa  # supondo que o usuário tem um campo de empresa
             )
             return redirect('contact:load_chat', chamado_id=chamado.id)
         else:
@@ -359,3 +362,4 @@ def documentacao_chamado_view(request, chamado_id):
         'imagens_ajustes': imagens_ajustes,
     }
     return render(request, 'contact/documentacao_chamado.html', context)
+

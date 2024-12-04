@@ -16,11 +16,10 @@
                         </div>
                     {% endif %}
                     <small>{{ mensagem.data_envio }}</small>
+                    <small>({{ mensagem.empresa.nome_fantasia }})</small>
                 </div>
             {% endfor %}
-        </div>
-        
-        <!-- Formulário de Mensagem e Imagem -->
+        </div> 
         <form method="post" action="{% url 'contact:load_chat' chamado.id %}" enctype="multipart/form-data">
             {% csrf_token %}
             <textarea name="mensagem" id="mensagem" rows="4" placeholder="Digite sua mensagem..."></textarea>

@@ -122,6 +122,31 @@ class Empresa(models.Model):
     def __str__(self):
         return self.razao_social
 
+class TempoManutencao(models.Model):
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='tempos_manutencao')
+    tipo_manutencao = models.CharField(max_length=255, choices=[
+        ('preventiva', 'Preventiva'),
+        ('emergial', 'Emergial'),
+        ('corretiva', 'Corretiva'),
+    ])
+    tempo = models.DurationField(help_text='Tempo em dias, horas, etc.')
+
+    def __str__(self):
+        return f'{self.empresa.nome_fantasia} - {self.tipo_manutencao}: {self.tempo}'
+
+class DocumentoEmpresa(models.Model):
+    TIPOS_DOCUMENTO = [
+        ('financeiro', 'Financeiro'),
+        ('contrato', 'Contrato'),
+    ]
+
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='documentos')
+    tipo_documento = models.CharField(max_length=50, choices=TIPOS_DOCUMENTO)
+    descricao = models.CharField(max_length=255, blank=True, null=True)
+    documento = models.FileField(upload_to='documentos_empresa/')
+
+    def __str__(self):
+        return f'{self.empresa.nome_fantasia} - {self.get_tipo_documento_display()}'
 
 class Area(models.Model):
     nome = models.CharField(max_length=255)
@@ -188,6 +213,7 @@ class Chamado(models.Model):
     data_inicio_atv = models.DateTimeField(blank=True, null=True)
     data_fim_atv = models.DateTimeField(blank=True, null=True)
     data_fim_chamado = models.DateTimeField(blank=True, null=True)
+    data_limite_atendimento = models.DateTimeField(blank=True, null=True)
     
     status_chamado = models.CharField(max_length=255,choices=[
         ('aberto', 'Aberto'),
@@ -226,13 +252,21 @@ class Chamado(models.Model):
         
         if 'fim_atividade' in kwargs:
             self.data_fim_atv = timezone.now()
-            
+        
+        if not self.data_limite_atendimento:
+            try:
+                tempo_manutencao = self.empresa.tempos_manutencao.get(tipo_manutencao=self.tipo_manutencao)
+                self.data_limite_atendimento = timezone.now() + tempo_manutencao.tempo
+            except TempoManutencao.DoesNotExist:
+                self.data_limite_atendimento = None  # ou definir um valor padrão
+        
         super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f'Chamado {self.numero_ordem} - {self.titulo}'
-
-
+    
+    
 class DetalheTarefaPreenchido(models.Model):
     detalhe_tarefa = models.ForeignKey(DetalheTarefa, on_delete=models.CASCADE)
     chamado = models.ForeignKey(Chamado, on_delete=models.CASCADE)
@@ -279,3 +313,8 @@ class MensagemChat(models.Model):
     conteudo = models.TextField(blank=True)
     imagem = models.ImageField(upload_to='imagens_chat/', blank=True, null=True)
     data_envio = models.DateTimeField(auto_now_add=True)
+    empresa = models.ForeignKey(Empresa, null=True, blank=True, on_delete=models.SET_NULL)
+
+    def save(self, *args, **kwargs):
+        self.empresa = self.usuario.empresa  
+        super().save(*args, **kwargs)
