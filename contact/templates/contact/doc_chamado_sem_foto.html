@@ -50,11 +50,6 @@
         .column-observation {
             width: 55%;
         }
-        .image-gallery img {
-            width: 100px;
-            height: auto;
-            margin-right: 10px;
-        }
         .header {
             width: 100%;
             border: 1px solid black;
@@ -92,9 +87,6 @@
         }
         .signature-info {
             font-size: 12px;
-        }
-        .page-break {
-            page-break-before: always;
         }
     </style>
 </head>
@@ -142,6 +134,7 @@
             {% endfor %}
         </tbody>
     </table>
+
     <div class="signature">
         <p>Assinatura:</p>
         {% if chamado.assinatura %}
@@ -155,32 +148,5 @@
             <p><strong>Cargo:</strong> {{ chamado.cargo_assinante }}</p>
         </div>
     </div>
-    {% for detalhe in detalhes_preenchidos %}
-        <div class="sub-container page-break">
-            <p><strong>FOTOS ATIVIDADE:</strong> {{ detalhe.detalhe_tarefa.descricao }}</p>
-
-            <div>
-                <p><strong>Fotos Clientes:</strong></p>
-                {% if detalhe.fotos_clientes_url %}
-                    <div class="image-gallery">
-                        <img src="{{ detalhe.fotos_clientes_url }}" alt="Foto Cliente">
-                    </div>
-                {% else %}
-                    <p>N/A</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <p><strong>Fotos Ajustes:</strong></p>
-                {% if detalhe.fotos_ajustes_url %}
-                    <div class="image-gallery">
-                        <img src="{{ detalhe.fotos_ajustes_url }}" alt="Foto Ajuste">
-                    </div>
-                {% else %}
-                    <p>N/A</p>
-                {% endif %}
-            </div>
-        </div>
-    {% endfor %}
 </body>
 </html>

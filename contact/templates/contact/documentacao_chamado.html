@@ -4,7 +4,13 @@
 <div id="documentacao_chamado">
     <h3>Documentação do Chamado: {{ chamado.titulo }}</h3>
     <div class="form-group button-group">
-        <a href="{% url 'contact:download_documentacao_chamado_pdf' chamado.id %}" class="btn btn-primary">Download PDF</a>
+        <a href="{% url 'contact:download_documentacao_chamado_pdf' chamado.id %}" class="btn btn-primary">
+            <button id="download_pdf_foto">Download PDF com fotos</button>
+        </a>
+        <a href="{% url 'contact:documentacao_sem_fotos' chamado.id %}" class="btn btn-secondary">
+            <button id="download_pdf_foto">Download PDF sem fotos</button>
+        </a>
+
     </div>
     <div class="sub-container">
         {% for detalhe in detalhes_preenchidos %}

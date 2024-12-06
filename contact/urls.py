@@ -31,6 +31,7 @@ urlpatterns = [
     path('view_signature/<int:chamado_id>/', views.view_signature, name='view_signature'),
     path('save_signature/<int:chamado_id>/', views.save_signature, name='save_signature'),
     path('documentacao/<int:chamado_id>/', views.documentacao_chamado_view, name='documentacao_chamado'),
+    path('documentacao-sem-fotos/<int:chamado_id>/', views.documentacao_sem_fotos, name='documentacao_sem_fotos'),
     path('chamado/<int:chamado_id>/documentacao/download/', views.download_documentacao_chamado_pdf, name='download_documentacao_chamado_pdf'),
     path('tarefas/', views.buscar_tarefas, name='buscar_tarefas'),
     path('tarefas/criar/', views.criar_tarefa, name='criar_tarefa'),
