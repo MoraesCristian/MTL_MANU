@@ -1,9 +1,12 @@
 {% extends 'global/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+{% endblock %}
 
 {% block content %}
 <div class="dashboard-container">
     <h2 class="dashboard-title">Bem-vindo, {{ user.first_name }} {{ user.last_name }}</h2>
-
     <form method="GET" action="{% url 'home' %}" class="filter-form">
         <label for="empresa" class="filter-label">Filtrar por Empresa:</label>
         <select name="empresa_id" id="empresa" class="filter-select">
@@ -14,7 +17,6 @@
                 </option>
             {% endfor %}
         </select>
-
         <label for="date_filter" class="filter-label">Filtrar por Data:</label>
         <select name="date_filter" id="date_filter" class="filter-select">
             <option value="">Todos os Dias</option>
@@ -23,7 +25,6 @@
             <option value="60" {% if date_filter == '60' %}selected{% endif %}>Últimos 60 dias</option>
             <option value="90" {% if date_filter == '90' %}selected{% endif %}>Últimos 90 dias</option>
         </select>
-
         <button type="submit" class="filter-button">Filtrar</button>
     </form>
     

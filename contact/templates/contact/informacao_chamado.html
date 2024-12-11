@@ -21,9 +21,12 @@
         
         <p><strong>Local Específico:</strong> {{ chamado.local_especifico }}</p>
         <p><strong>Data de Criação:</strong> {{ chamado.data_criacao }}</p>
-        <p><strong>Data de Início da Atividade:</strong> {{ chamado.data_inicio_atv }}</p>
-        <p><strong>Data de Fim da Atividade:</strong> {{ chamado.data_fim_atv }}</p>
-        
+        <p><strong>Data de Início:</strong> {{ chamado.data_inicio_atv }}</p>
+        <p><strong>Data de Fim:</strong> {{ chamado.data_fim_chamado }}</p>
+        {% if user_tipo == 'admin' or user_tipo == 'operador' %}
+        <p><strong>Inicio das Atividades:</strong> {{ chamado.data_inicio_atv }}</p>
+        <p><strong>Fim das Atividades:</strong> {{ chamado.data_fim_atv }}</p>
+        {% endif %}
         {% if imagens %}
         <h4>Imagens do Chamado</h4>
         <div class="chamado-imagens">
@@ -51,7 +54,7 @@
         <p><strong>Observação:</strong> {{ empresa.observacao }}</p>
     </div>
 
-    {% if prestadora_servico or user_tipo == 'admin' or user_tipo == 'operador' %}
+    {% if user_tipo == 'admin' or user_tipo == 'operador' %}
     <div class="sub-container">
         <h3>Informações da Prestadora de Serviço</h3>
         <p><strong>Nome Fantasia:</strong> {{ prestadora_servico.nome_fantasia }}</p>
@@ -64,15 +67,14 @@
     </div>
     {% endif %}
 
-    {% if tecnico_responsavel %}
+    {% if user_tipo == 'admin' or user_tipo == 'operador' %}
     <div class="sub-container">
         <h3>Técnico Responsável</h3>
         <p><strong>Nome:</strong> {{ tecnico_responsavel.nome }}</p>
-        {% if user_tipo == 'operador' and user_tipo == 'admin' %}
+        {% if user_tipo == 'operador' or user_tipo == 'admin' %}
             <p><strong>Email:</strong> {{ tecnico_responsavel.email }}</p>
             <p><strong>Telefone:</strong> {{ tecnico_responsavel.telefone }}</p>
         {% endif %}
     </div>
     {% endif %}
 {% endblock %}
-

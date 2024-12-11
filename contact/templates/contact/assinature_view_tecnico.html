@@ -1,0 +1,27 @@
+{% extends 'contact/visualizar_chamado.html' %}
+
+{% block content %}
+    <h3>Visualizar Assinatura</h3>
+    <div id="signature-pad-container">
+        <canvas id="signature-pad"></canvas>
+    </div>
+    <p><strong>Nome do Assinante:</strong> {{ nome_tecnico }}</p>
+    {% if chamado.status_chamado != 'concluido' %}
+        <a href="{% url 'contact:save_signature_tecnico' chamado.id %}"><button>Editar</button></a>
+    {% endif %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const canvas = document.getElementById('signature-pad');
+
+            {% if assinatura_existente %}
+            const img = new Image();
+            img.src = "{{ assinatura_existente }}";
+            img.onload = function() {
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+            {% endif %}
+        });
+    </script>
+{% endblock %}

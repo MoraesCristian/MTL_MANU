@@ -76,12 +76,15 @@ def load_chat(request, chamado_id):
 def load_informacao_chamado(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
     imagens = ImagemChamado.objects.filter(chamado=chamado)
+    user_tipo = request.user.tipo_usuario 
+    
     context = {
         'chamado': chamado,
         'empresa': chamado.empresa,
         'prestadora_servico': chamado.prestadora_servico,
         'tecnico_responsavel': chamado.tecnico_responsavel,
         'imagens': imagens,
+        'user_tipo': user_tipo,  
     }
     return render(request, 'contact/informacao_chamado.html', context)
 
@@ -265,7 +268,6 @@ def atualizar_status_chamado_view(request, chamado_id):
             elif novo_status == 'rejeitado':
                 redirection_url = 'contact:listar_chamados'
 
-
             chamado.save()
             return redirect(redirection_url, **redirection_args)
 
@@ -312,13 +314,11 @@ def save_signature(request, chamado_id):
             chamado.nome_assinante = nome_assinante
             chamado.email_assinante = email_assinante
             chamado.cargo_assinante = cargo_assinante
-            chamado.status_chamado = 'concluido'
-            chamado.data_fim_chamado = timezone.now()
             chamado.save()
         except Exception as e:
             return HttpResponseBadRequest(f"Erro ao salvar a assinatura: {str(e)}")
 
-        return HttpResponseRedirect(reverse('contact:view_signature', args=[chamado.id]))
+        return HttpResponseRedirect(reverse('contact:view_signature_tecnico', args=[chamado.id]))
 
     elif request.method == 'GET':
         context = {
@@ -329,6 +329,40 @@ def save_signature(request, chamado_id):
             'cargo_assinante': chamado.cargo_assinante,
         }
         return render(request, 'contact/assinature.html', context)
+
+    return HttpResponseBadRequest("Método não permitido.")
+
+@csrf_exempt
+def save_signature_tecnico(request, chamado_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
+
+    if request.method == 'POST':
+        assinatura_tecnico = request.POST.get('assinatura_tecnico')
+        nome_tecnico = request.POST.get('nome_tecnico')
+
+        if not assinatura_tecnico or not nome_tecnico:
+            return HttpResponseBadRequest("Todos os campos são obrigatórios.")
+
+        try:
+            formato, imgstr = assinatura_tecnico.split(';base64,')
+            img_data = base64.b64decode(imgstr)
+            chamado.assinatura_tecnico.save(f'chamado_{chamado_id}_ass_tecnico.png', ContentFile(img_data), save=True)
+            chamado.nome_tecnico = nome_tecnico
+            chamado.data_fim_chamado = timezone.now() 
+            chamado.status_chamado = 'concluido'
+            chamado.save()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Erro ao salvar a assinatura: {str(e)}")
+
+        return HttpResponseRedirect(reverse('contact:documentacao_chamado', args=[chamado.id]))
+
+    elif request.method == 'GET':
+        context = {
+            'chamado': chamado,
+            'assinatura_existente': chamado.assinatura_tecnico.url if chamado.assinatura_tecnico else None,
+            'nome_tecnico': chamado.nome_tecnico,
+        }
+        return render(request, 'contact/assinature_tecnico.html', context)
 
     return HttpResponseBadRequest("Método não permitido.")
 
@@ -344,22 +378,26 @@ def view_signature(request, chamado_id):
     }
     return render(request, 'contact/assinature_view.html', context)
 
+def view_signature_tecnico(request, chamado_id):
+    chamado = get_object_or_404(Chamado, id=chamado_id)
+    context = {
+        'chamado': chamado,
+        'assinatura_existente': chamado.assinatura_tecnico.url if chamado.assinatura_tecnico else None,
+        'nome_tecnico': chamado.nome_tecnico
+    }
+    return render(request, 'contact/assinature_view_tecnico.html', context)
+
 @login_required
 def documentacao_chamado_view(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
-    
-    # Pegando todos os detalhes preenchidos associados ao chamado
     detalhes_preenchidos = DetalheTarefaPreenchido.objects.filter(chamado=chamado)
 
-    # Pegando as imagens associadas ao chamado
-    imagens_clientes = chamado.imagem_set.filter(tipo_imagem='cliente')
-    imagens_ajustes = chamado.imagem_set.filter(tipo_imagem='ajuste')
-
+    for detalhe in detalhes_preenchidos:
+        detalhe.fotos_clientes = Imagem.objects.filter(tipo_imagem='cliente', detalhe_tarefa=detalhe)
+        detalhe.fotos_ajustes = Imagem.objects.filter(tipo_imagem='ajuste', detalhe_tarefa=detalhe)
+    
     context = {
         'chamado': chamado,
         'detalhes_preenchidos': detalhes_preenchidos,
-        'imagens_clientes': imagens_clientes,
-        'imagens_ajustes': imagens_ajustes,
     }
     return render(request, 'contact/documentacao_chamado.html', context)
-

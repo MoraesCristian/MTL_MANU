@@ -1,32 +1,42 @@
 {% extends 'global/base.html' %}
 {% load static %}
 
-{% block title %}MTL : Empresa {% endblock %}
+{% block title %}EMPRESAS{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
 {% endblock %}
 
 {% block content %}
-  <div class="grid-container">
-    {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
+<div class="grid-container">
+  {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
     <div class="card">
-      <a href="{% url 'contact:adicionar_empresa' %}">Adicionar Empresa</a>
-      <i class='bx bx-alarm-add' ></i>
-      <li><strong>Adicionar empresa:</strong></li>
+      <a href="{% url 'contact:adicionar_empresa' %}" class="full-card-link">
+        <i class='bx bx-alarm-add' ></i>
+        <ul class="card-list">
+          <li><strong>Adicionar empresa</strong></li>
+        </ul>
+      </a>
     </div>
-    {% endif %}
-    {% for empresa in empresas %}
-      <div class="card">
+  {% endif %}
+  {% for empresa in empresas %}
+    <div class="card"  >
+      <a href="{% url 'contact:empresas_details' empresa.id %}" class="full-card-link"> 
         <i class='bx bx-building'></i>
-        <a href="{% url 'contact:empresas_details' empresa.id %}">{{ empresa.razao_social }}</a>
-        <li><strong>Nome Fantasia:</strong>{{ empresa.nome_fantasia }}</li>
-        <li><strong>CNPJ:</strong> {{ empresa.cnpj }}</li>
-        <li><strong>Telefone:</strong> {{ empresa.telefone }}</li>
-        <li><strong>Email:</strong> {{ empresa.email_empresa }}</li>
-        <li><strong>Endereço:</strong> {{ empresa.logradouro }}</li>
-      </div>
-    {% endfor %}
-  </div>
+        <ul class="card-list">
+          <li><strong>Nome:</strong>{{ empresa.razao_social }}</li>
+          <li><strong>Nome Fantasia:</strong>{{ empresa.nome_fantasia }}</li>
+          <li><strong>CNPJ:</strong> {{ empresa.cnpj }}</li>
+          <li><strong>Telefone:</strong> {{ empresa.telefone }}</li>
+          <li><strong>Email:</strong> {{ empresa.email_empresa }}</li>
+          <li><strong>Endereço:</strong> {{ empresa.logradouro }}</li>
+        </ul>
+      </a>
+    </div>
+  {% endfor %}
+</div>
 {% endblock %}
+
+
+
 

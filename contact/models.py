@@ -196,37 +196,33 @@ class Chamado(models.Model):
         ('Normal', 'Prioridade Normal'),
         ('Baixa', 'Baixa Prioridade')
     ])
-    
     area_chamado = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True)
     tarefa = models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True, related_name='chamados')
     local_especifico = models.CharField(max_length=255)
-    
     data_criacao = models.DateTimeField(auto_now_add=True)
-    
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='chamados',null=True)
     empresa_nome_fantasia = models.CharField(max_length=255, blank=True)
     empresa_cnpj = models.CharField(max_length=18, blank=True)
-    
     prestadora_servico = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='empresa', null=True, blank=True)
     tecnico_responsavel = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='tecnicos')
-    
     data_inicio_atv = models.DateTimeField(blank=True, null=True)
     data_fim_atv = models.DateTimeField(blank=True, null=True)
     data_fim_chamado = models.DateTimeField(blank=True, null=True)
     data_limite_atendimento = models.DateTimeField(blank=True, null=True)
-    
     status_chamado = models.CharField(max_length=255,choices=[
         ('aberto', 'Aberto'),
         ('concluido', 'Concluído'),
         ('executando', 'Executando'),
         ('rejeitado', 'Rejeitado'),
-        ('assinatura', 'Aguardando assinatura')
+        ('assinatura', 'Aguardando assinatura'),
+        ('vencidas','OS Vencida')
     ],default='aberto')
-    
     assinatura = models.ImageField(upload_to='signatures/', null=True, blank=True)
     nome_assinante = models.CharField(max_length=255, blank=True)
     email_assinante = models.EmailField(blank=True)
     cargo_assinante = models.CharField(max_length=255, blank=True)
+    assinatura_tecnico = models.ImageField(upload_to='signatures/', null=True, blank=True)
+    nome_tecnico = models.CharField(max_length=255, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.pk: 
@@ -262,7 +258,9 @@ class Chamado(models.Model):
         
         super().save(*args, **kwargs)
 
-
+    def get_status_chamado_display(self):
+        return dict(self._meta.get_field('status_chamado').choices)[self.status_chamado]
+    
     def __str__(self):
         return f'Chamado {self.numero_ordem} - {self.titulo}'
     

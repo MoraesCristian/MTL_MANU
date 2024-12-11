@@ -10,16 +10,20 @@
 {% block content %}
     <div class="grid-container">
         <div class="card">
-            <a href="{% url 'contact:empresas_view' %}"> Empresa</a>
-            <i class='bx bx-building'></i>
-            <li><strong>Adicionar empresa:</strong></li>
+            <a href="{% url 'contact:empresas_view' %}" class="full-card-link">
+                <i class='bx bx-building'></i>
+                <ul class="card-list">
+                    <li><strong>Adicionar empresa</strong></li>
+                </ul>
+            </a>
         </div>
         <div class="card">
-            <a href="{% url 'contact:list_user' %}"> Usuários</a>
-            <i class='bx bx-building'></i>
-            <li><strong>Usuários:</strong></li>
+            <a href="{% url 'contact:list_user' %}" class="full-card-link">
+                <i class='bx bx-building'></i>
+                <ul class="card-list">
+                    <li><strong>Usuários</strong></li>
+                </ul>
+            </a>
         </div>
-
-
     </div>
 {% endblock %}

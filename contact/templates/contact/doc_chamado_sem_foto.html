@@ -95,6 +95,8 @@
         <table class="header-table">
             <tr>
                 <td colspan="2" class="header-title">Documentação do Chamado: {{ chamado.titulo }}</td>
+                <strong>MTL MANUTENCAO PREDIAL E SERVICOS INTEGRADOS EIRELI</strong> <br>
+                <strong>CNPJ: 22.674.482/0001-06</strong> <br>
             </tr>
             <tr>
                 <td class="header-info">
@@ -116,7 +118,7 @@
         <thead>
             <tr>
                 <th class="column-activity">Atividade</th>
-                <th class="column-status">SIM - N/A</th>
+                <th class="column-status">OK - N/A</th>
                 <th class="column-observation">Observação</th>
             </tr>
         </thead>
@@ -135,17 +137,28 @@
         </tbody>
     </table>
 
-    <div class="signature">
-        <p>Assinatura:</p>
+    <div class="signature" class="sub-container">
+        <p>Assinatura cliente:</p>
         {% if chamado.assinatura %}
             <img src="{{ base_url }}{{ chamado.assinatura.url }}" alt="Assinatura">
         {% else %}
             <p>N/A</p>
         {% endif %}
-        <div class="signature-info">
+        <div class="signature-info" >
             <p><strong>Nome:</strong> {{ chamado.nome_assinante }}</p>
             <p><strong>Email:</strong> {{ chamado.email_assinante }}</p>
             <p><strong>Cargo:</strong> {{ chamado.cargo_assinante }}</p>
+        </div>
+    </div>
+    <div class="signature" class="sub-container">
+        <p>Assinatura Técnico:</p>
+        {% if chamado.assinatura %}
+            <img src="{{ base_url }}{{ chamado.assinatura_tecnico.url }}" alt="assinatura_tecnico">
+        {% else %}
+            <p>N/A</p>
+        {% endif %}
+        <div class="signature-info">
+            <p><strong>Nome:</strong> {{ chamado.nome_tecnico }}</p>
         </div>
     </div>
 </body>

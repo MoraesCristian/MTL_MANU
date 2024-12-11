@@ -10,44 +10,43 @@
         <a href="{% url 'contact:documentacao_sem_fotos' chamado.id %}" class="btn btn-secondary">
             <button id="download_pdf_foto">Download PDF sem fotos</button>
         </a>
-
     </div>
     <div class="sub-container">
         {% for detalhe in detalhes_preenchidos %}
-            <div class="detalhe-tarefa">
-                <p><strong>Tarefa:</strong> {{ detalhe.detalhe_tarefa.descricao }}</p>
-                <p><strong>Usuário:</strong> {{ detalhe.usuario }}</p>
-                <p><strong>Observação:</strong> {{ detalhe.observacao|default:"Nenhuma observação." }}</p>
-                <p><strong>Concluído:</strong> {{ detalhe.concluido|yesno:"Sim,N/A" }}</p>
-                <div class="sub-container">
-                    <p><strong>Fotos Clientes:</strong></p>
-                    {% if detalhe.fotos_clientes %}
-                        <div class="image-gallery">
-                            <a href="{{ detalhe.fotos_clientes.url }}" target="_blank">
-                                <img src="{{ detalhe.fotos_clientes.url }}" alt="Foto Cliente" style="width: 100px; height: auto; margin-right: 10px;">
+        <div class="detalhe-tarefa">
+            <p><strong>Tarefa:</strong> {{ detalhe.detalhe_tarefa.descricao }}</p>
+            <p><strong>Usuário:</strong> {{ detalhe.usuario }}</p>
+            <p><strong>Observação:</strong> {{ detalhe.observacao|default:"Nenhuma observação." }}</p>
+            <p><strong>Concluído:</strong> {{ detalhe.concluido|yesno:"OK,N/A" }}</p>
+            <div class="sub-container">
+                <p><strong>Fotos Clientes:</strong></p>
+                {% if detalhe.fotos_clientes %}
+                    <div class="image-gallery">
+                        {% for imagem in detalhe.fotos_clientes %}
+                            <a href="{{ imagem.imagem.url }}" target="_blank">
+                                <img src="{{ imagem.imagem.url }}" alt="Foto Cliente" style="width: 100px; height: auto; margin-right: 10px;">
                             </a>
-                        </div>
-                    {% else %}
-                        <p>N/A</p>
-                    {% endif %}
-                </div>
-
-                <!-- Exibindo fotos de ajustes -->
-                <div class="sub-container">
-                    <p><strong>Fotos Ajustes:</strong></p>
-                    {% if detalhe.fotos_ajustes %}
-                        <div class="image-gallery">
-                            <a href="{{ detalhe.fotos_ajustes.url }}" target="_blank">
-                                <img src="{{ detalhe.fotos_ajustes.url }}" alt="Foto Ajuste" style="width: 100px; height: auto; margin-right: 10px;">
-                            </a>
-                        </div>
-                    {% else %}
-                        <p>N/A</p>
-                    {% endif %}
-                </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>N/A</p>
+                {% endif %}
             </div>
-            <hr>
+            <div class="sub-container">
+                <p><strong>Fotos Ajustes:</strong></p>
+                {% if detalhe.fotos_ajustes %}
+                    <div class="image-gallery">
+                        {% for imagem in detalhe.fotos_ajustes %}
+                            <a href="{{ imagem.imagem.url }}" target="_blank">
+                                <img src="{{ imagem.imagem.url }}" alt="Foto Ajuste" style="width: 100px; height: auto; margin-right: 10px;">
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p>N/A</p>
+                {% endif %}
+            </div>
+        </div>
         {% endfor %}
     </div>
-</div>
 {% endblock %}

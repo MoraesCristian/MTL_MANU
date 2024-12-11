@@ -1,7 +1,7 @@
 {% extends 'global/base.html' %}
 {% load static %}
 
-{% block title %}CONF{% endblock title %}
+{% block title %}CONFIGURAÇÕES{% endblock title %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
@@ -10,12 +10,20 @@
 {% block content %}
 <div class="grid-container">
     <div class="card">
-        <i class='bx bxs-edit-alt'></i>
-        <a href="{% url 'contact:listar_areas' %}">Listar áreas</a>
+        <a href="{% url 'contact:listar_areas' %}" class="full-card-link">
+            <i class='bx bxs-edit-alt'></i>
+            <ul class="card-list">
+                <li><strong>Listar Areas</strong></li>
+            </ul>
+        </a>
     </div>
     <div class="card">
-        <i class='bx bxs-objects-horizontal-left'></i>
-        <a href="{% url 'contact:listar_tarefas' %}">Listar Tarefa</a>
+        <a href="{% url 'contact:listar_tarefas' %}" class="full-card-link">
+            <i class='bx bxs-objects-horizontal-left'></i>
+            <ul class="card-list">
+                <li><strong>Listar Tarefa</strong></li>
+            </ul>
+        </a>
     </div>
     {% for area in areas %}
         <div class="card">

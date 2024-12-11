@@ -91,6 +91,23 @@ class AssinaturaForm(forms.ModelForm):
     class Meta:
         model = Chamado
         fields = ['nome_assinante', 'email_assinante', 'assinatura']
+        
+        
+class AssinaturaTecnicoForm(forms.ModelForm):
+    nome_tecnico = forms.CharField(
+        required=True,
+        label='Nome do Técnico',
+        widget=forms.TextInput(attrs={'required': True})
+    )
+    assinatura_tecnico = forms.ImageField(
+        required=True,
+        label='Assinatura Técnico',
+        widget=forms.ClearableFileInput(attrs={'required': True})
+    )
+
+    class Meta:
+        model = Chamado
+        fields = ['nome_tecnico', 'assinatura_tecnico']
 
 
 class ImagemChamadoForm(forms.ModelForm):

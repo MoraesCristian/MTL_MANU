@@ -22,14 +22,14 @@ body {
   padding: 15px; 
   background-color: #f4f4f4; 
   border-right: 1px solid #ccc;
-  margin-top: 25px;
+  margin-top: 10px;
 }
 
 /* Conteúdo principal */
 .main-content {
   flex: 3; /* Flexível, ocupará mais espaço que a sidebar */
   padding: 15px; /* Adiciona um espaçamento interno */
-  margin-top: 25px;
+  margin-top: 10px;
 }
 
 .fixed-header {

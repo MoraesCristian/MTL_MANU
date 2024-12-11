@@ -53,20 +53,30 @@
                     </a>
                 </div>
             {% endif %}
-            {% if user.tipo_usuario == 'user' %}
-                {% if chamado.status_chamado == 'assinatura' %}
+            {% if user.tipo_usuario == 'user' and chamado.status_chamado == 'assinatura' %}
+            <div>
+                <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
+                    <button id="signature">Assinatura</button>
+                </a>
+            </div>
+            <div>
+                <a href="{% url 'contact:view_signature_tecnico' chamado_id=chamado.id %}">
+                    <button id="signature">Assinatura Técnico</button>
+                </a>
+            </div>
+            {% elif user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'cliente' %}
+                {% if chamado.status_chamado == 'assinatura' or chamado.status_chamado == 'concluido' %}
                     <div>
                         <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
                             <button id="signature">Assinatura</button>
                         </a>
                     </div>
+                    <div>
+                        <a href="{% url 'contact:view_signature_tecnico' chamado_id=chamado.id %}">
+                            <button id="signature">Assinatura Técnico</button>
+                        </a>
+                    </div>
                 {% endif %}
-            {% elif user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'cliente' %}
-                <div>
-                    <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
-                        <button id="signature">Assinatura</button>
-                    </a>
-                </div>
             {% endif %}
 
             {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' %}
@@ -76,21 +86,7 @@
                     </a>
                 </div>
             {% endif %}
-            {% if user.tipo_usuario == 'user' %}
-                {% if chamado.status_chamado == 'concluido' %}
-                    <div>
-                        <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
-                            <button id="signature">Assinatura</button>
-                        </a>
-                    </div>
-                {% endif %}
-            {% elif user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'cliente' %}
-                <div>
-                    <a href="{% url 'contact:view_signature' chamado_id=chamado.id %}">
-                        <button id="signature">Assinatura</button>
-                    </a>
-                </div>
-            {% endif %}
+            
             <div>
                 <a href="{% url 'contact:documentacao_chamado' chamado_id=chamado.id %}">
                     <button id="documentacao">Documentação</button>
@@ -107,19 +103,20 @@
                             <select name="status_chamado" id="status_chamado_select">
                                 <option value="aberto" {% if chamado.status_chamado == 'aberto' %}selected{% endif %}>Aberto</option>
                                 <option value="executando" {% if chamado.status_chamado == 'executando' %}selected{% endif %}>Executando</option>
+                                <option value="assinatura" {% if chamado.status_chamado == 'assinatura' %}selected{% endif %}>Assinatura</option>
                                 <option value="concluido" {% if chamado.status_chamado == 'concluido' %}selected{% endif %}>Concluído</option>
                                 <option value="rejeitado" {% if chamado.status_chamado == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
                             </select>
                             <button id="atualizar_status" type="submit">Atualizar Status</button>
                         </form>
-                        {% elif user.empresa == chamado.prestadora_servico and user.tipo_usuario != 'cliente' %}
-                            {%if chamado.status_chamado != 'assinatura'%}
-                                <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="status_chamado" value="executando">
-                                    <button id="executar" type="submit">Executar</button>
-                                </form>
-                            {% endif %}
+                    {% elif user.empresa == chamado.prestadora_servico and user.tipo_usuario != 'cliente' %}
+                        {% if chamado.status_chamado != 'assinatura' %}
+                            <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="status_chamado" value="executando">
+                                <button id="executar" type="submit">Executar</button>
+                            </form>
+                        {% endif %}
                         {% if chamado.status_chamado == 'executando' %}
                             <form method="post" action="{% url 'contact:atualizar_status_chamado' chamado.id %}">
                                 {% csrf_token %}
@@ -127,7 +124,6 @@
                                 <button id="concluir" type="submit">Concluir</button>
                             </form>
                         {% endif %}
-                                
                     {% elif user.tipo_usuario == 'cliente' %}
                         <p><strong>Status:</strong> <span id="status_chamado">{{ chamado.status_chamado }}</span></p>
                     {% endif %}
@@ -139,6 +135,7 @@
                             <select name="status_chamado" id="status_chamado_select">
                                 <option value="aberto" {% if chamado.status_chamado == 'aberto' %}selected{% endif %}>Aberto</option>
                                 <option value="executando" {% if chamado.status_chamado == 'executando' %}selected{% endif %}>Executando</option>
+                                <option value="assinatura" {% if chamado.status_chamado == 'assinatura' %}selected{% endif %}>Assinatura</option>
                                 <option value="concluido" {% if chamado.status_chamado == 'concluido' %}selected{% endif %}>Concluído</option>
                                 <option value="rejeitado" {% if chamado.status_chamado == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
                             </select>
