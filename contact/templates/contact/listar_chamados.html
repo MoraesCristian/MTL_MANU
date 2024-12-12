@@ -1,8 +1,6 @@
 {% extends 'global/base.html' %}
 {% load static %}
 
-{% block title %}LSITA DE CHAMADOS{% endblock %}
-
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
 {% endblock %}
@@ -10,6 +8,7 @@
 {% block content %}
 
 {% if user.tipo_usuario == 'admin' or user.tipo_usuario == 'operador' or user.tipo_usuario == 'manager' %}
+  <h1>LISTAR CHAMADOS</h1>
   <form method="get" class="filter-form">
     <div class="form-group">
       <input type="text" name="search" placeholder="Pesquisar" value="{{ request.GET.search }}">
@@ -35,7 +34,7 @@
         <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
         <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
         <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
-        <option value="assinatura" {% if request.GET.status_chamado == "assinatura" %}selected{% endif %}>Assinatura</option>
+        <option value="assinatura" {% if request.GET.status_chamado == "assinatura" %}selected{% endif %}>Aguardando Assinatura</option>
       </select>
     </div>
     <div class="form-group">
@@ -68,7 +67,7 @@
         <option value="concluido" {% if request.GET.status_chamado == "concluido" %}selected{% endif %}>Concluído</option>
         <option value="executando" {% if request.GET.status_chamado == "executando" %}selected{% endif %}>Executando</option>
         <option value="rejeitado" {% if request.GET.status_chamado == "rejeitado" %}selected{% endif %}>Rejeitado</option>
-        <option value="assinatura" {% if request.GET.status_chamado == "assinatura" %}selected{% endif %}>Assinatura</option>
+        <option value="assinatura" {% if request.GET.status_chamado == "assinatura" %}selected{% endif %}>Aguardando Assinatura</option>
       </select>
     </div>
     <div class="form-group">
@@ -107,7 +106,7 @@
           <li><strong>Data Abertura:</strong> {{ chamado.data_criacao }}</li>
           <li><strong>Data Limite:</strong> {{ chamado.data_limite_atendimento }}</li>
           <li><strong>Prioridade:</strong> {{ chamado.prioridade_chamado }}</li>
-          <li><strong>Status:</strong> {{ chamado.status_chamado }}</li>
+          <li><strong>Status:</strong> {{ chamado.get_status_chamado_display }}</li>
         </ul>
       </a>
     </div>

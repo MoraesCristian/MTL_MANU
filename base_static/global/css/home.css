@@ -354,87 +354,6 @@ body{
     -ms-overflow-style: none;  /* Oculta a barra de rolagem no IE e Edge */
 }
 
-.dashboard-container {
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* Ocupa 100% da altura da janela */
-    margin: 10px;
-    box-sizing: border-box; /* Inclui padding e border no tamanho total */
-}
-
-.chart-top, .chart-bot {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    height: 50%; /* Ocupa 50% da altura da dashboard-container */
-    box-sizing: border-box; /* Inclui padding e border no tamanho total */
-    margin-bottom: 10px;
-}
-
-.chart-container, .chart-container-bot {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    flex: 0 1 65%; /* Ocupa 65% da largura */
-    min-width: 300px; /* Largura mínima para responsividade */
-    border: 1px solid #ccc; /* Apenas para visualização */
-    border-radius: 10px;
-    padding: 10px; /* Espaçamento interno */
-    box-sizing: border-box; /* Inclui padding e border no tamanho total */
-    height: 100%; /* Ocupa 100% da altura do contêiner pai */
-    margin-top: 10px;
-    overflow: hidden; /* Evita que o gráfico ultrapasse os limites do contêiner */
-}
-
-.chart-status, .chart-status-bot {
-    padding: 1em;
-    flex: 0 1 30%; /* Ocupa 30% da largura */
-    min-width: 150px; /* Largura mínima para responsividade */
-    border: 1px solid #ccc; /* Apenas para visualização */
-    border-radius: 10px;
-    text-align: left;
-    text-decoration: none;
-    height: 100%; /* Ocupa 100% da altura do contêiner pai */
-    margin-top: 10px;
-    box-sizing: border-box; /* Inclui padding e border no cálculo da largura */
-}
-
-@media (max-width: 768px) {
-    /* Para telas menores que 768px */
-    .dashboard-container {
-        padding: 10px; /* Adiciona padding para evitar que o conteúdo encoste nas bordas da tela */
-    }
-    .chart-top, .chart-bot {
-        flex-direction: column; /* Disposição em coluna */
-        height: auto; /* A altura se ajusta automaticamente */
-    }
-    .chart-container, .chart-container-bot, .chart-status, .chart-status-bot {
-        flex: 1 1 100%; /* Em telas pequenas, ocupe 100% da largura */
-        height: auto; /* Deixe a altura ser ajustada automaticamente */
-        max-width: 100%; /* Garante que o gráfico não ultrapasse a tela */
-        margin-top: 10px;
-    }
-    .chart-container-bot {
-        max-height: 300px; /* Ajuste a altura máxima para dispositivos móveis */
-        overflow: auto; /* Permita rolagem em telas menores */
-    }
-    .chart-status {
-        margin-top: 10px;
-        flex: 1 1 100%; /* Deixe a área de status ocupar 100% em telas pequenas */
-        min-width: 100%; /* Garante que a largura não seja menor que 100% */
-        padding: 10px; /* Adiciona espaçamento interno */
-    }
-    .filter-form {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .filter-label, .filter-select, .filter-button {
-        width: 100%;
-    }
-}
 
 .status-indicator {
     display: inline-block;
@@ -475,3 +394,4 @@ body{
     margin-left: 5px;
     vertical-align: middle;
 }
+

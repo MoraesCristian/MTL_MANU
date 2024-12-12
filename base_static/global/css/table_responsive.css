@@ -14,10 +14,13 @@ body {
   padding: min(50px, 7%);
   height: 100vh;
   background-color: rgb(34, 34, 60);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 h1 {
-  margin: 30px 1;
+  margin: 30px 0;
 }
 
 .filter-form {
@@ -25,6 +28,7 @@ h1 {
   flex-wrap: wrap;
   gap: 1rem;
   margin-bottom: 1.5rem;
+  justify-content: center;
 }
 
 .filter-form .form-group {
@@ -47,6 +51,7 @@ h1 {
   color: white;
   cursor: pointer;
   border: none;
+  transition: background-color 0.3s ease;
 }
 
 .filter-button:hover {
@@ -74,9 +79,16 @@ h1 {
   text-decoration: none;
   font-size: 20px;
   list-style-type: none;
-  max-width: 100%; 
+  max-width: 100%;
   overflow: hidden;
   word-wrap: break-word;
+  margin: 10px 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card.abrir-chamado-card {
@@ -92,8 +104,9 @@ h1 {
 }
 
 .card-list {
-  list-style-type: none;  /* Remove os pontos */
-  padding: 0;  /* Remove o padding padrão */
+  list-style-type: none; /* Remove os pontos */
+  padding: 0; /* Remove o padding padrão */
+  margin: 0;
 }
 
 .card .full-card-link i {
@@ -106,4 +119,5 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 15px;
   justify-content: center;
+  width: 100%;
 }

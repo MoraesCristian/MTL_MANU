@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block title %}{% endblock title %}
     <link rel="stylesheet" href="{% static 'global/css/home.css' %}">
-    <!-- Boxicons CDN Link -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     {% block extra_css %}{% endblock %}
 </head>
@@ -20,10 +19,6 @@
       <i class='bx bx-menu' id="btn" ></i>
     </div>
     <ul class="nav_list">
-      <li class="search-container">
-        <i class='bx bx-search search-icon'></i>
-        <input type="text" placeholder="Procurar">
-      </li>
       <li>
         <a href="{% url 'home' %}" class="nav-link">
           <i class='bx bx-home-alt-2'></i>

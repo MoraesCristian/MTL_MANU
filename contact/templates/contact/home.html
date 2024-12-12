@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/dashboard.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -34,7 +35,7 @@
             <div id="totalChamados" style="text-align: center; font-weight: bold; margin-top: 10px;"></div>
         </div>
         <div class="chart-status">
-            <h3 class="status-title">Totais por Status</h3>
+            <h3 class="status-title">Totais de Chamados por Status</h3>
             <div class="status-list">
                 {% for status, total in status_totals.items %}
                     <div class="status-item">
@@ -54,6 +55,13 @@
     <div class="chart-bot">
         <div class="chart-container-bot">
             <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-link">
+            <h3 class="cart-link-title">Conheça um pouco sobre a empresa:</h3>
+            <a href="https://www.mtlmanutencao.com.br" target="_blank" class="chart-card">
+                <img src="https://www.mtlmanutencao.com.br/path/to/image.jpg" alt="Imagem da empresa" class="chart-card-image">
+                <p class="chart-card-text">Clique aqui para saber mais!</p>
+            </a>
         </div>
     </div>
 </div>

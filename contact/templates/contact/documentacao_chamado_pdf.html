@@ -19,36 +19,42 @@
             padding: 15px;
             box-sizing: border-box;
             border-radius: 10px;
-            background-color: #f9f9f9;
         }
         .report-table {
             width: 100%;
-            border-collapse: collapse;
             margin-bottom: 20px;
+            font-size: 12px
         }
+        
         .report-table th, .report-table td {
             border: 1px solid #000;
-            padding: 5px;
+            padding: 8px; /* Ajuste do padding para melhorar a aparência */
             text-align: left;
             vertical-align: top;
+            font-size: 12px; /* Ajuste do tamanho da fonte */
         }
+        
         .report-table th {
             background-color: #f2f2f2;
             font-weight: bold;
         }
+        
         .section-title {
             background-color: #d9d9d9;
             font-weight: bold;
         }
         .column-activity {
             width: 40%;
+    
         }
         .column-status {
-            width: 5%;
+            width: 7%;
             text-align: center;
+            font-size: 10px;
         }
         .column-observation {
-            width: 55%;
+            width: 63%;
+            ont-size: 10px;
         }
         .image-gallery {
             display: flex;
@@ -56,7 +62,7 @@
             gap: 10px;
         }
         .image-gallery img {
-            width: 100px;
+            width: 150px;
             height: auto;
             padding: 10px;
             object-fit: cover;
@@ -65,44 +71,59 @@
         .header {
             width: 100%;
             border: 1px solid black;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             padding: 10px;
+            border-radius: 10px;
+        }
+        .header-fixo{
+            width: 100%;
+            border: 1px solid black;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
         }
         .header img {
-            width: 100px;
+            width: 150px;
             height: auto;
         }
         .header-table {
             width: 100%;
             border-collapse: collapse;
+            border-radius: 10px;
+
         }
         .header-table td {
             padding: 5px;
             vertical-align: top;
+            border-radius:10px;
         }
         .header-title {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: bold;
             text-align: left;
             vertical-align: middle;
+            border-radius: 10px;
         }
         .header-info {
             font-size: 12px;
+            border-radius:10px;
         }
+
         .signature-container {
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
             text-align: center;
-            border: 1px solid #000;
             padding: 10px;
-            border-radius: 10px;
         }
+
         .signature {
             width: 45%;
+            border: 1px solid #000;
+            border-radius:10px;
         }
         .signature img {
-            width: 150px;
+            width: 200px;
             height: auto;
         }
         .signature-info {
@@ -114,18 +135,20 @@
     </style>
 </head>
 <body>
+    <div class="header-fixo">
+        <tr>
+            <td colspan="2">
+                <strong>MTL MANUTENCAO PREDIAL E SERVICOS INTEGRADOS EIRELI</strong><br>
+                <strong>CNPJ: 22.674.482/0001-06</strong><br>
+            </td>
+        </tr>
+    </div>
     <div class="header">
         <table class="header-table">
             <tr>
-                <td colspan="2">
-                    <strong>MTL MANUTENCAO PREDIAL E SERVICOS INTEGRADOS EIRELI</strong><br>
-                    <strong>CNPJ: 22.674.482/0001-06</strong><br>
-                </td>
-            </tr>
-            <tr>
                 <td class="header-info">
                     <strong>Cliente:</strong> {{ chamado.empresa.nome_fantasia }}<br>
-                    <strong>Cidade:</strong> {{ chamado.empresa.logradouro }}<br>
+                    <strong>Endereço:</strong> {{ chamado.empresa.logradouro }}<br>
                     <strong>Estado:</strong> {{ chamado.empresa.estado }}
                 </td>
                 <td class="header-info">
@@ -134,13 +157,10 @@
                     <strong>Nº OS:</strong> {{ chamado.numero_ordem }}
                 </td>
             </tr>
-            <tr>
-                <td colspan="2" class="header-title">Documentação do Chamado: {{ chamado.titulo }}</td>
-            </tr>
         </table>
     </div>
 
-    <h2>Detalhes Preenchidos</h2>
+    <h2>Documentação do Chamado: {{ chamado.titulo }}</h2>
     <table class="report-table">
         <thead>
             <tr>
@@ -166,7 +186,7 @@
 
     <div class="signature-container">
         <div class="signature">
-            <p>Assinatura:</p>
+            <p>Assinatura responsavel:</p>
             {% if chamado.assinatura %}
                 <img src="{{ base_url }}{{ chamado.assinatura.url }}" alt="Assinatura">
             {% else %}

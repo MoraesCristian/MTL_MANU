@@ -1,68 +1,103 @@
+/* Estilo do corpo */
 body {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background-color: #f0f0f0;
-  font-family: Arial, sans-serif;
+  background-color: #f4f7fa; /* Cor de fundo mais suave */
+  font-family: 'Arial', sans-serif;
+  margin: 0; /* Remove qualquer margem padrão */
 }
+
+/* Container de login */
 .login-container {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  background-color: #fff;
+  padding: 30px; /* Mais espaçamento interno para melhorar a legibilidade */
+  border-radius: 12px; /* Bordas mais arredondadas */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* Sombra mais suave e intensa */
   text-align: center;
-  width: 300px;
+  width: 100%;
+  max-width: 400px; /* Tamanho máximo para manter o container responsivo */
 }
+
+/* Logo dentro do container de login */
 .login-container img {
   max-width: 100px;
+  margin-bottom: 20px; /* Distância entre a imagem e o título */
 }
+
+/* Título do login */
 .login-container h2 {
   margin-bottom: 20px;
+  font-size: 24px;
+  color: #333; /* Cor de texto mais escura */
+  font-weight: 600;
 }
+
+/* Formulário de login */
 .login-container form {
   display: flex;
   flex-direction: column;
+  gap: 20px; /* Espaço uniforme entre os campos */
 }
+
+/* Estilo dos divs dentro do formulário */
 .login-container form div {
-  margin-bottom: 15px;
   text-align: left;
 }
+
+/* Labels */
 .login-container label {
+  font-size: 14px;
+  color: #555; /* Cor mais suave para os labels */
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
+
+/* Campos de entrada (input) */
 .login-container input[type="email"],
 .login-container input[type="password"] {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 12px 16px; /* Padding igual dos dois lados (horizontal) */
+  border: 1px solid #ddd; /* Bordas mais suaves */
+  border-radius: 6px; /* Bordas ligeiramente arredondadas */
+  font-size: 16px; /* Tamanho de fonte maior para facilitar a leitura */
+  background-color: #fafafa; /* Cor de fundo mais clara para os campos */
+  box-sizing: border-box; /* Inclui o padding e borda no cálculo do tamanho */
+  transition: border-color 0.3s ease; /* Transição suave ao focar no campo */
 }
+
+/* Efeito ao focar nos campos de entrada */
+.login-container input[type="email"]:focus,
+.login-container input[type="password"]:focus {
+  border-color: #007bff; /* Cor do foco mais marcante */
+  outline: none; /* Remove o contorno padrão do foco */
+}
+
+/* Botão de login */
 .login-container button {
-  padding: 10px;
+  padding: 12px 0;
   background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
+  font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
+
+/* Efeito de hover no botão */
 .login-container button:hover {
   background-color: #0056b3;
 }
+
+/* Link de "esqueci minha senha" */
 .login-container a {
   color: #007bff;
   text-decoration: none;
-}
-.login-container a:hover {
-  text-decoration: underline;
+  font-size: 14px;
 }
 
-.content {
-  max-width: var(--main-page-width);
-  margin: calc(var(--spacing) * 2) auto;
-  padding: var(--spacing);
-  background: var(--clr-white);
-  box-shadow: 2px 2px 5px var(--clr-dark-shadow-20);
-  border-radius: var(--default-border-radius);
+.login-container a:hover {
+  text-decoration: underline;
 }

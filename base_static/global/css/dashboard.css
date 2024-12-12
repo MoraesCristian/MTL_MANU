@@ -1,0 +1,177 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+}
+
+.form-adicionar-empresa body {
+    overflow: auto;
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    height: 100vh; /* Faz o container ocupar a altura total da tela */
+}
+
+.dashboard-title {
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.filter-select, .filter-button {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.filter-button {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+.filter-button:hover {
+    background-color: #0056b3;
+}
+
+.chart-top, .chart-bot {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Alinha os itens verticalmente ao centro */
+    width: 100%;
+    height: calc(50% - 40px); /* Divide o espaço em duas partes iguais, ajustando para o padding */
+    margin-top: 20px;
+}
+
+.chart-container, .chart-container-bot {
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    width: 70%; /* Ajusta a largura conforme solicitado */
+    height: 100%; /* Faz os gráficos ocuparem a altura total disponível */
+    border: 1px solid rgb(75, 82, 92);
+    margin-right: 10px;
+    border-radius: 10px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.chart-status, .chart-link {
+    width: 30%; /* Ajusta a largura conforme solicitado */
+    height: 100%; /* Faz os gráficos ocuparem a altura total disponível */
+    border: 1px solid rgb(75, 82, 92);
+    border-radius: 10px;
+    overflow-y: auto; /* Adiciona rolagem apenas se necessário */
+    padding-left: 20px;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.status-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.status-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.status-item {
+    margin-bottom: 10px;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-link {
+    text-decoration: none;
+    color: #000;
+}
+
+.status-link:hover {
+    text-decoration: underline;
+}
+
+.total-number {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.status-empty {
+    color: #888;
+}
+
+/* Cores dos status */
+.status-indicator.aberto {
+    background-color: #1500ff;
+}
+
+.status-indicator.concluido {
+    background-color: #09c600;
+}
+
+.status-indicator.executando {
+    background-color: #e9ff00;
+}
+
+.status-indicator.rejeitado {
+    background-color: #ff0000;
+}
+
+.status-indicator.assinatura {
+    background-color: #e0bb00;
+}
+
+.status-indicator.nenhum-dado {
+    background-color: #898989;
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 10px; /* Adiciona padding para evitar que o conteúdo encoste nas bordas da tela */
+    }
+
+    .chart-top, .chart-bot {
+        flex-direction: column; /* Muda a direção para coluna */
+        height: auto; /* Ajusta a altura automaticamente */
+        margin-top: 10px; /* Ajusta a margem para um espaçamento menor */
+    }
+
+    .chart-container, .chart-container-bot, .chart-status, .chart-link {
+        width: 100%; /* Faz os gráficos ocuparem a largura total em dispositivos móveis */
+        height: auto; /* Ajusta a altura automaticamente */
+        margin-bottom: 20px; /* Adiciona margem inferior para espaçamento */
+    }
+}
