@@ -7,11 +7,13 @@ from urllib.parse import urljoin
 from contact.models import Chamado, DetalheTarefaPreenchido, Imagem
 from weasyprint import HTML
 
+
 @login_required
 def download_documentacao_chamado_pdf(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
     detalhes_preenchidos = DetalheTarefaPreenchido.objects.filter(chamado=chamado)
     base_url = request.build_absolute_uri('/')
+    logo_url = base_url + 'static/images/logo_docs.png'
 
     for detalhe in detalhes_preenchidos:
         if not detalhe.observacao:
@@ -29,11 +31,12 @@ def download_documentacao_chamado_pdf(request, chamado_id):
         
         for imagem in Imagem.objects.filter(detalhe_tarefa=detalhe, tipo_imagem='ajuste'):
             detalhe.fotos_ajustes_url.append(urljoin(base_url, imagem.imagem.url))
-
+            
     context = {
         'chamado': chamado,
         'detalhes_preenchidos': detalhes_preenchidos,
         'base_url': base_url,
+        'logo_url': logo_url,
     }
 
     html_string = render_to_string('contact/documentacao_chamado_pdf.html', context)
@@ -50,6 +53,7 @@ def documentacao_sem_fotos(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
     detalhes_preenchidos = DetalheTarefaPreenchido.objects.filter(chamado=chamado)
     base_url = request.build_absolute_uri('/')
+    logo_url = urljoin(base_url, 'static/images/logo_docs.png')
 
     for detalhe in detalhes_preenchidos:
         if not detalhe.observacao:
@@ -63,6 +67,7 @@ def documentacao_sem_fotos(request, chamado_id):
         'chamado': chamado,
         'detalhes_preenchidos': detalhes_preenchidos,
         'base_url': base_url, 
+        'logo_url': logo_url,
     }
 
     html_string = render_to_string('contact/doc_chamado_sem_foto.html', context)

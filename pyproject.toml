@@ -15,6 +15,7 @@ django-crispy-forms = "^2.3"
 crispy-bootstrap4 = "^2024.1"
 pandas = "^2.2.3"
 xhtml2pdf = "^0.2.16"
+weasyprint = "^63.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -53,12 +53,25 @@
             padding: 10px;
             border-radius: 10px;
         }
-        .header-fixo{
+        .header-fixo {
             width: 100%;
             border: 1px solid black;
             margin-bottom: 10px;
             padding: 10px;
             border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        
+        .header-fixo img {
+            width: 100px; /* Reduzindo o tamanho da imagem */
+            height: auto;
+            position: absolute;
+            top: 10px;  /* Ajuste a distância superior conforme necessário */
+            right: 10px;  /* Ajuste a distância à direita conforme necessário */
+            z-index: 10;  /* Garante que a imagem esteja acima dos outros elementos */
         }
         .header img {
             width: 150px;
@@ -111,12 +124,13 @@
 </head>
 <body>
     <div class="header-fixo">
-        <tr>
-            <td colspan="2">
-                <strong>MTL MANUTENCAO PREDIAL E SERVICOS INTEGRADOS EIRELI</strong><br>
-                <strong>CNPJ: 22.674.482/0001-06</strong><br>
-            </td>
-        </tr>
+        <div>
+            <strong>MTL MANUTENCAO PREDIAL E SERVICOS INTEGRADOS EIRELI</strong><br>
+            <strong>CNPJ: 22.674.482/0001-06</strong><br>
+        </div>
+        <div>
+            <img src="{{ logo_url }}" alt="Logo da Empresa" class="logo_img">
+        </div>
     </div>
     <div class="header">
         <table class="header-table">

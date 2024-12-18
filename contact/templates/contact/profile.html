@@ -1,10 +1,19 @@
 {% extends 'global/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'global/css/table_responsive.css' %}">
+{% endblock %}
 
 {% block content %}
-  <h1>Perfil do Usuário</h1>
-  <p><strong>Nome:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</p>
-  <p><strong>Email:</strong> {{ usuario.email }}</p>
-  <p><strong>Telefone:</strong> {{ usuario.telefone }}</p>
-  <p><strong>Empresa:</strong> {{ usuario.empresa.razao_social }}</p>
-  <p><strong>Tipo de Usuário:</strong> {{ usuario.get_tipo_usuario_display }}</p>
+<div class="card">
+  <ul class="card-list">
+    <h1>Perfil do Usuário</h1>
+    <li><strong>Nome:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</li>
+    <li><strong>Email:</strong> {{ usuario.email }}</li>
+    <li><strong>Telefone:</strong> {{ usuario.telefone }}</li>
+    <li><strong>Empresa:</strong> {{ usuario.empresa.razao_social }}</li>
+    <li><strong>Tipo de Usuário:</strong> {{ usuario.get_tipo_usuario_display }}</li>
+  </ul>
+</div>
 {% endblock %}

@@ -101,3 +101,14 @@ body {
 .login-container a:hover {
   text-decoration: underline;
 }
+
+.logo_img {
+  display: block;
+  margin: 0 auto 20px;
+  width: 300px; /* Ajuste a largura conforme necessário */
+  height: auto; /* Mantém a proporção da imagem */
+
+}
+.login-container {
+  text-align: center; 
+}

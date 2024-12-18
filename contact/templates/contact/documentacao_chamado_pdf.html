@@ -7,9 +7,11 @@
         body {
             font-family: Arial, sans-serif;
         }
+        
         h2, h3 {
             text-align: center;
         }
+        
         .sub-container {
             width: 100%;
             height: auto;
@@ -20,18 +22,19 @@
             box-sizing: border-box;
             border-radius: 10px;
         }
+        
         .report-table {
             width: 100%;
             margin-bottom: 20px;
-            font-size: 12px
+            font-size: 12px;
         }
         
         .report-table th, .report-table td {
             border: 1px solid #000;
-            padding: 8px; /* Ajuste do padding para melhorar a aparência */
+            padding: 8px;
             text-align: left;
             vertical-align: top;
-            font-size: 12px; /* Ajuste do tamanho da fonte */
+            font-size: 12px;
         }
         
         .report-table th {
@@ -43,24 +46,28 @@
             background-color: #d9d9d9;
             font-weight: bold;
         }
+        
         .column-activity {
             width: 40%;
-    
         }
+        
         .column-status {
             width: 7%;
             text-align: center;
             font-size: 10px;
         }
+        
         .column-observation {
             width: 63%;
-            ont-size: 10px;
+            font-size: 10px;
         }
+        
         .image-gallery {
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
         }
+        
         .image-gallery img {
             width: 150px;
             height: auto;
@@ -68,6 +75,7 @@
             object-fit: cover;
             border-radius: 10px;
         }
+        
         .header {
             width: 100%;
             border: 1px solid black;
@@ -75,28 +83,40 @@
             padding: 10px;
             border-radius: 10px;
         }
-        .header-fixo{
+        
+        .header-fixo {
             width: 100%;
             border: 1px solid black;
             margin-bottom: 10px;
             padding: 10px;
             border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
         }
-        .header img {
-            width: 150px;
+        
+        .header-fixo img {
+            width: 100px; /* Reduzindo o tamanho da imagem */
             height: auto;
+            position: absolute;
+            top: 10px;  /* Ajuste a distância superior conforme necessário */
+            right: 10px;  /* Ajuste a distância à direita conforme necessário */
+            z-index: 10;  /* Garante que a imagem esteja acima dos outros elementos */
         }
+        
         .header-table {
             width: 100%;
             border-collapse: collapse;
             border-radius: 10px;
-
         }
+        
         .header-table td {
             padding: 5px;
             vertical-align: top;
-            border-radius:10px;
+            border-radius: 10px;
         }
+        
         .header-title {
             font-size: 14px;
             font-weight: bold;
@@ -104,11 +124,12 @@
             vertical-align: middle;
             border-radius: 10px;
         }
+        
         .header-info {
             font-size: 12px;
-            border-radius:10px;
+            border-radius: 10px;
         }
-
+        
         .signature-container {
             display: flex;
             justify-content: space-between;
@@ -116,19 +137,22 @@
             text-align: center;
             padding: 10px;
         }
-
+        
         .signature {
             width: 45%;
             border: 1px solid #000;
-            border-radius:10px;
+            border-radius: 10px;
         }
+        
         .signature img {
             width: 200px;
             height: auto;
         }
+        
         .signature-info {
             font-size: 12px;
         }
+        
         .page-break {
             page-break-before: always;
         }
@@ -136,12 +160,13 @@
 </head>
 <body>
     <div class="header-fixo">
-        <tr>
-            <td colspan="2">
-                <strong>MTL MANUTENCAO PREDIAL E SERVICOS INTEGRADOS EIRELI</strong><br>
-                <strong>CNPJ: 22.674.482/0001-06</strong><br>
-            </td>
-        </tr>
+        <div>
+            <strong>MTL MANUTENCAO PREDIAL E SERVICOS INTEGRADOS EIRELI</strong><br>
+            <strong>CNPJ: 22.674.482/0001-06</strong><br>
+        </div>
+        <div>
+            <img src="{{ logo_url }}" alt="Logo da Empresa" class="logo_img">
+        </div>
     </div>
     <div class="header">
         <table class="header-table">
@@ -186,7 +211,7 @@
 
     <div class="signature-container">
         <div class="signature">
-            <p>Assinatura responsavel:</p>
+            <p>Assinatura responsável:</p>
             {% if chamado.assinatura %}
                 <img src="{{ base_url }}{{ chamado.assinatura.url }}" alt="Assinatura">
             {% else %}
@@ -199,46 +224,42 @@
             </div>
         </div>
         <div class="signature">
-            <p>Assinatura Técnico:</p>
-            {% if chamado.assinatura_tecnico %}
-                <img src="{{ base_url }}{{ chamado.assinatura_tecnico.url }}" alt="Assinatura Técnico">
+            <p>Assinatura cliente:</p>
+            {% if chamado.assinatura_cliente %}
+                <img src="{{ base_url }}{{ chamado.assinatura_cliente.url }}" alt="Assinatura">
             {% else %}
                 <p>N/A</p>
             {% endif %}
             <div class="signature-info">
-                <p><strong>Nome:</strong> {{ chamado.nome_tecnico }}</p>
+                <p><strong>Nome:</strong> {{ chamado.nome_cliente }}</p>
+                <p><strong>Email:</strong> {{ chamado.email_cliente }}</p>
+                <p><strong>Cargo:</strong> {{ chamado.cargo_cliente }}</p>
             </div>
         </div>
     </div>
 
     {% for detalhe in detalhes_preenchidos %}
         <div class="sub-container page-break">
-            <p><strong>FOTOS ATIVIDADE:</strong> {{ detalhe.detalhe_tarefa.descricao }}</p>
-
+            <h3>{{ detalhe.detalhe_tarefa.descricao }}</h3>
             <div>
-                <p><strong>Fotos antes do ajuste:</strong></p>
-                {% if detalhe.fotos_clientes_url %}
-                    <div class="image-gallery">
-                        {% for foto_cliente in detalhe.fotos_clientes_url %}
-                            <img src="{{ foto_cliente }}" alt="Foto Cliente">
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>N/A</p>
-                {% endif %}
+                <h4>Fotos do cliente:</h4>
+                <div class="image-gallery">
+                    {% for foto in detalhe.fotos_clientes_url %}
+                        <img src="{{ foto }}" alt="Foto Cliente">
+                    {% empty %}
+                        <p>Sem fotos do cliente disponíveis.</p>
+                    {% endfor %}
+                </div>
             </div>
-
             <div>
-                <p><strong>Fotos Ajustes:</strong></p>
-                {% if detalhe.fotos_ajustes_url %}
-                    <div class="image-gallery">
-                        {% for foto_ajuste in detalhe.fotos_ajustes_url %}
-                            <img src="{{ foto_ajuste }}" alt="Foto Ajuste">
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <p>N/A</p>
-                {% endif %}
+                <h4>Fotos dos ajustes:</h4>
+                <div class="image-gallery">
+                    {% for foto in detalhe.fotos_ajustes_url %}
+                        <img src="{{ foto }}" alt="Foto Ajuste">
+                    {% empty %}
+                        <p>Sem fotos dos ajustes disponíveis.</p>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     {% endfor %}

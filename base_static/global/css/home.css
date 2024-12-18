@@ -12,7 +12,7 @@ body{
     overflow: hidden;
 }
 .form-adicionar-empresa body {
-    overflow: auto; /* Para permitir rolagem nos formulários, se necessário */
+    overflow: auto;
 }
 
 .sidebar{
@@ -47,9 +47,13 @@ body{
     pointer-events: none;
 }
 
-.logo_content .logo i{
-    font-size: 28px;
+.logo_content .logo img {
+    height: 28px; /* Ajuste a altura conforme necessário */
     margin-right: 5px;
+}
+
+.sidebar.active .logo_content .logo img {
+    height: 35px; /* Ajuste a altura conforme necessário */
 }
 
 .logo_content .logo .logo_name{
@@ -333,11 +337,9 @@ body{
     box-sizing: border-box;
     display: flex;             
     flex-direction: column;    
-    align-items: center;      
-    justify-content: center;   
-    height: 100%;             
-    
+    justify-content: space-between;
 }
+
 
 .home_content::-webkit-scrollbar {
     width: 0px;

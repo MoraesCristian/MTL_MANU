@@ -1,3 +1,4 @@
+
 * {
     margin: 0;
     padding: 0;
@@ -86,9 +87,32 @@ body {
     border: 1px solid rgb(75, 82, 92);
     border-radius: 10px;
     overflow-y: auto; /* Adiciona rolagem apenas se necessário */
-    padding-left: 20px;
     padding: 10px;
     overflow: hidden;
+}
+
+.chart-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #000;
+}
+
+.chart-card img {
+    max-width: 100%;
+    max-height: 300px; /* Define uma altura máxima para a imagem */
+    min-height: 150px; /* Define uma altura mínima para a imagem */
+    object-fit: cover; /* Faz a imagem cobrir o container sem distorcer */
+    border-radius: 10px;
+    margin-bottom: 10px; /* Adiciona espaço abaixo da imagem */
+}
+
+.chart-link-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 10px; /* Adiciona espaço acima do título */
+    text-align: center; /* Centraliza o texto */
 }
 
 .status-title {
@@ -173,5 +197,9 @@ body {
         width: 100%; /* Faz os gráficos ocuparem a largura total em dispositivos móveis */
         height: auto; /* Ajusta a altura automaticamente */
         margin-bottom: 20px; /* Adiciona margem inferior para espaçamento */
+    }
+
+    .chart-card img {
+        max-height: 200px; /* Define uma altura máxima menor para dispositivos móveis */
     }
 }
