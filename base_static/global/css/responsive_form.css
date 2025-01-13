@@ -15,19 +15,24 @@ body {
     height: 100vh;
     background-color: rgb(34, 34, 60);
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
 }
 
 h1 {
-    text-align: center;
-    margin-bottom: 20px;
+    margin: 30px 0;
+}
+
+.form-chamado {
+    width: 100%;
 }
 
 .form-group {
     margin-bottom: 15px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .card {
@@ -41,18 +46,6 @@ h1 {
     margin: 10px auto; /* Centraliza o card horizontalmente e adiciona margem superior */
     text-decoration: none;
     transition: background-color 0.3s ease;
-}
-
-.card a {
-    text-decoration: none;
-    color: inherit;
-}
-
-.link-as-text {
-    color: inherit;
-    text-decoration: none;
-    text-align: center;
-    display: block;
 }
 
 .card:hover {
@@ -94,6 +87,19 @@ select:focus {
     outline: none;
 }
 
+input[type="file"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #000;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+}
+
 .btn {
     margin-top: 10px;
     padding: 10px 20px;
@@ -128,9 +134,50 @@ select:focus {
     display: flex;
     justify-content: space-between;
     gap: 10px; /* Espaçamento entre os botões */
+    width: 100%;
 }
 
 p {
     font-weight: bold;
     margin-bottom: 15px;
+}
+
+/* Media Queries para Responsividade */
+@media (max-width: 768px) {
+    body {
+        padding: 20px;
+    }
+
+    .card {
+        width: 80%; /* Ajuste a largura do card para telas menores */
+    }
+
+    .button-group {
+        flex-direction: column; /* Ajusta os botões para uma coluna em telas menores */
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        width: 100%; /* Ajuste a largura do card para telas muito pequenas */
+    }
+
+    .btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    textarea,
+    select {
+        font-size: 14px;
+    }
 }

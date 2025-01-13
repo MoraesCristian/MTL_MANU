@@ -224,16 +224,14 @@
             </div>
         </div>
         <div class="signature">
-            <p>Assinatura cliente:</p>
-            {% if chamado.assinatura_cliente %}
-                <img src="{{ base_url }}{{ chamado.assinatura_cliente.url }}" alt="Assinatura">
+            <p>Assinatura Técnico:</p>
+            {% if chamado.assinatura_tecnico %}
+                <img src="{{ base_url }}{{ chamado.assinatura_tecnico.url }}" alt="Assinatura Técnico">
             {% else %}
                 <p>N/A</p>
             {% endif %}
             <div class="signature-info">
-                <p><strong>Nome:</strong> {{ chamado.nome_cliente }}</p>
-                <p><strong>Email:</strong> {{ chamado.email_cliente }}</p>
-                <p><strong>Cargo:</strong> {{ chamado.cargo_cliente }}</p>
+                <p><strong>Nome:</strong> {{ chamado.nome_tecnico }}</p>
             </div>
         </div>
     </div>

@@ -167,14 +167,15 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
                 if contador_clientes > 4:
                     break  # Interrompe a adição se o limite for alcançado
                 novo_nome_imagem = f"{chamado.numero_ordem}_detalhe_{detalhe_tarefa.id}_cliente_{contador_clientes}.jpg"
-                imagem.name = novo_nome_imagem
-                Imagem.objects.create(
+                imagem_data = ContentFile(imagem.read())  # Lê o conteúdo do arquivo
+                imagem_obj = Imagem(
                     detalhe_tarefa=detalhe_preenchido,
                     numero_ordem=chamado,
                     tarefa=tarefa,
-                    imagem=imagem,
                     tipo_imagem='cliente'
                 )
+                imagem_obj.imagem.save(novo_nome_imagem, imagem_data)  # Salva o arquivo com o nome especificado
+                imagem_obj.save()
                 contador_clientes += 1
 
             # Limitar o número de imagens de ajustes
@@ -185,15 +186,16 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
                 if contador_ajustes > 4:
                     break  # Interrompe a adição se o limite for alcançado
                 novo_nome_imagem = f"{chamado.numero_ordem}_detalhe_{detalhe_tarefa.id}_ajuste_{contador_ajustes}.jpg"
-                imagem.name = novo_nome_imagem
-                Imagem.objects.create(
+                imagem_data = ContentFile(imagem.read())  # Lê o conteúdo do arquivo
+                imagem_obj = Imagem(
                     detalhe_tarefa=detalhe_preenchido,
                     numero_ordem=chamado,
                     tarefa=tarefa,
-                    imagem=imagem,
                     tipo_imagem='ajuste'
                 )
-                contador_ajustes += 1
+                imagem_obj.imagem.save(novo_nome_imagem, imagem_data)  # Salva o arquivo com o nome especificado
+                imagem_obj.save()
+                contador_clientes += 1
 
             return redirect('contact:detalhe_tarefa', chamado.id, tarefa.id, detalhe_tarefa.id)
 

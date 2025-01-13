@@ -1,5 +1,4 @@
 import re
-from tkinter import NO
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.db import models
