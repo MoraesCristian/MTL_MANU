@@ -106,6 +106,14 @@ class Empresa(models.Model):
     prefixo = models.CharField(max_length=15, blank=True, default='') 
     criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas_criadas')
     filial_de = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='filiais')
+    analista_resp = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='empresas_responsaveis',
+        limit_choices_to={'tipo_usuario': 'operador'}
+    )
     responsavel_empre = models.CharField(max_length=255, blank=True)
     email_responsavel = models.EmailField(max_length=255, blank=True)
     

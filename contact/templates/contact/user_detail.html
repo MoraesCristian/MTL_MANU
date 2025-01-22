@@ -12,6 +12,7 @@
       <p id="email_usuario">Email:  {{ usuario.email }} </p>
       <p id="empresa_usuario">Empresa: {{ usuario.empresa }} </p>
       <p id="telefone_usuario">Telefone: {{ usuario.telefone }} </p>
+      <p id="tipo_usuairo">CPF: {{ usuario.cpf }} </p>
       <p id="tipo_usuairo">Tipo usuário: {{ usuario.get_tipo_usuario_display }} </p>
       <div class="form-group button-group">
         <a href="{% url 'contact:edit_user' user_id=usuario.id %}" class="btn btn-primary">Editar</a>

@@ -1,6 +1,8 @@
 from django import forms
 from django.forms.models import inlineformset_factory
-from contact.models import Empresa, TempoManutencao, DocumentoEmpresa
+from contact.models import Empresa, TempoManutencao, DocumentoEmpresa, Usuario
+
+
 
 class EmpresaForm(forms.ModelForm):
     tempo_preventiva = forms.DurationField(
@@ -22,7 +24,7 @@ class EmpresaForm(forms.ModelForm):
             'razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal',
             'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo',
             'filial_de', 'tempo_preventiva', 'tempo_emergencial', 'tempo_corretiva',
-            'responsavel_empre', 'email_responsavel',
+            'responsavel_empre', 'email_responsavel','analista_resp',
         ]
         widgets = {
             'razao_social': forms.TextInput(attrs={'id': 'razao_social', 'class': 'form-control'}),
@@ -39,10 +41,14 @@ class EmpresaForm(forms.ModelForm):
             'filial_de': forms.Select(attrs={'id': 'filial_de', 'class': 'form-control'}),
             'responsavel_empre': forms.TextInput(attrs={'class': 'form-control'}),
             'email_responsavel': forms.EmailInput(attrs={'class': 'form-control'}),
+            'analista_resp': forms.Select(attrs={'class': 'form-control'}), 
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        
+        self.fields['analista_resp'].queryset = Usuario.objects.filter(tipo_usuario='operador')
+        
         if self.instance.pk:
             try:
                 tempo = TempoManutencao.objects.get(empresa=self.instance, tipo_manutencao='preventiva')
@@ -101,7 +107,8 @@ class AdicionarEmpresaForm(forms.ModelForm):
         model = Empresa
         fields = [
             'razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 'logradouro',
-            'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo', 'filial_de', 'responsavel_empre', 'email_responsavel'
+            'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo', 'filial_de', 'responsavel_empre',
+            'email_responsavel', 'analista_resp',
         ]
         
         widgets = {
@@ -119,11 +126,14 @@ class AdicionarEmpresaForm(forms.ModelForm):
             'filial_de': forms.Select(attrs={'id': 'filial_de', 'class': 'form-control'}),
             'responsavel_empre': forms.TextInput(attrs={'class': 'form-control'}),
             'email_responsavel': forms.EmailInput(attrs={'class': 'form-control'}),
+            'analista_resp': forms.Select(attrs={'class': 'form-control'}),
         }
         
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+        
+        self.fields['analista_resp'].queryset = Usuario.objects.filter(tipo_usuario='operador')
 
     def save(self, commit=True):
         empresa = super().save(commit=False)
