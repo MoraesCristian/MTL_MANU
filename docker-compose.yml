@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  djangoapp:
+    container_name: Django-MTL
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app   # Monta o diretório local no contêiner, permitindo a alteração de arquivos sem reconstruir a imagem
+      - /base_static  # Monta o diretório estático
+      - /base_templates  # Monta o diretório de templates
+    env_file:
+      - ./dotenv_files/.env
+    depends_on:
+      - postgres  # Adiciona dependência do serviço postgres
+
+  postgres:
+    container_name: dbInfrawebMTL
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ./dotenv_files/.env
+
+volumes:
+  postgres_data:
+    driver: local

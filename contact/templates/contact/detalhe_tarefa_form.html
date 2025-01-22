@@ -49,14 +49,14 @@
         <div class="sub-container">
             <div class="form-group">
                 <label for="id_observacao">Observação</label>
-                <textarea name="observacao" id="id_observacao" class="form-control sub-container" rows="4">{% if detalhe_preenchido and detalhe_preenchido.observacao %}{{ detalhe_preenchido.observacao }}{% endif %}</textarea>
+                <textarea name="observacao" id="id_observacao" class="form-control sub-container" rows="4">{{ detalhe_preenchido.observacao }}</textarea>
             </div>
         </div>
         
         <div class="sub-container">
             <div class="form-group">
                 <label for="id_concluido">Concluído</label>
-                <input type="checkbox" name="concluido" id="id_concluido" class="form-check-input" {% if detalhe_preenchido and detalhe_preenchido.concluido %}checked{% endif %}>
+                <input type="checkbox" name="concluido" id="id_concluido" class="form-check-input" {% if detalhe_preenchido.concluido %}checked{% endif %}>
             </div>
         </div>
 
@@ -70,21 +70,49 @@
         const inputClientes = document.getElementById('id_fotos_clientes');
         const inputAjustes = document.getElementById('id_fotos_ajustes');
     
-        // Função para limitar o número de arquivos
+        // Função para limitar o número de arquivos selecionados
         function limitarArquivos(input) {
             input.addEventListener('change', function () {
-                console.log('Arquivos selecionados: ', this.files.length); // Log do número de arquivos
                 if (this.files.length > 4) {
                     alert('Você só pode selecionar no máximo 4 arquivos.');
-                    this.value = ''; // Limpa o input
+                    this.value = ''; // Limpa os arquivos selecionados
+                } else {
+                    // Envia os arquivos imediatamente após seleção
+                    enviarArquivos(this, this.name);
                 }
+            });
+        }
+
+        function enviarArquivos(input, tipo) {
+            const formData = new FormData();
+            Array.from(input.files).forEach((file) => {
+                formData.append(tipo, file);
+            });
+    
+            fetch('{% url "contact:detalhe_tarefa_edit" chamado.id tarefa.id detalhe_tarefa.id %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Imagens enviadas com sucesso!');
+                    location.reload(); // Recarrega a página para exibir as novas imagens
+                } else {
+                    alert('Erro ao enviar imagens. Tente novamente.');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao enviar imagens:', error);
+                alert('Erro ao enviar imagens. Verifique sua conexão e tente novamente.');
             });
         }
     
         limitarArquivos(inputClientes);
         limitarArquivos(inputAjustes);
 
-        // Adicionar evento para os botões de exclusão
         const deleteButtons = document.querySelectorAll('.delete-image');
         deleteButtons.forEach(button => {
             button.addEventListener('click', function () {
@@ -100,7 +128,6 @@
                     })
                     .then(response => {
                         if (response.ok) {
-                            // Remove a imagem do DOM
                             this.parentElement.remove();
                         } else {
                             alert('Falha ao excluir a imagem.');
@@ -110,7 +137,7 @@
             });
         });
     });
+    
 </script>
-
 
 {% endblock %}

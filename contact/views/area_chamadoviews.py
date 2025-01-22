@@ -5,12 +5,15 @@ from contact.forms.tarefa_forms import DetalheTarefaPreenchidoForm
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.utils import timezone
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse
+from PIL import Image
+import io
 
 
 
@@ -131,74 +134,58 @@ def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
     return render(request, 'contact/detalhe_tarefa.html', context)
 
 
+def processar_imagens(request, detalhe_preenchido, chamado, tarefa, tipo_imagem, imagens_existentes, prefixo_nome):
+    contador = imagens_existentes.count() + 1
+    for imagem in request.FILES.getlist(prefixo_nome):
+        if contador > 4:
+            break
+        try:
+            novo_nome_imagem = f"{chamado.numero_ordem}_detalhe_{tarefa.id}_{tipo_imagem}_{contador}.jpg"
+            img = Image.open(imagem)
+            img.verify()  # Verifica se é uma imagem válida
+            img = Image.open(imagem)  # Reabrir para manipulação
+            img_io = io.BytesIO()
+            img.save(img_io, format=img.format or 'JPEG')
+            img_io.seek(0)
+            imagem_final = ContentFile(img_io.read(), name=novo_nome_imagem)
+            file_path = default_storage.save(f"imagens/{novo_nome_imagem}", imagem_final)
+            Imagem.objects.create(
+                detalhe_tarefa=detalhe_preenchido,
+                numero_ordem=chamado,
+                tarefa=tarefa,
+                tipo_imagem=tipo_imagem,
+                imagem=file_path
+            )
+            contador += 1
+        except UnidentifiedImageError:
+            print(f"Arquivo inválido: {imagem.name}")
+        except Exception as e:
+            print(f"Erro ao salvar {novo_nome_imagem}: {e}")
+
+
 @login_required
 def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
     tarefa = get_object_or_404(Tarefa, id=tarefa_id)
     detalhe_tarefa = get_object_or_404(DetalheTarefa, id=detalhe_tarefa_id, tarefa=tarefa)
-
-    if chamado.status_chamado == 'concluido' and request.user.tipo_usuario not in ['admin', 'operador']:
-        raise PermissionDenied("Você não tem permissão para editar este chamado.")
-
-    try:
-        detalhe_preenchido = DetalheTarefaPreenchido.objects.get(detalhe_tarefa=detalhe_tarefa, chamado=chamado)
-        imagens_clientes = Imagem.objects.filter(detalhe_tarefa=detalhe_preenchido, tipo_imagem='cliente')
-        imagens_ajustes = Imagem.objects.filter(detalhe_tarefa=detalhe_preenchido, tipo_imagem='ajuste')
-    except DetalheTarefaPreenchido.DoesNotExist:
-        detalhe_preenchido = None
-        imagens_clientes = []
-        imagens_ajustes = []
+    detalhe_preenchido = DetalheTarefaPreenchido.objects.filter(detalhe_tarefa=detalhe_tarefa, chamado=chamado).first()
+    imagens_clientes = Imagem.objects.filter(detalhe_tarefa=detalhe_preenchido, tipo_imagem='cliente')
+    imagens_ajustes = Imagem.objects.filter(detalhe_tarefa=detalhe_preenchido, tipo_imagem='ajuste')
 
     if request.method == 'POST':
         form = DetalheTarefaPreenchidoForm(request.POST, request.FILES, instance=detalhe_preenchido)
         if form.is_valid():
             detalhe_preenchido = form.save(commit=False)
-            detalhe_preenchido.observacao = detalhe_preenchido.observacao.strip() if detalhe_preenchido.observacao else ""
             detalhe_preenchido.detalhe_tarefa = detalhe_tarefa
             detalhe_preenchido.chamado = chamado
             detalhe_preenchido.usuario = request.user
             detalhe_preenchido.save()
 
-            # Limitar o número de imagens de clientes
-            imagens_clientes_existentes = imagens_clientes.count()
-            contador_clientes = imagens_clientes_existentes + 1
-
-            for imagem in request.FILES.getlist('fotos_clientes'):
-                if contador_clientes > 4:
-                    break  # Interrompe a adição se o limite for alcançado
-                novo_nome_imagem = f"{chamado.numero_ordem}_detalhe_{detalhe_tarefa.id}_cliente_{contador_clientes}.jpg"
-                imagem_data = ContentFile(imagem.read())  # Lê o conteúdo do arquivo
-                imagem_obj = Imagem(
-                    detalhe_tarefa=detalhe_preenchido,
-                    numero_ordem=chamado,
-                    tarefa=tarefa,
-                    tipo_imagem='cliente'
-                )
-                imagem_obj.imagem.save(novo_nome_imagem, imagem_data)  # Salva o arquivo com o nome especificado
-                imagem_obj.save()
-                contador_clientes += 1
-
-            # Limitar o número de imagens de ajustes
-            imagens_ajustes_existentes = imagens_ajustes.count()
-            contador_ajustes = imagens_ajustes_existentes + 1
-
-            for imagem in request.FILES.getlist('fotos_ajustes'):
-                if contador_ajustes > 4:
-                    break  # Interrompe a adição se o limite for alcançado
-                novo_nome_imagem = f"{chamado.numero_ordem}_detalhe_{detalhe_tarefa.id}_ajuste_{contador_ajustes}.jpg"
-                imagem_data = ContentFile(imagem.read())  # Lê o conteúdo do arquivo
-                imagem_obj = Imagem(
-                    detalhe_tarefa=detalhe_preenchido,
-                    numero_ordem=chamado,
-                    tarefa=tarefa,
-                    tipo_imagem='ajuste'
-                )
-                imagem_obj.imagem.save(novo_nome_imagem, imagem_data)  # Salva o arquivo com o nome especificado
-                imagem_obj.save()
-                contador_clientes += 1
-
-            return redirect('contact:detalhe_tarefa', chamado.id, tarefa.id, detalhe_tarefa.id)
-
+            processar_imagens(request, detalhe_preenchido, chamado, tarefa, 'cliente', imagens_clientes, 'fotos_clientes')
+            processar_imagens(request, detalhe_preenchido, chamado, tarefa, 'ajuste', imagens_ajustes, 'fotos_ajustes')
+            
+        return redirect('contact:detalhe_tarefa', chamado.id, tarefa.id, detalhe_tarefa.id)
+    
     else:
         form = DetalheTarefaPreenchidoForm(instance=detalhe_preenchido)
 
@@ -210,12 +197,12 @@ def detalhe_tarefa_edit_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):
         'imagens_clientes': imagens_clientes,
         'imagens_ajustes': imagens_ajustes,
         'form': form,
-        'edit_mode': True,
-        'is_new': detalhe_preenchido is None,
-        'can_delete_images': request.user.tipo_usuario in ['admin', 'operador','user']  # Passar a permissão para o template
+        'can_delete_images': request.user.tipo_usuario in ['admin', 'operador'],
     }
 
     return render(request, 'contact/detalhe_tarefa_form.html', context)
+
+
 
 @csrf_exempt
 def delete_image(request):

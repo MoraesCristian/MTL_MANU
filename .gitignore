@@ -7,9 +7,13 @@ db.sqlite3
 media
 *.sql
 .vscode
+staticfiles/
 static/
 media/
 Django_agenda/
+
+#Docker 
+data/
 
 # Backup files # 
 *.bak 

@@ -7,7 +7,7 @@ class EmpresaForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex:: 4:00:00 para 4 horas, 2 days para 2 dias'})
     )
-    tempo_emergial = forms.DurationField(
+    tempo_emergencial = forms.DurationField(
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex:: 4:00:00 para 4 horas, 2 days para 2 dias'})
     )
@@ -21,7 +21,8 @@ class EmpresaForm(forms.ModelForm):
         fields = [
             'razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal',
             'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo',
-            'filial_de', 'tempo_preventiva', 'tempo_emergial', 'tempo_corretiva',
+            'filial_de', 'tempo_preventiva', 'tempo_emergencial', 'tempo_corretiva',
+            'responsavel_empre', 'email_responsavel',
         ]
         widgets = {
             'razao_social': forms.TextInput(attrs={'id': 'razao_social', 'class': 'form-control'}),
@@ -36,6 +37,8 @@ class EmpresaForm(forms.ModelForm):
             'observacao': forms.Textarea(attrs={'id': 'observacao', 'class': 'form-control'}),
             'prefixo': forms.TextInput(attrs={'id': 'prefixo', 'class': 'form-control'}),
             'filial_de': forms.Select(attrs={'id': 'filial_de', 'class': 'form-control'}),
+            'responsavel_empre': forms.TextInput(attrs={'class': 'form-control'}),
+            'email_responsavel': forms.EmailInput(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -47,8 +50,8 @@ class EmpresaForm(forms.ModelForm):
             except TempoManutencao.DoesNotExist:
                 pass
             try:
-                tempo = TempoManutencao.objects.get(empresa=self.instance, tipo_manutencao='emergial')
-                self.fields['tempo_emergial'].initial = tempo.tempo
+                tempo = TempoManutencao.objects.get(empresa=self.instance, tipo_manutencao='emergencial')
+                self.fields['tempo_emergencial'].initial = tempo.tempo
             except TempoManutencao.DoesNotExist:
                 pass
             try:
@@ -69,8 +72,8 @@ class EmpresaForm(forms.ModelForm):
             )
             TempoManutencao.objects.update_or_create(
                 empresa=empresa,
-                tipo_manutencao='emergial',
-                defaults={'tempo': self.cleaned_data.get('tempo_emergial')}
+                tipo_manutencao='emergencial',
+                defaults={'tempo': self.cleaned_data.get('tempo_emergencial')}
             )
             TempoManutencao.objects.update_or_create(
                 empresa=empresa,
@@ -85,7 +88,7 @@ class AdicionarEmpresaForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 4:00:00 para 4 horas, 2 days para 2 dias'})
     )
-    tempo_emergial = forms.DurationField(
+    tempo_emergencial = forms.DurationField(
         required=False,
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ex: 4:00:00 para 4 horas, 2 days para 2 dias'})
     )
@@ -96,7 +99,11 @@ class AdicionarEmpresaForm(forms.ModelForm):
 
     class Meta:
         model = Empresa
-        fields = ['razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 'logradouro', 'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo', 'filial_de']
+        fields = [
+            'razao_social', 'nome_fantasia', 'cnpj', 'is_estadual', 'is_municipal', 'logradouro',
+            'estado', 'telefone', 'email_empresa', 'observacao', 'prefixo', 'filial_de', 'responsavel_empre', 'email_responsavel'
+        ]
+        
         widgets = {
             'razao_social': forms.TextInput(attrs={'class': 'form-control'}),
             'nome_fantasia': forms.TextInput(attrs={'class': 'form-control'}),
@@ -110,6 +117,8 @@ class AdicionarEmpresaForm(forms.ModelForm):
             'observacao': forms.TextInput(attrs={'class': 'form-control'}),
             'prefixo': forms.TextInput(attrs={'class': 'form-control'}),
             'filial_de': forms.Select(attrs={'id': 'filial_de', 'class': 'form-control'}),
+            'responsavel_empre': forms.TextInput(attrs={'class': 'form-control'}),
+            'email_responsavel': forms.EmailInput(attrs={'class': 'form-control'}),
         }
         
     def __init__(self, *args, **kwargs):
@@ -130,8 +139,8 @@ class AdicionarEmpresaForm(forms.ModelForm):
             )
             TempoManutencao.objects.update_or_create(
                 empresa=empresa,
-                tipo_manutencao='emergial',
-                defaults={'tempo': self.cleaned_data.get('tempo_emergial')}
+                tipo_manutencao='emergencial',
+                defaults={'tempo': self.cleaned_data.get('tempo_emergencial')}
             )
             TempoManutencao.objects.update_or_create(
                 empresa=empresa,

@@ -34,15 +34,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     empresa = models.ForeignKey('Empresa', on_delete=models.CASCADE, null=True, blank=True)
+    cpf = models.CharField(max_length=50, blank=True)
     telefone = models.CharField(max_length=50, blank=True)
     email = models.EmailField(max_length=255, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     tipo_usuario = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='user')
     criado_por = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='usuarios_criados')
-    
     objects = CustomUserManager()
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
@@ -107,6 +106,8 @@ class Empresa(models.Model):
     prefixo = models.CharField(max_length=15, blank=True, default='') 
     criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas_criadas')
     filial_de = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='filiais')
+    responsavel_empre = models.CharField(max_length=255, blank=True)
+    email_responsavel = models.EmailField(max_length=255, blank=True)
     
     def clean(self):
         self.razao_social = self.remove_special_characters(self.razao_social)
@@ -183,7 +184,7 @@ class Chamado(models.Model):
     descricao = models.TextField(blank=True)
     tipo_manutencao = models.CharField(max_length=255, choices=[
         ('preventiva', 'Preventiva'),
-        ('emergial', 'Emergial'),
+        ('emergencial', 'Emergencial'),
         ('corretiva', 'Corretiva'),
     ])
     localizacao_atv = models.CharField(max_length=255, choices=[
