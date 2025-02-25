@@ -4,17 +4,17 @@ from contact.models import Chamado, Tarefa, Empresa, Usuario,  MensagemChat, Det
 
 class ChamadoForm(forms.ModelForm):
     empresa_nome_fantasia = forms.ModelChoiceField(
-        queryset=Empresa.objects.none(),  # Inicialmente vazio
+        queryset=Empresa.objects.none(),
         required=True,
         label='Empresa'
     )
     prestadora_servico = forms.ModelChoiceField(
-        queryset=Empresa.objects.all(),  # Mostrar todas as empresas
+        queryset=Empresa.objects.all(),
         required=False,
         label='Terceiro'
     )
     tecnico_responsavel = forms.ModelChoiceField(
-        queryset=Usuario.objects.none(),  # Substitua com o modelo de usuário ou técnico apropriado
+        queryset=Usuario.objects.none(),
         required=False,
         label='Técnico Responsável'
     )
@@ -22,14 +22,13 @@ class ChamadoForm(forms.ModelForm):
         required=False, 
         label='Imagens'
     )
-     
     class Meta:
         model = Chamado
         fields = [
             'empresa_nome_fantasia', 'localizacao_atv', 'tipo_manutencao',
             'area_chamado', 'tarefa', 'descricao', 'local_especifico',
             'prioridade_chamado', 'prestadora_servico', 'tecnico_responsavel',
-            'imagens'
+            'imagens','analista_resp',
         ]
         widgets = {
             'empresa_nome_fantasia': forms.Select(attrs={'required': True}),
@@ -42,12 +41,15 @@ class ChamadoForm(forms.ModelForm):
             'prioridade_chamado': forms.Select(attrs={'required': True}),
             'prestadora_servico': forms.Select(attrs={'required': False}),
             'imagens': forms.ClearableFileInput(attrs={'required': False}),
+            'analista_resp': forms.Select(attrs={'class': 'form-control'}), 
         }
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         empresas = kwargs.pop('empresas', None)
         super().__init__(*args, **kwargs)
+        
+        self.fields['analista_resp'].queryset = Usuario.objects.filter(tipo_usuario='operador')
         
         if empresas is not None:
             self.fields['empresa_nome_fantasia'].queryset = empresas
@@ -150,3 +152,14 @@ class AdicionarPrestadoraServicoForm(forms.ModelForm):
     class Meta:
         model = Chamado
         fields = ['prestadora_servico']
+        
+class AdicionarTecnicosForm(forms.ModelForm):
+    tecnicos_responsaveis = forms.ModelMultipleChoiceField(
+        queryset=Usuario.objects.filter(tipo_usuario='user'),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+
+    class Meta:
+        model = Chamado
+        fields = ['tecnicos_responsaveis']

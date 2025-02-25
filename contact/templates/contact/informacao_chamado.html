@@ -10,7 +10,8 @@
         <p><strong>Tipo de Manutenção:</strong> {{ chamado.get_tipo_manutencao_display }}</p>
         <p><strong>Localização da Atividade:</strong> {{ chamado.get_localizacao_atv_display }}</p>
         <p><strong>Prioridade do Chamado:</strong> {{ chamado.get_prioridade_chamado_display }}</p>
-        
+        <p><strong>Analista Responsável:</strong> {{ chamado.analista_resp }}</p>
+
         {% if chamado.area_chamado %}
         <p><strong>Área do Chamado:</strong> {{ chamado.area_chamado.nome }}</p>
         {% endif %}
@@ -67,14 +68,4 @@
     </div>
     {% endif %}
 
-    {% if user_tipo == 'admin' or user_tipo == 'operador' %}
-    <div class="sub-container">
-        <h3>Técnico Responsável</h3>
-        <p><strong>Nome:</strong> {{ tecnico_responsavel.nome }}</p>
-        {% if user_tipo == 'operador' or user_tipo == 'admin' %}
-            <p><strong>Email:</strong> {{ tecnico_responsavel.email }}</p>
-            <p><strong>Telefone:</strong> {{ tecnico_responsavel.telefone }}</p>
-        {% endif %}
-    </div>
-    {% endif %}
 {% endblock %}

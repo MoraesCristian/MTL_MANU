@@ -37,3 +37,11 @@ class TarefaAdmin(admin.ModelAdmin):
     list_per_page = 50
     list_max_show_all = 100
     list_display_links = ('descricao',)
+    
+@admin.register(models.DetalheTarefa)
+class DetalhesTarefaAdmin(admin.ModelAdmin):
+    list_display = ('tarefa', 'descricao')
+    search_fields = ('descricao',)
+    list_per_page = 50
+    list_max_show_all = 100
+    list_display_links = ('descricao',)

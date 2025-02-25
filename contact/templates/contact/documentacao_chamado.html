@@ -13,7 +13,12 @@
             </a>
         </div>
     {% else %}
-        <p><strong>N/A</p>
+        <div class="form-group button-group">
+            <a href="{% url 'contact:down_doc_fotos_emrg_corre' chamado.id %}" class="btn btn-primary">
+                <button id="download_pdf_foto">Download PDF com fotos</button>
+            </a>
+        </div>
+
     {% endif %}
         
     <div class="sub-container">

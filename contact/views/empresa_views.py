@@ -70,6 +70,7 @@ def adicionar_empresa_view(request):
         form = AdicionarEmpresaForm()
     return render(request, 'contact/adicionar_empresa.html', {'form': form})
 
+@login_required
 def editar_empresa_view(request, empresa_id):
     user = request.user
     if user.tipo_usuario not in ['admin', 'operador']:
@@ -88,6 +89,7 @@ def editar_empresa_view(request, empresa_id):
     
     return render(request, 'contact/edit_empresas.html', {'form': form, 'empresa': empresa})
 
+@login_required
 def add_documento(request, empresa_id):
     empresa = get_object_or_404(Empresa, id=empresa_id)
     
@@ -103,6 +105,7 @@ def add_documento(request, empresa_id):
     
     return render(request, 'contact/add_documento.html', {'form': form, 'empresa': empresa})
 
+@login_required
 def delete_documento(request, documento_id, empresa_id):
     documento = get_object_or_404(DocumentoEmpresa, id=documento_id)
     empresa_id = documento.empresa.id

@@ -37,6 +37,7 @@
             </div>
             <p class="sub-container"><strong id="observacao_label">Observação:</strong> <span id="observacao_text">{{ detalhe_preenchido.observacao }}</span></p>
             <p class="sub-container"><strong id="concluido_label">Concluído:</strong> <span id="concluido_status">{{ detalhe_preenchido.concluido|yesno:"Sim,Não" }}</span></p>
+            <p class="sub-container"><strong id="naocomporta_label">N/A:</strong> <span id="concluido_status">{{ detalhe_preenchido.concluido|yesno:"Sim,Não" }}</span></p>
         {% else %}
             <p id="detalhes_na">Não há detalhes preenchidos para esta tarefa.</p>
         {% endif %}

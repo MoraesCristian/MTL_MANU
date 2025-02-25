@@ -106,14 +106,6 @@ class Empresa(models.Model):
     prefixo = models.CharField(max_length=15, blank=True, default='') 
     criado_por = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='empresas_criadas')
     filial_de = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='filiais')
-    analista_resp = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='empresas_responsaveis',
-        limit_choices_to={'tipo_usuario': 'operador'}
-    )
     responsavel_empre = models.CharField(max_length=255, blank=True)
     email_responsavel = models.EmailField(max_length=255, blank=True)
     
@@ -204,6 +196,14 @@ class Chamado(models.Model):
         ('Normal', 'Prioridade Normal'),
         ('Baixa', 'Baixa Prioridade')
     ])
+    analista_resp = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='empresas_responsaveis',
+        limit_choices_to={'tipo_usuario': 'operador'}
+    )
     area_chamado = models.ForeignKey(Area, on_delete=models.SET_NULL, null=True, blank=True)
     tarefa = models.ForeignKey(Tarefa, on_delete=models.SET_NULL, null=True, blank=True, related_name='chamados')
     local_especifico = models.CharField(max_length=255)
@@ -212,7 +212,7 @@ class Chamado(models.Model):
     empresa_nome_fantasia = models.CharField(max_length=255, blank=True)
     empresa_cnpj = models.CharField(max_length=18, blank=True)
     prestadora_servico = models.ForeignKey(Empresa, on_delete=models.CASCADE, related_name='empresa', null=True, blank=True)
-    tecnico_responsavel = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True, related_name='tecnicos')
+    tecnicos_responsaveis = models.ManyToManyField(Usuario, blank=True, related_name='chamados_tecnicos')
     data_inicio_atv = models.DateTimeField(blank=True, null=True)
     data_fim_atv = models.DateTimeField(blank=True, null=True)
     data_fim_chamado = models.DateTimeField(blank=True, null=True)
@@ -281,6 +281,7 @@ class DetalheTarefaPreenchido(models.Model):
     fotos_ajustes = models.ImageField(upload_to='fotos_ajustes/', blank=True, null=True)
     observacao = models.TextField(blank=True, null=True)
     concluido = models.BooleanField(default=False)
+    nao_comporta = models.BooleanField(default=False)
 
     def __str__(self):
         return f'Detalhe preenchido por {self.usuario} para {self.detalhe_tarefa}'

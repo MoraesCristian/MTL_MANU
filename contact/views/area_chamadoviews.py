@@ -85,7 +85,7 @@ def load_informacao_chamado(request, chamado_id):
         'chamado': chamado,
         'empresa': chamado.empresa,
         'prestadora_servico': chamado.prestadora_servico,
-        'tecnico_responsavel': chamado.tecnico_responsavel,
+        'tecnicos_responsaveis': chamado.tecnicos_responsaveis,
         'imagens': imagens,
         'user_tipo': user_tipo,  
     }
@@ -94,17 +94,14 @@ def load_informacao_chamado(request, chamado_id):
 @login_required
 def load_tarefas_a_realizar(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
-    tarefas = Tarefa.objects.filter(id=chamado.tarefa.id)
-    detalhes_tarefas = DetalheTarefa.objects.filter(tarefa=chamado.tarefa)
-
+    detalhes_preenchidos = DetalheTarefaPreenchido.objects.filter(chamado=chamado)
+    
     context = {
         'chamado': chamado,
-        'tarefas': tarefas,
-        'detalhes_tarefas': detalhes_tarefas
+        'detalhes_preenchidos': detalhes_preenchidos,
     }
 
     return render(request, 'contact/tarefas_a_realizar.html', context)
-    
     
 @login_required
 def detalhe_tarefa_view(request, chamado_id, tarefa_id, detalhe_tarefa_id):

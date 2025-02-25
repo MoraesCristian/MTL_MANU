@@ -189,6 +189,30 @@ button:hover {
   transform: scale(1.02);
 }
 
+.status-concluido {
+  background-color: #e8f5e9; /* Verde claro */
+  color: green; /* Texto verde */
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid green; /* Borda verde */
+}
+
+.status-na {
+  background-color: #fff3e0; /* Laranja claro */
+  color: orange; /* Texto laranja */
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid orange; /* Borda laranja */
+}
+
+.status-nao-realizado {
+  background-color: #ffebee; /* Vermelho claro */
+  color: red; /* Texto vermelho */
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid red; /* Borda vermelha */
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
   .container {

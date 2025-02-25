@@ -15,12 +15,16 @@
                     <label for="id_empresa_nome_fantasia">Empresa:</label>
                     {{ form.empresa_nome_fantasia }}
                 </div>
-
                 <div class="form-group">
                     <label for="id_empresa_endereco">Endereço da Empresa:</label>
                     <input type="text" id="id_empresa_endereco" class="form-control" readonly>
                 </div>
-
+                {% if request.user.tipo_usuario != 'manager' %}
+                    <div class="form-group">
+                        <label for="id_analista_resp">Analista Responsável:</label>
+                        {{ form.analista_resp }}
+                    </div>
+                {% endif %}
                 <div class="form-group">
                     <label for="id_localizacao_atv">Área de verificação:</label>
                     {{ form.localizacao_atv }}

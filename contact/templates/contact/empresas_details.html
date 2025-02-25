@@ -22,7 +22,6 @@
       <p id="filial">Empresa Matriz: {{ empresa.filial_de }}</p>
       <p id="responsavel">Responsavel: {{empresa.responsavel_empre}} </p>
       <p id="email_responsavel">Email Responsavel: {{empresa.email_responsavel}} </p>
-      <p id="analista_resp">Analista Responsavel: {{empresa.analista_resp}} </p>
       <h2>Tempos de Manutenção</h2>
       {% for tempo in tempos_manutencao %}
         <p>{{ tempo.get_tipo_manutencao_display }}: {{ tempo.tempo }}</p>

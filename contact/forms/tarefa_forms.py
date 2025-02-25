@@ -25,11 +25,13 @@ class TarefaForm(forms.ModelForm):
 class DetalheTarefaPreenchidoForm(forms.ModelForm):
     class Meta:
         model = DetalheTarefaPreenchido
-        fields = ['fotos_clientes', 'fotos_ajustes','observacao', 'concluido']
+        fields = ['fotos_clientes', 'fotos_ajustes','observacao', 'concluido','nao_comporta']
         widgets = {
             'fotos_clientes': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
             'fotos_ajustes': forms.ClearableFileInput(attrs={'class': 'form-control-file'}),
             'observacao': forms.Textarea(attrs={'class': 'form-control'}),
             'concluido': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'nao_comporta': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            
         }
         

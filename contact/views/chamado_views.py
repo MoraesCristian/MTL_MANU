@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa,DetalheTarefaPreenchido, ImagemChamado
+from contact.models import Chamado, Empresa, Tarefa, Area, DetalheTarefa,DetalheTarefaPreenchido, ImagemChamado, Usuario
 from django.http import HttpResponseForbidden, JsonResponse
-from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm, AdicionarPrestadoraServicoForm, ImagemChamadoForm
+from contact.forms.chamado_forms import ChamadoForm , DetalheTarefaForm, AdicionarPrestadoraServicoForm, ImagemChamadoForm, AdicionarTecnicosForm
 from contact.forms.area_forms import AreaForm
 from contact.forms.tarefa_forms import TarefaForm
 from collections import defaultdict
@@ -96,13 +96,15 @@ def abrir_chamado(request):
     if request.method == 'POST':
         form = ChamadoForm(request.POST, request.FILES, user=user, empresas=empresas)
         if form.is_valid():
-            chamado = form.save(commit=False)
+            chamado = form.save(commit=False)  # Apenas salva o Chamado sem associar objetos relacionados
             chamado.criado_por = request.user
             chamado.empresa = form.cleaned_data['empresa_nome_fantasia']
             
             if chamado.area_chamado and chamado.tarefa:
                 chamado.titulo = f'{chamado.tarefa}'
 
+            chamado.analista_resp = form.cleaned_data['analista_resp']
+            
             chamado.save()
 
             imagens = request.FILES.getlist('imagens')
@@ -123,6 +125,8 @@ def abrir_chamado(request):
         form = ChamadoForm(user=user, empresas=empresas)
     
     return render(request, 'contact/abrir_chamado.html', {'form': form})
+
+
 
 @login_required
 def load_empresa_address(request):
@@ -243,23 +247,53 @@ def criar_detalhe_tarefa(request, tarefa_id):
     return render(request, 'contact/criar_detalhe_tarefa.html', {'form': form, 'tarefa': tarefa})
 
 @login_required
-def adicionar_prestadora_servico_view(request, chamado_id):
+def gerenciar_chamado_view(request, chamado_id):
     chamado = get_object_or_404(Chamado, id=chamado_id)
 
-    if request.method == 'POST':
-        form = AdicionarPrestadoraServicoForm(request.POST, instance=chamado)
-        if form.is_valid():
-            chamado.prestadora_servico = form.cleaned_data['prestadora_servico']
-            chamado.save()
-            return redirect('contact:visualizar_chamado', chamado_id=chamado.id)
-    else:
-        form = AdicionarPrestadoraServicoForm(instance=chamado)
-
+    # Salvar a prestadora atual antes de qualquer alteração
     prestadora_atual = chamado.prestadora_servico
 
-    return render(request, 'contact/adicionar_prestadora_servico.html', {
-        'form': form,
-        'chamado': chamado,
-        'prestadora_atual': prestadora_atual
-    })
+    # Formulário para gerenciar a prestadora de serviço
+    prestadora_form = AdicionarPrestadoraServicoForm(
+        request.POST or None, instance=chamado
+    )
 
+    # Filtrar técnicos com base na prestadora atual
+    tecnicos_queryset = Usuario.objects.filter(
+        tipo_usuario='user',
+        empresa=chamado.prestadora_servico
+    )
+
+    # Formulário para gerenciar técnicos responsáveis
+    tecnicos_form = AdicionarTecnicosForm(
+        request.POST or None, instance=chamado
+    )
+    tecnicos_form.fields['tecnicos_responsaveis'].queryset = tecnicos_queryset
+
+    if request.method == 'POST':
+        # Processar a alteração da prestadora de serviço
+        if 'prestadora_submit' in request.POST:
+            if prestadora_form.is_valid():
+                # Obter a nova prestadora do formulário
+                nova_prestadora = prestadora_form.cleaned_data['prestadora_servico']
+
+                # Verificar se a prestadora foi alterada
+                if prestadora_atual != nova_prestadora:
+                    # Atualizar a prestadora de serviço e limpar os técnicos vinculados
+                    chamado.prestadora_servico = nova_prestadora
+                    chamado.tecnicos_responsaveis.clear()  # Remove todos os técnicos vinculados
+                    chamado.save()  # Salvar o chamado atualizado
+                return redirect('contact:adicionar_prestadora_servico', chamado_id=chamado.id)
+
+        # Processar a adição de técnicos
+        elif 'tecnicos_submit' in request.POST:
+            if tecnicos_form.is_valid():
+                tecnicos_form.save()
+                return redirect('contact:adicionar_prestadora_servico', chamado_id=chamado.id)
+
+    return render(request, 'contact/adicionar_prestadora_servico.html', {
+        'chamado': chamado,
+        'prestadora_form': prestadora_form,
+        'tecnicos_form': tecnicos_form,
+        'prestadora_atual': prestadora_atual,
+    })

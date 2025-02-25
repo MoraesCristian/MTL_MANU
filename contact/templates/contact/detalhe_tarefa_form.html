@@ -55,11 +55,14 @@
         
         <div class="sub-container">
             <div class="form-group">
-                <label for="id_concluido">Concluído</label>
+                <label for="id_concluido">Concluído: </label>
                 <input type="checkbox" name="concluido" id="id_concluido" class="form-check-input" {% if detalhe_preenchido.concluido %}checked{% endif %}>
             </div>
+            <div class="form-group">
+                <label for="id_nao_comporta">N/A: </label>
+                <input type="checkbox" name="nao_comporta" id="id_nao_comporta" class="form-check-input" {% if detalhe_preenchido.nao_comporta %}checked{% endif %}>
+            </div>
         </div>
-
         <button type="submit" class="btn btn-primary">Salvar</button>
     </form>
     <button type="button" onclick="location.href='{% url 'contact:load_tarefas_a_realizar' chamado.id %}'" class="btn btn-secondary" id="voltar_link">Voltar para Tarefas a Realizar</button>

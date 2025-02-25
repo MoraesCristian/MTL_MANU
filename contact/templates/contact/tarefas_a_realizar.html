@@ -3,28 +3,40 @@
 {% block content %}
 
 <div id="tarefas-a-realizar">
+    <h3>TAREFAS A REALIZAR</h3>
     <ul>
-        {% for tarefa in tarefas %}
+        {% for detalhe in detalhes_preenchidos %}
             <li>
-                <h3>Tarefas a Realizar {{ tarefa.descricao }}</h3>
                 <ul>
-                    {% for detalhe in detalhes_tarefas %}
-                        {% if detalhe.tarefa.id == tarefa.id %}
-                            <li>
-                                <a href="{% url 'contact:detalhe_tarefa' chamado.id tarefa.id detalhe.id %}" class="card-link">
-                                    <div class="card">
-                                        <span>{{ detalhe.descricao }}</span>
-                                    </div>
-                                </a>
-                            </li>
-                        {% endif %}
-                    {% empty %}
-                        <li>Sem detalhes disponíveis.</li>
-                    {% endfor %}
+                    <li>
+                        <a href="{% url 'contact:detalhe_tarefa' chamado.id detalhe.detalhe_tarefa.tarefa.id detalhe.detalhe_tarefa.id %}" class="card-link">
+                            <div class="card 
+                                {% if detalhe.concluido %}
+                                    status-concluido
+                                {% elif detalhe.nao_comporta %}
+                                    status-na
+                                {% else %}
+                                    status-nao-realizado
+                                {% endif %}
+                            ">
+                                <span>{{ detalhe.detalhe_tarefa.descricao }}</span>
+                                <p>
+                                    Status: 
+                                    {% if detalhe.concluido %}
+                                        Concluído
+                                    {% elif detalhe.nao_comporta %}
+                                        N/A
+                                    {% else %}
+                                        Não Realizado
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </a>
+                    </li>
                 </ul>
             </li>
         {% empty %}
-            <li>Sem tarefas disponíveis.</li>
+            <li>Nenhum detalhe de tarefa preenchido disponível.</li>
         {% endfor %}
     </ul>
 </div>

@@ -135,24 +135,43 @@
         .signature-container {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 10px;
             text-align: center;
-            padding: 10px;
+            padding: 5px;
         }
-        
+
         .signature {
             width: 45%;
             border: 1px solid #000;
-            border-radius: 10px;
+            border-radius: 5px;
+            padding: 5px;
+            box-sizing: border-box;
         }
-        
+
         .signature img {
-            width: 200px;
+            width: 150px;
             height: auto;
+            margin-bottom: 5px;
         }
-        
+
         .signature-info {
-            font-size: 12px;
+            font-size: 8px;
+            text-align: left;
+        }
+
+        .info-field {
+            margin-bottom: 5px;
+        }
+
+        .info-field strong {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .info-field p {
+            margin: 0;
+            font-size: 8px;
         }
         
         .page-break {
@@ -210,7 +229,6 @@
             {% endfor %}
         </tbody>
     </table>
-
     <div class="signature-container">
         <div class="signature">
             <p>Assinatura responsável:</p>
@@ -220,9 +238,18 @@
                 <p>N/A</p>
             {% endif %}
             <div class="signature-info">
-                <p><strong>Nome:</strong> {{ chamado.nome_assinante }}</p>
-                <p><strong>Email:</strong> {{ chamado.email_assinante }}</p>
-                <p><strong>Cargo:</strong> {{ chamado.cargo_assinante }}</p>
+                <div class="info-field">
+                    <strong>Nome:</strong>
+                    <p>{{ chamado.nome_assinante }}</p>
+                </div>
+                <div class="info-field">
+                    <strong>Email:</strong>
+                    <p>{{ chamado.email_assinante }}</p>
+                </div>
+                <div class="info-field">
+                    <strong>Cargo:</strong>
+                    <p>{{ chamado.cargo_assinante }}</p>
+                </div>
             </div>
         </div>
         <div class="signature">
@@ -233,7 +260,10 @@
                 <p>N/A</p>
             {% endif %}
             <div class="signature-info">
-                <p><strong>Nome:</strong> {{ chamado.nome_tecnico }}</p>
+                <div class="info-field">
+                    <strong>Nome:</strong>
+                    <p>{{ chamado.nome_tecnico }}</p>
+                </div>
             </div>
         </div>
     </div>

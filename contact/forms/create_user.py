@@ -1,6 +1,6 @@
 from django import forms
 from contact.models import Usuario, Empresa
-
+ 
 class UsuarioCreationForm(forms.ModelForm):
     class Meta:
         model = Usuario

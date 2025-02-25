@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Documentação do Chamado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 8px;
+            margin: 0;
+            padding: 0;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: 10px;
+            text-align: left;
+            margin: 5px;
+            text-transform: uppercase;
+            background-color: rgb(0, 100, 207);
+            color: white;
+            padding: 3px;
+            border-radius: 3px;
+        }
+
+        h2 {
+            font-size: 10px;
+            text-align: center;
+            margin: 5px;
+            text-transform: uppercase;
+            padding: 3px;
+            border-radius: 3px;
+        }
+
+        strong {
+            display: inline-block;
+            width: 150px;
+        }
+
+        .header-fixo {
+            font-size: 10px;
+            width: 100%;
+            margin-bottom: 3px;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .header-fixo img {
+            width: 120px;
+            height: auto;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            z-index: 10;
+        }
+
+        .section {
+            font-size: 8px;
+            margin: 5px;
+            padding: 1px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        table td, table th {
+            padding: 3px;
+            border: 1px solid #ddd;
+            text-align: left;
+            font-size: 8px;
+        }
+
+        table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 10px;
+        }
+
+        ul li {
+            font-size: 8px;
+            margin-bottom: 2px;
+        }
+
+        .image-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .image-gallery img {
+            width: 100px;
+            height: auto;
+            object-fit: cover;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .signature-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .signature {
+            width: 45%;
+            border: 1px solid #000;
+            border-radius: 5px;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+
+        .signature img {
+            width: 150px;
+            height: auto;
+            margin-bottom: 5px;
+        }
+
+        .signature-info {
+            font-size: 8px;
+            text-align: left;
+        }
+
+        .info-field {
+            margin-bottom: 5px;
+        }
+
+        .info-field strong {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .info-field p {
+            margin: 0;
+            font-size: 8px;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .info-table td {
+            padding: 3px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .info-table td:first-child {
+            font-weight: bold;
+            width: 40%;
+        }
+
+        .observations {
+            margin-top: 10px;
+            padding: 5px;
+            background-color: #fefefe;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .sub-container {
+            margin-bottom: 10px;
+        }
+
+        .sub-container h1 {
+            font-size: 10px;
+            color: rgb(252, 252, 252);
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-fixo">
+        <div>
+            <img src="{{ logo_url }}" alt="Logo da Empresa" class="logo_img">
+        </div>
+        <div>
+            <strong>RELATÓRIO FOTOGRÁFICO REFERENTE:</strong><br>
+            <strong>ATENDIMENTO {{ chamado.tipo_manutencao }}</strong><br>
+            <strong>OS: {{ chamado.numero_ordem }} </strong><br>
+        </div>
+    </div>
+    <h1>EMPRESA RESPONSAVEL</h1>
+    <div class="section">
+        <table>
+            <tr>
+                <td><strong>NOME:</strong></td>
+                <td>MTL Manutenção Predial e Serviços Integrados EIRELI</td>
+            </tr>
+            <tr>
+                <td><strong>CNPJ:</strong></td>
+                <td>22.674.482/0001-06</td>
+            </tr>
+            <tr>
+                <td><strong>GERENTE RESPONSAVEL:</strong></td>
+                <td>Rafael Cardoso</td>
+            </tr>
+            <tr>
+                <td><strong>EMAIL: </strong></td>
+                <td>rafael.cardoso@mtlmanuntencao.com.br</td>
+            </tr>
+            <tr>
+                <td><strong>TELEFONE: </strong></td>
+                <td>(041)9.9810-0115</td>
+            </tr>
+            <tr>
+                <td><strong>ANALISTA RESPONSÁVEL:</strong></td>
+                <td>{{ analista_nome }}</td>
+            </tr>
+            <tr>
+                <td><strong>EMAIL ANALISTA RESPONSÁVEL:</strong></td>
+                <td>{{ analista_email }}</td>
+            </tr>
+        </table>
+    </div>
+    <h1>INFORMAÇÕES CLIENTE:</h1>
+    <div class="section">
+        <table>
+            <tr>
+                <td><strong>CLIENTE:</strong></td>
+                <td>{{ chamado.empresa.nome_fantasia }}</td>
+            </tr>
+            <tr>
+                <td><strong>ENDEREÇO:</strong></td>
+                <td>{{ chamado.empresa.logradouro }}</td>
+            </tr>
+            <tr>
+                <td><strong>RESPONSÁVEL:</strong></td>
+                <td>{{ chamado.empresa.responsavel_empre }}</td>
+            </tr>
+            <tr>
+                <td><strong>EMAIL RESPONSÁVEL:</strong></td>
+                <td>{{ chamado.empresa.email_responsavel }}</td>
+            </tr>
+        </table>
+    </div>
+    <h1>INFORMAÇÃO DA ATIVIDADE OS: {{ chamado.numero_ordem }}</h1>
+    <div class="section">
+        <div id='atuacao'>ATUAÇÃO: {{ chamado.tipo_manutencao }} </div>
+        <div id='prioridade'>PRIORIDADE: {{ chamado.prioridade_chamado }}</div>
+        <div id='observacao-chamado'> {{ chamado.descricao }} </div>        
+    </div>
+    <h1>EQUIPE TÉCNICA:</h1>
+    <div class="section">
+        <ul>
+            {% for tecnico in tecnicos %}
+                <li>{{ tecnico.first_name }} {{ tecnico.last_name }} - CPF:  {{ tecnico.cpf }}</li>
+            {% empty %}
+                <li>Nenhum técnico atribuído.</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <h1> </h1>
+    <div class="section">
+        <table>
+            <tr>
+                <td><strong>DATA E HORA DO ACIONAMENTO:</strong></td>
+                <td>{{ chamado.data_criacao }}</td>
+            </tr>
+            <tr>
+                <td><strong>DATA E HORA DO INICIO:</strong></td>
+                <td>{{ chamado.data_inicio_atv }}</td>
+            </tr>
+            <tr>
+                <td><strong>DATA E HORA DA FINALIZAÇÃO: </strong></td>
+                <td>{{ chamado.data_fim_chamado }}</td>
+            </tr>
+            <tr>
+                <td><strong>DURAÇÃO DO CHAMADO:</strong></td>
+                <td>{{ duracao_chamado }}</td>
+            </tr>
+        </table>
+    </div>
+    <h1>FOTOS ADICIONADAS NO CHAMADO:</h1>
+    <div class="image-gallery">
+        {% if imagens_urls %}
+            {% for imagem_url in imagens_urls %}
+                <div class="gallery-item">
+                    <img src="{{ imagem_url }}" alt="Imagem do chamado {{ chamado.numero_ordem }}">
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>Nenhuma imagem foi adicionada a este chamado.</p>
+        {% endif %}
+    </div>
+    
+    <h1>SEGUE IMAGENS ABAIXO DAS ATIVIDADES NA PRÓXIMA PÁGINA:</h1>
+    {% for detalhe in detalhes_preenchidos %}
+        <div class="sub-container page-break">
+            <h1>Atividade: {{ detalhe.detalhe_tarefa.descricao }}</h1>
+            <div>
+                <h1>Fotos antes dos ajuste:</h1>
+                <div class="image-gallery">
+                    {% for foto in detalhe.fotos_clientes_url %}
+                        <img src="{{ foto }}" alt="Foto Cliente">
+                    {% empty %}
+                        <p>N/A</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <h1>Fotos dos ajustes:</h1>
+                <div class="image-gallery">
+                    {% for foto in detalhe.fotos_ajustes_url %}
+                        <img src="{{ foto }}" alt="Foto Ajuste">
+                    {% empty %}
+                        <p>N/A.</p>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                <h1>Observações: </h1>
+                <ul>{{ detalhe.observacao }} </ul>
+            </div>
+        </div>
+    {% endfor %}
+    <div class="signature-container">
+        <div class="signature">
+            <p>Assinatura responsável:</p>
+            {% if chamado.assinatura %}
+                <img src="{{ base_url }}{{ chamado.assinatura.url }}" alt="Assinatura">
+            {% else %}
+                <p>N/A</p>
+            {% endif %}
+            <div class="signature-info">
+                <div class="info-field">
+                    <strong>Nome:</strong>
+                    <p>{{ chamado.nome_assinante }}</p>
+                </div>
+                <div class="info-field">
+                    <strong>Email:</strong>
+                    <p>{{ chamado.email_assinante }}</p>
+                </div>
+                <div class="info-field">
+                    <strong>Cargo:</strong>
+                    <p>{{ chamado.cargo_assinante }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="signature">
+            <p>Assinatura Técnico:</p>
+            {% if chamado.assinatura_tecnico %}
+                <img src="{{ base_url }}{{ chamado.assinatura_tecnico.url }}" alt="Assinatura Técnico">
+            {% else %}
+                <p>N/A</p>
+            {% endif %}
+            <div class="signature-info">
+                <div class="info-field">
+                    <strong>Nome:</strong>
+                    <p>{{ chamado.nome_tecnico }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
