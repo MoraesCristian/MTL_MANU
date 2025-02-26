@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -162,8 +163,8 @@ LOGOUT_REDIRECT_URL = '/'
 AUTH_USER_MODEL = 'contact.Usuario'
 
 AXES_ENABLED = True
-AXES_FAILURE_LIMIT = 3
-AXES_COOLOFF_TIME = 1  # 1 Hora
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=10)
 AXES_LOCKOUT_PARAMETERS = ['username']
 AXES_USERNAME_FORM_FIELD = 'email'
 AXES_RESET_ON_SUCCESS = True
